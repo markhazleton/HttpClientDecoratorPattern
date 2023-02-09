@@ -1,7 +1,24 @@
+using HttpClientDecorator;
+using HttpClientDecorator.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Http Client Factory
+builder.Services.AddHttpClient();
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+
+// Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
+builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
+{
+    var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
+    var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
+    var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+    IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
+    IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
+    return telemetryService;
+});
 
 var app = builder.Build();
 
@@ -15,11 +32,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapRazorPages();
-
 app.Run();
