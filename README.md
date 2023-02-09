@@ -15,7 +15,7 @@ By using the Decorator Pattern, developers can add
 additional properties and methods to the existing HttpClient class to add telemetry data to the request. 
 This allows for easy tracking of requests and their associated data, such as request time, response time, and response size. 
 By using the Decorator Pattern, the original HttpClient class remains unchanged, and the telemetry data is added 
-through a ìwrapperî or ìdecoratorî class. This makes the code more maintainable, as the changes are isolated to 
+through a ‚Äúwrapper‚Äù or ‚Äúdecorator‚Äù class. This makes the code more maintainable, as the changes are isolated to 
 the decorator class, while the original HttpClient class remains unchanged.
 
 ## Motiviation
@@ -37,7 +37,7 @@ identify and troubleshoot issues, and understand how an application is being use
 
 
 ## Build status
-Build status of continus integration 
+![Build Workflow](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/dotnet.yml/badge.svg)
 
 ## Screenshots
 Include logo/demo screenshot etc.
@@ -56,17 +56,15 @@ Show what the library does as concisely as possible, developers should be able t
   1. Open the solution file in Visual Studio.
   1. Run the Web project to see the demonstration in action.
 
-
 ## API Reference
 - This project uses a freely availible Joke API. ( https://jokeapi.dev/ ) Joke API Project on GitHub: https://github.com/Sv443/JokeAPI
-
 
 
 ## Tests
 Describe and show how to run the tests with code examples.
 
 ## How to use?
-If people like your project theyíll want to learn how they can use it. To do so include step by step guide to use your project.
+If people like your project they‚Äôll want to learn how they can use it. To do so include step by step guide to use your project.
 
 ## Contribute
 
@@ -80,6 +78,6 @@ I also watched several Pluralsight.com courses on the Decorator Pattern.
 
 
 ## License
-MIT © [Mark Hazleton](https://markhazleton.controlorigins.com)
+MIT ¬© [Mark Hazleton](https://markhazleton.controlorigins.com)
 
 
