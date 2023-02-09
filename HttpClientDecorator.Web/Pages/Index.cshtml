@@ -4,7 +4,30 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="card border-info">
+            <div class="card-header">
+                <h1>@ViewData["Title"]</h1>
+            </div>
+            <div class="card-body">
+                <p>
+                    This repository demonstrates how to use the decorator design pattern to add telemetry to an HttpClient.
+                </p>
+                <p>
+                    The Decorator Pattern is a design pattern that allows developers to add additional functionality to existing classes/objects without modifying the existing class/object.
+                </p>
+                <p>
+                    This repository demonstrates how to use the decorator design pattern to add telemetry to an HttpClient in C#. By the end of this demonstration, you will have a good understanding of the decorator pattern and how to use it to add telemetry to an HttpClient.
+                </p>
+                <p>
+                    By using the Decorator Pattern, developers can add additional properties and methods to the existing HttpClient class to add telemetry data to the request. This allows for easy tracking of requests and their associated data, such as request time, response time, and response size. By using the Decorator Pattern, the original HttpClient class remains unchanged, and the telemetry data is added through a “wrapper” or “decorator” class. This makes the code more maintainable, as the changes are isolated to the decorator class, while the original HttpClient class remains unchanged.
+                </p>
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
 </div>
+

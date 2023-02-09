@@ -18,22 +18,23 @@ By using the Decorator Pattern, the original HttpClient class remains unchanged,
 through a “wrapper” or “decorator” class. This makes the code more maintainable, as the changes are isolated to 
 the decorator class, while the original HttpClient class remains unchanged.
 
-
-## Motivation
+## Motiviation
 To have a working version of the decorator pattern in C# with a real world example.
+This repository demonstrates the power and flexibility of the decorator design pattern, 
+and shows how to use it to add telemetry to an HttpClient in C#. 
 
-### What is HttpClient?
+
+### HttpClient & HttpClientFactory
 HttpClient is a modern, easy-to-use, and powerful HTTP client library that is built 
-into .NET. It provides a simple, asynchronous, and extensible way to make HTTP requests 
-and can be used in any .NET application, including .NET Core, .NET Framework, Xamarin, and UWP.
+into .NET. It provides a simple, asynchronous, and extensible way to make HTTP requests.
+This project uses the IHttpClientFactory to create an HttpClient instance. 
+
 
 ### What is Telemetry?
 Telemetry is the collection, transmission, and analysis of data related to the performance and 
 usage of an application. Telemetry helps us to monitor the performance of an application, 
 identify and troubleshoot issues, and understand how an application is being used.
 
-### Conclusion
-This repository demonstrates the power and flexibility of the decorator design pattern, and shows how to use it to add telemetry to an HttpClient in C#. If you have any questions or feedback, feel free to open an issue in this repository.
 
 ## Build status
 Build status of continus integration 
@@ -57,8 +58,8 @@ Show what the library does as concisely as possible, developers should be able t
 
 
 ## API Reference
-This project uses a freely availible Joke API. ( https://jokeapi.dev/ ) 
-For more information on the Joke API ->  https://github.com/Sv443/JokeAPI
+- This project uses a freely availible Joke API. ( https://jokeapi.dev/ ) Joke API Project on GitHub: https://github.com/Sv443/JokeAPI
+
 
 
 ## Tests
@@ -69,7 +70,7 @@ If people like your project they’ll want to learn how they can use it. To do so 
 
 ## Contribute
 
-Let people know how they can contribute into your project. A [contributing guideline](https://github.com/zulip/zulip-electron/blob/master/CONTRIBUTING.md) will be a big plus.
+Let people know how they can contribute into your project. A [contributing guideline](https://github.com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) will be a big plus.
 
 ## Credits
 Many great online examples and tutorials were used to create this repository.
