@@ -14,7 +14,7 @@ public class HttpGetCallResults
     public HttpGetCallResults()
     {
         Iteration = 0;
-        StatusPath = string.Empty;
+        GetPath = string.Empty;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class HttpGetCallResults
     public HttpGetCallResults(HttpGetCallResults statusCall)
     {
         Iteration = statusCall.Iteration;
-        StatusPath = statusCall.StatusPath;
+        GetPath = statusCall.GetPath;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class HttpGetCallResults
     public HttpGetCallResults(int it, string path)
     {
         Iteration = it;
-        StatusPath = path;
+        GetPath = path;
     }
 
     /// <summary>
@@ -64,11 +64,11 @@ public class HttpGetCallResults
     /// <summary>
     /// Property to store the status path of the HTTP GET call.
     /// </summary>
-    public string StatusPath { get; set; }
+    public string GetPath { get; set; }
 
     /// <summary>
     /// Property to store the results of the HTTP GET call.
     /// </summary>
     [NotMapped]
-    public dynamic? StatusResults { get; set; }
+    public dynamic? GetResults { get; set; }
 }

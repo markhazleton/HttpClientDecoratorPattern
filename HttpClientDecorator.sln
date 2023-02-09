@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientDecorator.Web", "HttpClientDecorator.Web\HttpClientDecorator.Web.csproj", "{50280061-30DC-4EA3-9504-6797A318442C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Web", "HttpClientDecorator.Web\HttpClientDecorator.Web.csproj", "{50280061-30DC-4EA3-9504-6797A318442C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientDecorator.Tests", "HttpClientDecorator.Tests\HttpClientDecorator.Tests.csproj", "{65F246DC-656B-4A1D-9F66-C4623281364D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Tests", "HttpClientDecorator.Tests\HttpClientDecorator.Tests.csproj", "{65F246DC-656B-4A1D-9F66-C4623281364D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

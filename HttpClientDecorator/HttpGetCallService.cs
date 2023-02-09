@@ -1,5 +1,4 @@
-﻿using HttpClientDecorator.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace HttpClientDecorator;
@@ -19,17 +18,17 @@ public class HttpGetCallService : IHttpGetCallService
         try
         {
             using var httpClient = _clientFactory.CreateClient();
-            var response = await httpClient.GetAsync(statusCall.StatusPath);
+            var response = await httpClient.GetAsync(statusCall.GetPath);
             response.EnsureSuccessStatusCode();
             var StatusResults = await response.Content.ReadAsStringAsync();
             try
             {
-                statusCall.StatusResults = JsonSerializer.Deserialize<T>(StatusResults);
+                statusCall.GetResults = JsonSerializer.Deserialize<T>(StatusResults);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical("HttpGetCallService:GetAsync:DeserializeException", ex.Message);
-                statusCall.StatusResults = JsonSerializer.Deserialize<dynamic>(StatusResults);
+                statusCall.GetResults = JsonSerializer.Deserialize<dynamic>(StatusResults);
             }
 
         }

@@ -1,0 +1,48 @@
+﻿@page
+@model HttpClientDecorator.Web.Pages.JokeModel
+@{
+}
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="card border-info">
+            <div class="card-header">
+                <p>
+                    Here is your joke from category @Html.DisplayFor(model => model.theJoke.category)
+                </p>
+
+            </div>
+            <div class="card-body">
+                @if (Model.theJoke != null)
+                {
+                    @if (Model.theJoke.type == "single")
+                    {
+                        <p>@Html.DisplayFor(model => model.theJoke.joke)</p>
+                    }
+                    else if (Model.theJoke.type == "twopart")
+                    {
+                        <dl>
+                            <dt>
+                                @Html.DisplayFor(model => model.theJoke.setup)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(model => model.theJoke.delivery)
+                            </dd>
+                        </dl>
+                    }
+                }
+                else
+                {
+                    <p>There was an error getting the joke.</p>
+                }
+            </div>
+            <div class="card-footer">
+                <strong>The Api Get call took @Html.DisplayFor(model=>model.jokeResult.ElapsedMilliseconds) millisectons to return.</strong>
+                <br />
+                <small>Joke is from @Html.DisplayFor(model=>model.jokeResult.GetPath)</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+

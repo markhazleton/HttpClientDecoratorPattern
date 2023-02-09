@@ -11,7 +11,7 @@ public class HttpGetCallResultsTests
 
         // Assert
         Assert.AreEqual(0, results.Iteration);
-        Assert.AreEqual(string.Empty, results.StatusPath);
+        Assert.AreEqual(string.Empty, results.GetPath);
     }
 
     [TestMethod]
@@ -21,7 +21,7 @@ public class HttpGetCallResultsTests
         var statusCall = new HttpGetCallResults
         {
             Iteration = 1,
-            StatusPath = "https://example.com"
+            GetPath = "https://example.com"
         };
 
         // Act
@@ -29,7 +29,7 @@ public class HttpGetCallResultsTests
 
         // Assert
         Assert.AreEqual(statusCall.Iteration, results.Iteration);
-        Assert.AreEqual(statusCall.StatusPath, results.StatusPath);
+        Assert.AreEqual(statusCall.GetPath, results.GetPath);
     }
 
     [TestMethod]
@@ -44,7 +44,7 @@ public class HttpGetCallResultsTests
 
         // Assert
         Assert.AreEqual(iteration, results.Iteration);
-        Assert.AreEqual(statusPath, results.StatusPath);
+        Assert.AreEqual(statusPath, results.GetPath);
     }
 
     [TestMethod]
@@ -92,10 +92,10 @@ public class HttpGetCallResultsTests
         // Act
         var results = new HttpGetCallResults
         {
-            StatusResults = statusResults
+            GetResults = statusResults
         };
 
         // Assert
-        Assert.AreEqual(statusResults, results.StatusResults);
+        Assert.AreEqual(statusResults, results.GetResults);
     }
 }
