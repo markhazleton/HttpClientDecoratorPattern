@@ -39,6 +39,13 @@ public class HttpGetCallResults
     }
 
     /// <summary>
+    /// Id for this record
+    /// </summary>
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key, Column(Order = 0)]
+    public int Id { get; set; }
+
+    /// <summary>
     /// Property to store the completion date and time of the HTTP GET call.
     /// </summary>
     [DisplayFormat(DataFormatString = "{0:yyyy.MM.dd hh:mm:ss.ffff}")]

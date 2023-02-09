@@ -1,0 +1,45 @@
+﻿@page
+@model HttpClientDecorator.Web.Pages.ListModel
+
+@{
+    ViewData["Title"] = "List";
+}
+<h1>Async Calls</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].CompletionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].ElapsedMilliseconds)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].Iteration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].StatusPath)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.HttpGetCallResults)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompletionDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ElapsedMilliseconds)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Iteration)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StatusPath)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
