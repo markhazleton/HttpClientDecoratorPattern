@@ -13,7 +13,7 @@ The proejcts in the repository have all been built using Visual Studio 2022.
 ## Issue
 Ensure the bug was not already reported by searching on 
 GitHub under [issues](https://github.com/markhazleton/HttpClientDecoratorPattern/issues). 
-If you're unable to find an open issue addressing the bug, open a [new issue](https://github.com/zulip/zulip-electron/issues/new).
+If you're unable to find an open issue addressing the bug, open a [new issue](https://github.com/markhazleton/HttpClientDecoratorPattern/issues/new).
 
 ### Write detailed information
 Detailed information is very helpful to understand an issue.
