@@ -1,5 +1,5 @@
-# HttpClientDecoratorPattern
-Decorator Design Pattern: Adding Telemetry to HttpClient
+# Decorator Design Pattern: Adding Telemetry to HttpClient
+
 ## Introduction
 The decorator design pattern is a powerful technique in object-oriented programming that allows you to extend the functionality of an object at runtime. This repository demonstrates how to use the decorator design pattern to add telemetry to an HttpClient in C#. By the end of this demonstration, you will have a good understanding of the decorator pattern and how to use it to add telemetry to an HttpClient.
 
@@ -15,9 +15,9 @@ This repository demonstrates how to use the decorator design pattern to add tele
 The TelemetryDecorator class that implements the decorator pattern and adds the telemetry functionality.
 Example code that shows how to use the TelemetryDecorator class with an HttpClient.
 ## Usage
-1 Clone this repository to your local machine.
-1 Open the solution file in Visual Studio.
-1 Run the project to see the demonstration in action.
+  1. Clone this repository to your local machine.
+  1. Open the solution file in Visual Studio.
+  1. Run the project to see the demonstration in action.
 
 ## Conclusion
 This repository demonstrates the power and flexibility of the decorator design pattern, and shows how to use it to add telemetry to an HttpClient in C#. If you have any questions or feedback, feel free to open an issue in this repository.
