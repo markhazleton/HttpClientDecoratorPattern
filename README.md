@@ -154,15 +154,22 @@ builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
 Some limited test cases have been created, for the models created for this prooject. 
 
 ## How to use?
-If people like your project they’ll want to learn how they can use it. To do so include step by step guide to use your project.
+This repositry is to show an example of the decorator pattern in C# and to server a as refresher
+when you need to implement the pattern.  
+
+It is not meant to be a production ready solution, or even
+a template for your own implementation of the pattern.
+
 
 ## Contribute
-You welcome to create pull requests for update to this repository.  Please review the  [contributing guideline](https://github.1com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) before making an pull requests.
+You are welcome to create pull requests for update to this repository.  
+Please review the  [contributing guideline](https://github.1com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) before making an pull requests.
+Please submit changeslimited to the topic of demonstrating the decorator pattern. 
 
 ## Credits
-Many great online examples and tutorials were used to create this repository.
+Many great online examples and tutorials inspired this repository.
 
-I also watched several Pluralsight.com courses on the Decorator Pattern.
+I also watched several Pluralsight.com courses on design patterns.
 
 ## License
-MIT © [Mark Hazleton](https://markhazleton.controlorigins.com)
+MIT ©2023 [Mark Hazleton](https://markhazleton.controlorigins.com)
