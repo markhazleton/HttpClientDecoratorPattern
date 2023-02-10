@@ -40,7 +40,11 @@ identify and troubleshoot issues, and understand how an application is being use
 ![Build Workflow](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/dotnet.yml/badge.svg)
 
 ## Screenshots
-Include logo/demo screenshot etc.
+
+
+![Joke Page](https://github.com/markhazleton/HttpClientDecoratorPattern/blog/main/images/JokeRazoPageResults.JPG)
+
+
 
 ## Tech/framework used
 Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
