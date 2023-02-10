@@ -70,8 +70,77 @@ Once all the tasks are complete, the method returns the results list and logs a 
 calls have been completed. The SemaphoreSlim is used to limit the number of concurrent requests and ensure 
 that the number of requests does not exceed the maxThreads value.
 
-## Code Example
-Show what the library does as concisely as possible, developers should be able to figure out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
+## Code Brief
+
+## Implementing the service interface and main class
+The pattern requires at least three classes
+- The interface that defines the methods to be implemented.
+- The base class that implements the functionality
+- The decorator class that adds additional functionality to the base class.
+
+Here are brief examples of the code, with logging and error handling removed for brevity.
+
+### The Interface
+```
+public interface IHttpGetCallService
+{
+    Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall);
+}
+```
+### The Base Class
+```
+public class HttpGetCallService : IHttpGetCallService
+{
+    private readonly IHttpClientFactory _clientFactory;
+    public HttpGetCallService(IHttpClientFactory httpClientFactory)
+    {
+        _clientFactory = httpClientFactory;
+    }
+    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
+    {
+       using var httpClient = _clientFactory.CreateClient();
+       var response = await httpClient.GetAsync(statusCall.GetPath);
+       response.EnsureSuccessStatusCode();
+       var StatusResults = await response.Content.ReadAsStringAsync();
+       statusCall.GetResults = JsonSerializer.Deserialize<T>(StatusResults);
+       return statusCall;
+    }
+}
+
+```
+
+### The Decorator Class
+```
+public class HttpGetCallServiceTelemetry : IHttpGetCallService
+{
+    private readonly IHttpGetCallService _service;
+    public HttpGetCallServiceTelemetry(IHttpGetCallService service)
+    {
+        _service = service;
+    }
+    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
+    {
+        return await _service.GetAsync<T>(statusCall);
+    }
+}
+```
+
+
+## Registering the Decorator and main class in program.cs
+In order to use the decorator pattern, you must register the decorator 
+and the main class in the ConfigureServices program.cs file.
+```
+builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
+{
+    var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
+    var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
+    var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+    IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
+    IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
+    return telemetryService;
+});
+```
+
 
 ## Installation
   1. Clone this repository to your local machine.
