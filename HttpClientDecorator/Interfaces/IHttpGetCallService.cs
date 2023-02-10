@@ -1,4 +1,5 @@
-﻿namespace HttpClientDecorator.Interfaces;
+﻿
+namespace HttpClientDecorator.Interfaces;
 
 public interface IHttpGetCallService
 {

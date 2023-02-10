@@ -1,2 +1,1 @@
-﻿global using HttpClientDecorator.Interfaces;
-global using HttpClientDecorator.Models;
+﻿global using HttpClientDecorator.Models;
