@@ -39,19 +39,14 @@ identify and troubleshoot issues, and understand how an application is being use
 ## Build status
 ![Build Workflow](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/dotnet.yml/badge.svg)
 
-## Screenshots
-
-
-![Joke Page](https://github.com/markhazleton/HttpClientDecoratorPattern/blog/main/images/JokeRazoPageResults.JPG)
-
-
-
 ## Tech/framework used
 Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
 
 ## Features
  1. **Joke**        - Make an API call to the public JOKE API and display the results.
     - Single Call passing with Model from Joke API
+    ![Joke Page](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/JokeRazorPageResults.JPG)
+
  1. **Many Calls**  - Make multiple API calls and display results so you can compare telemetry values. 
     - Demontrate using Semphore Slim Apporach to limiting the number of concurrent calls. 
 
