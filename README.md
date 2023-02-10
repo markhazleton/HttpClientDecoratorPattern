@@ -49,6 +49,7 @@ Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
 
  1. **Many Calls**  - Make multiple API calls and display results so you can compare telemetry values. 
     - Demontrate using Semphore Slim Apporach to limiting the number of concurrent calls. 
+    ![Many Calls](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/ListPageResults.JPG)
 
 ### List.cshtml Razor Page
 This page is responsible for making multiple HTTP GET requests concurrently using asynchronous programming. 
