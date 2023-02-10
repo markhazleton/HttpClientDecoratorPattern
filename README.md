@@ -46,7 +46,29 @@ Include logo/demo screenshot etc.
 Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
 
 ## Features
+ 1. **Joke**        - Make an API call to the public JOKE API and display the results.
+    - Single Call passing with Model from Joke API
+ 1. **Many Calls**  - Make multiple API calls and display results so you can compare telemetry values. 
+    - Demontrate using Semphore Slim Apporach to limiting the number of concurrent calls. 
 
+### List.cshtml Razor Page
+This page is responsible for making multiple HTTP GET requests concurrently using asynchronous programming. 
+
+The main method is called CallEndpointMultipleTimes amd retirms a list of Api call results.
+The method takes three parameters:
+- **maxThreads**: Represents the maximum number of threads to use for making the GET requests.
+- **itterationCount**: Represents the number of GET requests to be made.
+- **endpoint**: Represents the endpoint to send the GET request to.
+
+This code creates a semaphore, SemaphoreSlim, to limit the number of concurrent requests to maxThreads. 
+Then it creates a list of tasks, tasks, to store the results of the GetAsync calls. 
+For each iteration of the loop, it waits for the semaphore to be available and then adds a new task to the tasks list, 
+making a call to the GetAsync method. 
+The result of each GetAsync call is added to a List<HttpGetCallResults> object, results.
+
+Once all the tasks are complete, the method returns the results list and logs a message indicating that all 
+calls have been completed. The SemaphoreSlim is used to limit the number of concurrent requests and ensure 
+that the number of requests does not exceed the maxThreads value.
 
 ## Code Example
 Show what the library does as concisely as possible, developers should be able to figure out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
@@ -59,25 +81,19 @@ Show what the library does as concisely as possible, developers should be able t
 ## API Reference
 - This project uses a freely availible Joke API. ( https://jokeapi.dev/ ) Joke API Project on GitHub: https://github.com/Sv443/JokeAPI
 
-
 ## Tests
-Describe and show how to run the tests with code examples.
+Some limited test cases have been created, for the models created for this prooject. 
 
 ## How to use?
 If people like your project they’ll want to learn how they can use it. To do so include step by step guide to use your project.
 
 ## Contribute
-
-Let people know how they can contribute into your project. A [contributing guideline](https://github.com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) will be a big plus.
+You welcome to create pull requests for update to this repository.  Please review the  [contributing guideline](https://github.1com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) before making an pull requests.
 
 ## Credits
 Many great online examples and tutorials were used to create this repository.
 
 I also watched several Pluralsight.com courses on the Decorator Pattern.
 
-
-
 ## License
 MIT © [Mark Hazleton](https://markhazleton.controlorigins.com)
-
-
