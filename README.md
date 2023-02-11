@@ -35,9 +35,11 @@ Telemetry is the collection, transmission, and analysis of data related to the p
 usage of an application. Telemetry helps us to monitor the performance of an application, 
 identify and troubleshoot issues, and understand how an application is being used.
 
-
 ## Build status
 ![Build Workflow](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/dotnet.yml/badge.svg)
+
+## CI/CD Status
+[![Build and deploy ASP.Net Core app to Azure Web App - HttpClientDecorator](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecorator.yml/badge.svg?branch=main)](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecorator.yml)
 
 ## Tech/framework used
 Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
