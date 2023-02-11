@@ -1,4 +1,5 @@
-﻿namespace HttpClientDecorator.Tests.Models;
+﻿
+namespace HttpClientDecorator.Tests.Models;
 
 [TestClass]
 public class HttpGetCallResultsTests
