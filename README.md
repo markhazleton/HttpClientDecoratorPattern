@@ -130,7 +130,10 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
 In order to use the decorator pattern, you must register the decorator 
 and the main class in the ConfigureServices program.cs file.
 ```
-builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
+// Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
+// Add Http Client Factory
+builder.Services.AddHttpClient<IHttpGetCallService, HttpGetCallService>();
+builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
     var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
@@ -138,8 +141,7 @@ builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
     IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
     IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
     return telemetryService;
-});
-```
+});```
 
 
 ## Installation
@@ -170,6 +172,10 @@ Please submit changeslimited to the topic of demonstrating the decorator pattern
 Many great online examples and tutorials inspired this repository.
 
 I also watched several Pluralsight.com courses on design patterns.
+
+Some Related YouTube Videos
+- [Stop using the HttpClient the wrong way in .NET - Nick Chapsas](https://www.youtube.com/watch?v=Z6Y2adsMnAA)
+- 
 
 ## License
 MIT ©2023 [Mark Hazleton](https://markhazleton.controlorigins.com)

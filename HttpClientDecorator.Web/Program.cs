@@ -3,14 +3,14 @@ using HttpClientDecorator.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Http Client Factory
-builder.Services.AddHttpClient();
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 
 // Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
-builder.Services.AddScoped<IHttpGetCallService>(serviceProvider =>
+// Add Http Client Factory
+builder.Services.AddHttpClient<IHttpGetCallService, HttpGetCallService>();
+builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
     var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
