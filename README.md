@@ -131,7 +131,9 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
 ## Registering the Decorator and main class in program.cs
 In order to use the decorator pattern, you must register the decorator 
 and the main class in the ConfigureServices program.cs file.
+
 ```
+
 // Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
 // Add Http Client Factory
 builder.Services.AddHttpClient<IHttpGetCallService, HttpGetCallService>();
@@ -143,8 +145,9 @@ builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
     IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
     IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
     return telemetryService;
-});```
+});
 
+```
 
 ## Installation
   1. Clone this repository to your local machine.
