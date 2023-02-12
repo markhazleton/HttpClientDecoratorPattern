@@ -3,5 +3,5 @@ namespace HttpClientDecorator.Interfaces;
 
 public interface IHttpGetCallService
 {
-    Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall);
+    Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall);
 }

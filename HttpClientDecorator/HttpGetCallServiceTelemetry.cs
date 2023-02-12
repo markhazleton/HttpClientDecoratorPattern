@@ -28,11 +28,11 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
     /// <typeparam name="T">Result type of the GET request</typeparam>
     /// <param name="statusCall">HttpGetCallResults instance</param>
     /// <returns>HttpGetCallResults instance including telemetry information</returns>
-    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
+    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall)
     {
         Stopwatch sw = new();
         sw.Start();
-        var response = new HttpGetCallResults(statusCall);
+        var response = new HttpGetCallResults<T>(statusCall);
         try
         {
             response = await _service.GetAsync<T>(statusCall);

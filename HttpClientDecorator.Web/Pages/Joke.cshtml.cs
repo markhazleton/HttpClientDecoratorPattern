@@ -9,20 +9,40 @@ public class JokeModel : PageModel
 {
     private readonly ILogger<ListModel> _logger;
     private readonly IHttpGetCallService _service;
-    public HttpGetCallResults jokeResult { get; set; } = default!;
-    public Joke theJoke { get; set; } = default;
+    public HttpGetCallResults<Joke> jokeResult { get; set; } = default!;
+    public Joke? theJoke { get; set; } = default;
     public JokeModel(ILogger<ListModel> logger, IHttpGetCallService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
 
+    /// <summary>
+    /// This method retrieves a random joke from the Joke API
+    /// </summary>
     public async Task OnGet()
     {
-        jokeResult = new HttpGetCallResults();
-        jokeResult.GetPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
+        jokeResult = new HttpGetCallResults<Joke>();
+
+        if (jokeResult == null)
+        {
+            throw new ArgumentNullException(nameof(jokeResult));
+        }
+
+        jokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
         jokeResult = await _service.GetAsync<Joke>(jokeResult);
-        theJoke = (Joke)jokeResult?.GetResults;
+
+        if (_service == null)
+        {
+            throw new NullReferenceException(nameof(_service));
+        }
+
+        if (jokeResult?.ResponseResults == null)
+        {
+            throw new NullReferenceException(nameof(jokeResult.ResponseResults));
+        }
+
+        theJoke = jokeResult.ResponseResults;
     }
     public class Flags
     {
@@ -37,15 +57,15 @@ public class JokeModel : PageModel
     public class Joke
     {
         public bool error { get; set; }
-        public string category { get; set; }
-        public string type { get; set; }
-        public string setup { get; set; }
-        public string delivery { get; set; }
-        public string joke { get; set; }
-        public Flags flags { get; set; }
+        public string? category { get; set; }
+        public string? type { get; set; }
+        public string? setup { get; set; }
+        public string? delivery { get; set; }
+        public string? joke { get; set; }
+        public Flags? flags { get; set; }
         public int id { get; set; }
         public bool safe { get; set; }
-        public string lang { get; set; }
+        public string? lang { get; set; }
     }
 
 

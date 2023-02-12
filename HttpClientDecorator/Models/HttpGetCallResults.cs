@@ -6,7 +6,7 @@ namespace HttpClientDecorator.Models;
 /// <summary>
 /// Class to store the results of an HTTP GET call.
 /// </summary>
-public class HttpGetCallResults
+public class HttpGetCallResults<T>
 {
     /// <summary>
     /// Default constructor to initialize the iteration and status path.
@@ -14,17 +14,17 @@ public class HttpGetCallResults
     public HttpGetCallResults()
     {
         Iteration = 0;
-        GetPath = string.Empty;
+        RequestPath = string.Empty;
     }
 
     /// <summary>
     /// Constructor to initialize the iteration and status path from another instance of HttpGetCallResults.
     /// </summary>
     /// <param name="statusCall">An instance of HttpGetCallResults.</param>
-    public HttpGetCallResults(HttpGetCallResults statusCall)
+    public HttpGetCallResults(HttpGetCallResults<T> statusCall)
     {
         Iteration = statusCall.Iteration;
-        GetPath = statusCall.GetPath;
+        RequestPath = statusCall.RequestPath;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class HttpGetCallResults
     public HttpGetCallResults(int it, string path)
     {
         Iteration = it;
-        GetPath = path;
+        RequestPath = path;
     }
 
     /// <summary>
@@ -64,11 +64,11 @@ public class HttpGetCallResults
     /// <summary>
     /// Property to store the status path of the HTTP GET call.
     /// </summary>
-    public string GetPath { get; set; }
+    public string RequestPath { get; set; }
 
     /// <summary>
     /// Property to store the results of the HTTP GET call.
     /// </summary>
     [NotMapped]
-    public dynamic? GetResults { get; set; }
+    public T? ResponseResults { get; set; }
 }

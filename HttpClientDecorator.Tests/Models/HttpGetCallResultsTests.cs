@@ -8,29 +8,29 @@ public class HttpGetCallResultsTests
     public void HttpGetCallResults_DefaultConstructor_ShouldInitializeIterationAndStatusPath()
     {
         // Arrange & Act
-        var results = new HttpGetCallResults();
+        var results = new HttpGetCallResults<string>();
 
         // Assert
         Assert.AreEqual(0, results.Iteration);
-        Assert.AreEqual(string.Empty, results.GetPath);
+        Assert.AreEqual(string.Empty, results.RequestPath);
     }
 
     [TestMethod]
     public void HttpGetCallResults_CopyConstructor_ShouldCopyIterationAndStatusPath()
     {
         // Arrange
-        var statusCall = new HttpGetCallResults
+        var statusCall = new HttpGetCallResults<string>
         {
             Iteration = 1,
-            GetPath = "https://example.com"
+            RequestPath = "https://example.com"
         };
 
         // Act
-        var results = new HttpGetCallResults(statusCall);
+        var results = new HttpGetCallResults<string>(statusCall);
 
         // Assert
         Assert.AreEqual(statusCall.Iteration, results.Iteration);
-        Assert.AreEqual(statusCall.GetPath, results.GetPath);
+        Assert.AreEqual(statusCall.RequestPath, results.RequestPath);
     }
 
     [TestMethod]
@@ -41,11 +41,11 @@ public class HttpGetCallResultsTests
         const string statusPath = "https://example.com/status";
 
         // Act
-        var results = new HttpGetCallResults(iteration, statusPath);
+        var results = new HttpGetCallResults<string>(iteration, statusPath);
 
         // Assert
         Assert.AreEqual(iteration, results.Iteration);
-        Assert.AreEqual(statusPath, results.GetPath);
+        Assert.AreEqual(statusPath, results.RequestPath);
     }
 
     [TestMethod]
@@ -55,7 +55,7 @@ public class HttpGetCallResultsTests
         var completionDate = DateTime.Now;
 
         // Act
-        var results = new HttpGetCallResults
+        var results = new HttpGetCallResults<string>
         {
             CompletionDate = completionDate
         };
@@ -71,7 +71,7 @@ public class HttpGetCallResultsTests
         const long elapsedMilliseconds = 12345;
 
         // Act
-        var results = new HttpGetCallResults
+        var results = new HttpGetCallResults<string>
         {
             ElapsedMilliseconds = elapsedMilliseconds
         };
@@ -91,12 +91,12 @@ public class HttpGetCallResultsTests
         };
 
         // Act
-        var results = new HttpGetCallResults
+        var results = new HttpGetCallResults<string>
         {
-            GetResults = statusResults
+            ResponseResults = statusResults.ToString()
         };
 
         // Assert
-        Assert.AreEqual(statusResults, results.GetResults);
+        Assert.AreEqual(statusResults.ToString(), results.ResponseResults);
     }
 }

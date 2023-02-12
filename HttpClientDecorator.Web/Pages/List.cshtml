@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.HttpGetCallResults[0].Iteration)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].GetPath)
+                @Html.DisplayNameFor(model => model.HttpGetCallResults[0].RequestPath)
             </th>
         </tr>
     </thead>
@@ -37,7 +37,7 @@
                     @Html.DisplayFor(modelItem => item.Iteration)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.GetPath)
+                    @Html.DisplayFor(modelItem => item.RequestPath)
                 </td>
             </tr>
         }

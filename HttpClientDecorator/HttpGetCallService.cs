@@ -13,22 +13,38 @@ public class HttpGetCallService : IHttpGetCallService
         _clientFactory = httpClientFactory;
         _logger = logger;
     }
-    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
+    /// <summary>
+    /// Makes a GET request to the specified URL and returns the response.
+    /// </summary>
+    /// <typeparam name="T">The type of the expected response data.</typeparam>
+    /// <param name="statusCall">A container for the URL to make the GET request to, and the expected response data.</param>
+    /// <returns>A container for the response data and any relevant error information.</returns>
+    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall)
     {
+        if (statusCall == null)
+        {
+            throw new ArgumentNullException(nameof(statusCall), "The parameter 'statusCall' cannot be null.");
+        }
+
+        if (string.IsNullOrWhiteSpace(statusCall.RequestPath))
+        {
+            throw new ArgumentException("The URL path specified in 'statusCall' cannot be null or empty.", nameof(statusCall));
+        }
+
         try
         {
             using var httpClient = _clientFactory.CreateClient();
-            var response = await httpClient.GetAsync(statusCall.GetPath);
+            using var request = new HttpRequestMessage(HttpMethod.Get, statusCall.RequestPath);
+            using var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            var StatusResults = await response.Content.ReadAsStringAsync();
+            var statusResults = await response.Content.ReadAsStringAsync();
             try
             {
-                statusCall.GetResults = JsonSerializer.Deserialize<T>(StatusResults);
+                statusCall.ResponseResults = JsonSerializer.Deserialize<T>(statusResults);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical("HttpGetCallService:GetAsync:DeserializeException", ex.Message);
-                statusCall.GetResults = JsonSerializer.Deserialize<dynamic>(StatusResults);
             }
 
         }
@@ -36,6 +52,8 @@ public class HttpGetCallService : IHttpGetCallService
         {
             _logger.LogCritical("HttpGetCallService:GetAsync:Exception", ex.Message);
         }
+
         return statusCall;
     }
+
 }
