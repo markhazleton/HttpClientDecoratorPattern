@@ -16,11 +16,17 @@ public class ListModel : PageModel
         _service = getCallService;
     }
 
-    public IList<HttpGetCallResults<string>> HttpGetCallResults { get; set; } = default!;
+    public IList<HttpGetCallResults<SiteStatus>> HttpGetCallResults { get; set; } = default!;
 
     public async Task OnGetAsync()
     {
-        HttpGetCallResults = await CallEndpointMultipleTimes();
+        var runManny = new ListRequest
+        {
+            maxThreads = 10,
+            iterationCount = 100,
+            endpoint = "https://asyncdemoweb.azurewebsites.net/status"
+        };
+        HttpGetCallResults = await CallEndpointMultipleTimes(runManny);
     }
     /// <summary>
     /// 
@@ -29,28 +35,28 @@ public class ListModel : PageModel
     /// <param name="itterationCount"></param>
     /// <param name="endpoint"></param>
     /// <returns></returns>
-    private async Task<List<HttpGetCallResults<string>>> CallEndpointMultipleTimes(int maxThreads = 5, int itterationCount = 100, string endpoint = "https://asyncdemoweb.azurewebsites.net/status")
+    private async Task<List<HttpGetCallResults<SiteStatus>>> CallEndpointMultipleTimes(ListRequest listRequest)
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
-        SemaphoreSlim semaphore = new(maxThreads);
-        List<HttpGetCallResults<string>> results = new();
+        SemaphoreSlim semaphore = new(listRequest.maxThreads);
+        List<HttpGetCallResults<SiteStatus>> results = new();
 
         // Create a list of tasks to make the GetAsync calls
         List<Task> tasks = new();
-        for (int i = 0; i < itterationCount; i++)
+        for (int i = 0; i < listRequest.iterationCount; i++)
         {
             // Acquire the semaphore before making the request
             await semaphore.WaitAsync();
             curIndex++;
-            var statusCall = new HttpGetCallResults<string>(curIndex, endpoint);
+            var statusCall = new HttpGetCallResults<SiteStatus>(curIndex, listRequest.endpoint);
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {
                 try
                 {
                     // Get The Async Results
-                    var result = await _service.GetAsync<string>(statusCall);
+                    var result = await _service.GetAsync<SiteStatus>(statusCall);
                     lock (WriteLock)
                     {
                         results.Add(result);
@@ -71,5 +77,39 @@ public class ListModel : PageModel
         _logger.LogInformation("All calls complete");
         return results;
     }
+    public class ListRequest
+    {
+        public int maxThreads { get; set; }
+        public int iterationCount { get; set; }
+        public string endpoint { get; set; }
+    }
+
+    public class BuildVersion
+    {
+        public int majorVersion { get; set; }
+        public int minorVersion { get; set; }
+        public int build { get; set; }
+        public int revision { get; set; }
+    }
+
+    public class Features
+    {
+    }
+
+    public class SiteStatus
+    {
+        public DateTime buildDate { get; set; }
+        public BuildVersion buildVersion { get; set; }
+        public Features features { get; set; }
+        public List<object> messages { get; set; }
+        public string region { get; set; }
+        public int status { get; set; }
+        public Tests tests { get; set; }
+    }
+
+    public class Tests
+    {
+    }
+
 
 }

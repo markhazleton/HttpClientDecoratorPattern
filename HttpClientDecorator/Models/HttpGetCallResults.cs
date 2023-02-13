@@ -60,7 +60,10 @@ public class HttpGetCallResults<T>
     /// Property to store the iteration number of the HTTP GET call.
     /// </summary>
     public int Iteration { get; set; }
-
+    /// <summary>
+    /// Number of retires to get a successful HTTP GET call.
+    /// </summary>
+    public int Retries { get; set; }
     /// <summary>
     /// Property to store the status path of the HTTP GET call.
     /// </summary>

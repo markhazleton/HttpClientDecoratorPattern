@@ -17,43 +17,58 @@ public class HttpGetCallService : IHttpGetCallService
     /// Makes a GET request to the specified URL and returns the response.
     /// </summary>
     /// <typeparam name="T">The type of the expected response data.</typeparam>
-    /// <param name="statusCall">A container for the URL to make the GET request to, and the expected response data.</param>
+    /// <param name="getCallResults">A container for the URL to make the GET request to, and the expected response data.</param>
     /// <returns>A container for the response data and any relevant error information.</returns>
-    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall)
+    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> getCallResults)
     {
-        if (statusCall == null)
+        int retryCount = 0;
+        int maxRetries = 3;
+
+        if (getCallResults == null)
         {
-            throw new ArgumentNullException(nameof(statusCall), "The parameter 'statusCall' cannot be null.");
+            throw new ArgumentNullException(nameof(getCallResults), "The parameter 'getCallResults' cannot be null.");
         }
 
-        if (string.IsNullOrWhiteSpace(statusCall.RequestPath))
+        if (string.IsNullOrWhiteSpace(getCallResults.RequestPath))
         {
-            throw new ArgumentException("The URL path specified in 'statusCall' cannot be null or empty.", nameof(statusCall));
+            throw new ArgumentException("The URL path specified in 'getCallResults' cannot be null or empty.", nameof(getCallResults));
         }
 
-        try
+        string callResult = string.Empty;
+        while (true)
         {
-            using var httpClient = _clientFactory.CreateClient();
-            using var request = new HttpRequestMessage(HttpMethod.Get, statusCall.RequestPath);
-            using var response = await httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var statusResults = await response.Content.ReadAsStringAsync();
             try
             {
-                statusCall.ResponseResults = JsonSerializer.Deserialize<T>(statusResults);
+                getCallResults.Retries = retryCount;
+                using var httpClient = _clientFactory.CreateClient();
+                using var request = new HttpRequestMessage(HttpMethod.Get, getCallResults.RequestPath);
+                request.Version = new Version(2, 0);
+                request.Headers.ConnectionClose = false;
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+                using HttpResponseMessage response = await httpClient.SendAsync(request, cts.Token);
+                response.EnsureSuccessStatusCode();
+                callResult = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    getCallResults.ResponseResults = JsonSerializer.Deserialize<T>(callResult);
+                    return getCallResults;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical("HttpGetCallService:GetAsync:DeserializeException", ex.Message);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("HttpGetCallService:GetAsync:DeserializeException", ex.Message);
+                _logger.LogCritical("HttpGetCallService:GetAsync:Exception", ex.Message);
+                if (++retryCount >= maxRetries)
+                {
+                    throw;
+                }
             }
-
         }
-        catch (Exception ex)
-        {
-            _logger.LogCritical("HttpGetCallService:GetAsync:Exception", ex.Message);
-        }
-
-        return statusCall;
     }
-
 }
+
+
+
