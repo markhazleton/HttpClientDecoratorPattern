@@ -5,12 +5,12 @@ namespace HttpClientDecorator;
 
 public class HttpGetCallService : IHttpGetCallService
 {
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly HttpClient _httpClient;
     private readonly ILogger<HttpGetCallService> _logger;
 
     public HttpGetCallService(ILogger<HttpGetCallService> logger, IHttpClientFactory httpClientFactory)
     {
-        _clientFactory = httpClientFactory;
+        _httpClient = httpClientFactory.CreateClient("HttpClientDecorator");
         _logger = logger;
     }
     /// <summary>
@@ -19,7 +19,8 @@ public class HttpGetCallService : IHttpGetCallService
     /// <typeparam name="T">The type of the expected response data.</typeparam>
     /// <param name="getCallResults">A container for the URL to make the GET request to, and the expected response data.</param>
     /// <returns>A container for the response data and any relevant error information.</returns>
-    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> getCallResults)
+    /// <param name="ct"></param>
+    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> getCallResults, CancellationToken ct)
     {
         int retryCount = 0;
         int maxRetries = 3;
@@ -34,20 +35,17 @@ public class HttpGetCallService : IHttpGetCallService
             throw new ArgumentException("The URL path specified in 'getCallResults' cannot be null or empty.", nameof(getCallResults));
         }
 
-        string callResult = string.Empty;
-        while (true)
+        while (retryCount < maxRetries + 1)
         {
             try
             {
                 getCallResults.Retries = retryCount;
-                using var httpClient = _clientFactory.CreateClient();
                 using var request = new HttpRequestMessage(HttpMethod.Get, getCallResults.RequestPath);
                 request.Version = new Version(2, 0);
                 request.Headers.ConnectionClose = false;
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
-                using HttpResponseMessage response = await httpClient.SendAsync(request, cts.Token);
+                using HttpResponseMessage response = await _httpClient.SendAsync(request, ct);
                 response.EnsureSuccessStatusCode();
-                callResult = await response.Content.ReadAsStringAsync();
+                string callResult = await response.Content.ReadAsStringAsync();
                 try
                 {
                     getCallResults.ResponseResults = JsonSerializer.Deserialize<T>(callResult);
@@ -55,18 +53,22 @@ public class HttpGetCallService : IHttpGetCallService
                 }
                 catch (Exception ex)
                 {
+                    getCallResults.ErrorMessage = $"HttpGetCallService:GetAsync:DeserializeException:{ex.Message}";
                     _logger.LogCritical("HttpGetCallService:GetAsync:DeserializeException", ex.Message);
+                    return getCallResults;
                 }
             }
             catch (Exception ex)
             {
+                getCallResults.ErrorMessage = $"HttpGetCallService:GetAsync:Exception:{ex.Message}";
                 _logger.LogCritical("HttpGetCallService:GetAsync:Exception", ex.Message);
                 if (++retryCount >= maxRetries)
                 {
-                    throw;
+                    return getCallResults;
                 }
             }
         }
+        return getCallResults;
     }
 }
 

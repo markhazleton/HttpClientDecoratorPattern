@@ -18,7 +18,7 @@ public class ListModel : PageModel
 
     public IList<HttpGetCallResults<SiteStatus>> HttpGetCallResults { get; set; } = default!;
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken ct = default)
     {
         var runManny = new ListRequest
         {
@@ -26,7 +26,7 @@ public class ListModel : PageModel
             iterationCount = 100,
             endpoint = "https://asyncdemoweb.azurewebsites.net/status"
         };
-        HttpGetCallResults = await CallEndpointMultipleTimes(runManny);
+        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct);
     }
     /// <summary>
     /// 
@@ -35,7 +35,7 @@ public class ListModel : PageModel
     /// <param name="itterationCount"></param>
     /// <param name="endpoint"></param>
     /// <returns></returns>
-    private async Task<List<HttpGetCallResults<SiteStatus>>> CallEndpointMultipleTimes(ListRequest listRequest)
+    private async Task<List<HttpGetCallResults<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
@@ -56,7 +56,7 @@ public class ListModel : PageModel
                 try
                 {
                     // Get The Async Results
-                    var result = await _service.GetAsync<SiteStatus>(statusCall);
+                    var result = await _service.GetAsync<SiteStatus>(statusCall, ct);
                     lock (WriteLock)
                     {
                         results.Add(result);

@@ -28,17 +28,19 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
     /// <typeparam name="T">Result type of the GET request</typeparam>
     /// <param name="statusCall">HttpGetCallResults instance</param>
     /// <returns>HttpGetCallResults instance including telemetry information</returns>
-    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall)
+    /// <param name="cts"></param>
+    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall, CancellationToken ct)
     {
         Stopwatch sw = new();
         sw.Start();
         var response = new HttpGetCallResults<T>(statusCall);
         try
         {
-            response = await _service.GetAsync<T>(statusCall);
+            response = await _service.GetAsync<T>(statusCall, ct);
         }
         catch (Exception ex)
         {
+            response.ErrorMessage = $"Telemetry:GetAsync:Exception:{ex.Message}";
             _logger.LogCritical("Telemetry:GetAsync:Exception", ex.Message);
         }
         sw.Stop();

@@ -15,20 +15,28 @@
             <div class="card-body">
                 @if (Model.theJoke != null)
                 {
-                    @if (Model.theJoke.type == "single")
+                    @if (Model.theJoke.error)
                     {
-                        <p>@Html.DisplayFor(model => model.theJoke.joke)</p>
+                        <p>There was an error getting the joke.</p>
                     }
-                    else if (Model.theJoke.type == "twopart")
+                    else
                     {
-                        <dl>
-                            <dt>
-                                @Html.DisplayFor(model => model.theJoke.setup)
-                            </dt>
-                            <dd>
-                                @Html.DisplayFor(model => model.theJoke.delivery)
-                            </dd>
-                        </dl>
+                        @if (Model.theJoke.type == "single")
+                        {
+                            <p>@Html.DisplayFor(model => model.theJoke.joke)</p>
+                        }
+                        else if (Model.theJoke.type == "twopart")
+                        {
+                            <dl>
+                                <dt>
+                                    @Html.DisplayFor(model => model.theJoke.setup)
+                                </dt>
+                                <hr/>
+                                <dd>
+                                    @Html.DisplayFor(model => model.theJoke.delivery)
+                                </dd>
+                            </dl>
+                        }
                     }
                 }
                 else

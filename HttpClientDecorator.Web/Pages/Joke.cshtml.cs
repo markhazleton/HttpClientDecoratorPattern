@@ -20,7 +20,7 @@ public class JokeModel : PageModel
     /// <summary>
     /// This method retrieves a random joke from the Joke API
     /// </summary>
-    public async Task OnGet()
+    public async Task OnGet(CancellationToken ct = default)
     {
         jokeResult = new HttpGetCallResults<Joke>();
 
@@ -30,19 +30,25 @@ public class JokeModel : PageModel
         }
 
         jokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-        jokeResult = await _service.GetAsync<Joke>(jokeResult);
+        jokeResult = await _service.GetAsync<Joke>(jokeResult, ct);
 
         if (_service == null)
         {
             throw new NullReferenceException(nameof(_service));
         }
 
-        if (jokeResult?.ResponseResults == null)
+        if (jokeResult?.ResponseResults is null)
         {
-            throw new NullReferenceException(nameof(jokeResult.ResponseResults));
+            theJoke = new Joke()
+            {
+                error = true
+            };
+        }
+        else
+        {
+            theJoke = jokeResult.ResponseResults;
         }
 
-        theJoke = jokeResult.ResponseResults;
     }
     public class Flags
     {

@@ -9,7 +9,16 @@ builder.Services.AddRazorPages();
 
 // Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
 // Add Http Client Factory
-builder.Services.AddHttpClient<IHttpGetCallService, HttpGetCallService>();
+builder.Services.AddHttpClient("HttpClientDecorator", client =>
+{
+    client.Timeout = TimeSpan.FromMilliseconds(400);
+
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("User-Agent", "HttpClientDecorator");
+    client.DefaultRequestHeaders.Add("X-Request-ID", Guid.NewGuid().ToString());
+    client.DefaultRequestHeaders.Add("X-Request-Source", "HttpClientDecorator");
+});
+
 builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
