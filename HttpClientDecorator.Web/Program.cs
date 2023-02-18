@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-
 // Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
 // Add Http Client Factory
 builder.Services.AddHttpClient("HttpClientDecorator", client =>

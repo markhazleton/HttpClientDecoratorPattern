@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using HttpClientDecorator.Web.Status
+@using System.Reflection;
+@{
+    var currentYear = DateTime.Now.Year.ToString();
+    var status = new ApplicationStatus(Assembly.GetExecutingAssembly());
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -43,11 +49,24 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 <a href="https://markhazleton.controlorigins.com">Mark Hazleton</a> - HttpClientDecorator.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-4 col-md-3 mb-4 float-start">
+                    Version: @status.BuildVersion.ToString()
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    &copy; 2020-@currentYear HttpClientDecorator.Web  -
+                    <a href="https://markhazleton.controlorigins.com" title="Mark Hazleton, Solutions Architect, Lifelong Learner, not sidetracked by sizzle" target="_blank">Mark Hazleton</a> -
+                    <a href="https://github.com/markhazleton" target="_blank">GitHub</a>
+                </div>
+                <div class="col-lg-4 col-md-3 mb-4 float-end">
+                    Last Built: @status.BuildDate.ToLocalTime().ToLongDateString() <br />
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+
 
     <script src="~/lib/jquery/jquery.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
