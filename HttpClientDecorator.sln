@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Web", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Tests", "HttpClientDecorator.Tests\HttpClientDecorator.Tests.csproj", "{65F246DC-656B-4A1D-9F66-C4623281364D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectGraphDecorator", "ObjectGraphDecorator\ObjectGraphDecorator.csproj", "{A5249C4F-27E9-4DB5-B549-29AA810A0561}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectGraphDecorator", "ObjectGraphDecorator\ObjectGraphDecorator.csproj", "{A5249C4F-27E9-4DB5-B549-29AA810A0561}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

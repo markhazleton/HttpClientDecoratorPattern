@@ -7,11 +7,11 @@ namespace HttpClientDecorator.Web.Pages;
 
 public class JokeModel : PageModel
 {
-    private readonly ILogger<ListModel> _logger;
+    private readonly ILogger<JokeModel> _logger;
     private readonly IHttpGetCallService _service;
     public HttpGetCallResults<Joke> jokeResult { get; set; } = default!;
     public Joke? theJoke { get; set; } = default;
-    public JokeModel(ILogger<ListModel> logger, IHttpGetCallService getCallService)
+    public JokeModel(ILogger<JokeModel> logger, IHttpGetCallService getCallService)
     {
         _logger = logger;
         _service = getCallService;
