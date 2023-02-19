@@ -26,19 +26,22 @@ public class JokeModel : PageModel
 
         if (jokeResult == null)
         {
+            _logger.LogError("jokeResult is null");
             throw new ArgumentNullException(nameof(jokeResult));
         }
 
         jokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-        jokeResult = await _service.GetAsync<Joke>(jokeResult, ct);
+        jokeResult = await _service.GetAsync(jokeResult, ct);
 
         if (_service == null)
         {
+            _logger.LogError("_service is null");
             throw new NullReferenceException(nameof(_service));
         }
 
         if (jokeResult?.ResponseResults is null)
         {
+            _logger.LogError("jokeResult.ResponseResults is null");
             theJoke = new Joke()
             {
                 error = true
@@ -46,6 +49,7 @@ public class JokeModel : PageModel
         }
         else
         {
+            _logger.LogInformation("Good Response from Joke API");
             theJoke = jokeResult.ResponseResults;
         }
 

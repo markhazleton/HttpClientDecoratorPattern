@@ -61,9 +61,9 @@ public class HttpGetCallService : IHttpGetCallService
             catch (Exception ex)
             {
                 getCallResults.ErrorMessage = $"HttpGetCallService:GetAsync:Exception:{ex.Message}";
-                _logger.LogCritical("HttpGetCallService:GetAsync:Exception", ex.Message);
                 if (++retryCount >= maxRetries)
                 {
+                    _logger.LogCritical("HttpGetCallService:GetAsync:Exception", new { retryCount, ex.Message });
                     return getCallResults;
                 }
             }

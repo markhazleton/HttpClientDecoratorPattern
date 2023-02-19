@@ -10,7 +10,7 @@ builder.Services.AddRazorPages();
 // Add Http Client Factory
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
-    client.Timeout = TimeSpan.FromMilliseconds(400);
+    client.Timeout = TimeSpan.FromMilliseconds(1500);
 
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.DefaultRequestHeaders.Add("User-Agent", "HttpClientDecorator");
