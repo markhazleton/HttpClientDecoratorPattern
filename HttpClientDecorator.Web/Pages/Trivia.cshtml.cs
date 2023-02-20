@@ -1,5 +1,6 @@
 using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
+using HttpClientDecorator.Web.Models.Trivia;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HttpClientDecorator.Web.Pages;
@@ -47,22 +48,6 @@ public class TriviaModel : PageModel
     public Trivia? theTrivia { get; set; } = default;
     public HttpGetCallResults<OpenTBbResponse> triviaResult { get; set; } = default!;
 
-    public class OpenTBbResponse
-    {
-        public int response_code { get; set; }
-        public Trivia[] results { get; set; }
-    }
-
-    public class Trivia
-    {
-        public int triviaID { get; set; }
-        public string category { get; set; }
-        public string correct_answer { get; set; }
-        public string difficulty { get; set; }
-        public string[] incorrect_answers { get; set; }
-        public string question { get; set; }
-        public string type { get; set; }
-    }
 
 }
 
