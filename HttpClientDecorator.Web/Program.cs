@@ -5,6 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+builder.Services.AddHttpContextAccessor();
 
 // Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
 // Add Http Client Factory
@@ -42,5 +45,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+app.UseCookiePolicy();
+app.UseSession();
 app.MapRazorPages();
 app.Run();

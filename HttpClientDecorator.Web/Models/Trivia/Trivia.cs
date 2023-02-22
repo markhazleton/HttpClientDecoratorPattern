@@ -10,15 +10,3 @@ public class Trivia
     public string question { get; set; }
     public string type { get; set; }
 }
-
-public class TriviaAnswer
-{ 
-    public int triviaID { get;private set; }
-    public string answer { get;private set; }
-}
-
-public class TriviaMatch
-{ 
-    public List<Trivia> triviaQuestions { get;set; } = new List<Trivia>();
-    public List<TriviaAnswer> triviaAnswers { get;set; } = new List<TriviaAnswer>();
-}
