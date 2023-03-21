@@ -8,32 +8,31 @@
         <div class="card border-info">
             <div class="card-header">
                 <h1>
-                    Here is your joke with category: @Html.DisplayFor(model => model.theJoke.category)
+                    Here is your joke with category: @Html.DisplayFor(model => model.TheJoke.category)
                 </h1>
 
             </div>
             <div class="card-body">
-                @if (Model.theJoke != null)
+                @if (Model.TheJoke != null)
                 {
-                    @if (Model.theJoke.error)
+                    @if (Model.TheJoke.error)
                     {
                         <p>There was an error getting the joke.</p>
                     }
                     else
                     {
-                        @if (Model.theJoke.type == "single")
+                        @if (Model.TheJoke.type == "single")
                         {
-                            <p>@Html.DisplayFor(model => model.theJoke.joke)</p>
+                            <p>@Html.DisplayFor(model => model.TheJoke.joke)</p>
                         }
-                        else if (Model.theJoke.type == "twopart")
+                        else if (Model.TheJoke.type == "twopart")
                         {
                             <dl>
                                 <dt>
-                                    @Html.DisplayFor(model => model.theJoke.setup)
+                                    @Html.DisplayFor(model => model.TheJoke.setup)
                                 </dt>
-                                <hr/>
                                 <dd>
-                                    @Html.DisplayFor(model => model.theJoke.delivery)
+                                    @Html.DisplayFor(model => model.TheJoke.delivery)
                                 </dd>
                             </dl>
                         }
@@ -45,9 +44,9 @@
                 }
             </div>
             <div class="card-footer">
-                <strong>The Api Get call took @Html.DisplayFor(model=>model.jokeResult.ElapsedMilliseconds) millisectons to return.</strong>
+                <strong>The Api Get call took @Html.DisplayFor(model=>model.JokeResult.ElapsedMilliseconds) millisectons to return.</strong>
                 <br />
-                <small>Joke is from @Html.DisplayFor(model=>model.jokeResult.RequestPath)</small>
+                <small>Joke is from @Html.DisplayFor(model=>model.JokeResult.RequestPath)</small>
             </div>
         </div>
     </div>

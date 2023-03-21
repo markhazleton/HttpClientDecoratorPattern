@@ -43,9 +43,9 @@ public class HttpGetCallService : IHttpGetCallService
                 using var request = new HttpRequestMessage(HttpMethod.Get, getCallResults.RequestPath);
                 request.Version = new Version(2, 0);
                 request.Headers.ConnectionClose = false;
-                using HttpResponseMessage response = await _httpClient.SendAsync(request, ct);
+                using HttpResponseMessage response = await _httpClient.SendAsync(request, ct).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                string callResult = await response.Content.ReadAsStringAsync();
+                string callResult = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
                 try
                 {
                     getCallResults.ResponseResults = JsonSerializer.Deserialize<T>(callResult);

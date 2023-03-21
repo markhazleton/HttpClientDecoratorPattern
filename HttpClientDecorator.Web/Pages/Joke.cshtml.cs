@@ -10,8 +10,8 @@ public class JokeModel : PageModel
 {
     private readonly ILogger<JokeModel> _logger;
     private readonly IHttpGetCallService _service;
-    public HttpGetCallResults<Joke> jokeResult { get; set; } = default!;
-    public Joke? theJoke { get; set; } = default;
+    public HttpGetCallResults<Joke> JokeResult { get; set; } = default!;
+    public Joke TheJoke { get; set; } = new Joke();
     public JokeModel(ILogger<JokeModel> logger, IHttpGetCallService getCallService)
     {
         _logger = logger;
@@ -23,16 +23,16 @@ public class JokeModel : PageModel
     /// </summary>
     public async Task OnGet(CancellationToken ct = default)
     {
-        jokeResult = new HttpGetCallResults<Joke>();
+        JokeResult = new HttpGetCallResults<Joke>();
 
-        if (jokeResult == null)
+        if (JokeResult == null)
         {
-            _logger.LogError("jokeResult is null");
-            throw new ArgumentNullException(nameof(jokeResult));
+            _logger.LogError("JokeResult is null");
+            throw new Exception("JokeResult is null");
         }
 
-        jokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-        jokeResult = await _service.GetAsync(jokeResult, ct);
+        JokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
+        JokeResult = await _service.GetAsync(JokeResult, ct).ConfigureAwait(false);
 
         if (_service == null)
         {
@@ -40,10 +40,10 @@ public class JokeModel : PageModel
             throw new NullReferenceException(nameof(_service));
         }
 
-        if (jokeResult?.ResponseResults is null)
+        if (JokeResult?.ResponseResults is null)
         {
             _logger.LogError("jokeResult.ResponseResults is null");
-            theJoke = new Joke()
+            TheJoke = new Joke()
             {
                 error = true
             };
@@ -51,7 +51,7 @@ public class JokeModel : PageModel
         else
         {
             _logger.LogInformation("Good Response from Joke API");
-            theJoke = jokeResult.ResponseResults;
+            TheJoke = JokeResult.ResponseResults;
         }
 
     }

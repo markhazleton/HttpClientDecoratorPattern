@@ -1,6 +1,7 @@
 ﻿using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json.Serialization;
 
 namespace HttpClientDecorator.Web.Pages;
 
@@ -22,11 +23,11 @@ public class ListModel : PageModel
     {
         var runManny = new ListRequest
         {
-            maxThreads = 10,
-            iterationCount = 100,
-            endpoint = "https://asyncdemoweb.azurewebsites.net/status"
+            MaxThreads = 10,
+            IterationCount = 100,
+            Endpoint = "https://asyncdemoweb.azurewebsites.net/status"
         };
-        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct);
+        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct).ConfigureAwait(false);
     }
     /// <summary>
     /// 
@@ -39,24 +40,24 @@ public class ListModel : PageModel
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
-        SemaphoreSlim semaphore = new(listRequest.maxThreads);
+        SemaphoreSlim semaphore = new(listRequest.MaxThreads);
         List<HttpGetCallResults<SiteStatus>> results = new();
 
         // Create a list of tasks to make the GetAsync calls
         List<Task> tasks = new();
-        for (int i = 0; i < listRequest.iterationCount; i++)
+        for (int i = 0; i < listRequest.IterationCount; i++)
         {
             // Acquire the semaphore before making the request
-            await semaphore.WaitAsync();
+            await semaphore.WaitAsync().ConfigureAwait(false);
             curIndex++;
-            var statusCall = new HttpGetCallResults<SiteStatus>(curIndex, listRequest.endpoint);
+            var statusCall = new HttpGetCallResults<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {
                 try
                 {
                     // Get The Async Results
-                    var result = await _service.GetAsync<SiteStatus>(statusCall, ct);
+                    var result = await _service.GetAsync<SiteStatus>(statusCall, ct).ConfigureAwait(false);
                     lock (WriteLock)
                     {
                         results.Add(result);
@@ -71,7 +72,7 @@ public class ListModel : PageModel
         }
 
         // Wait for all tasks to complete
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(tasks).ConfigureAwait(false);
 
         // Log a message when all calls are complete
         _logger.LogInformation("All calls complete");
@@ -79,37 +80,31 @@ public class ListModel : PageModel
     }
     public class ListRequest
     {
-        public int maxThreads { get; set; }
-        public int iterationCount { get; set; }
-        public string endpoint { get; set; }
+        public int MaxThreads { get; set; }
+        public int IterationCount { get; set; }
+        public string? Endpoint { get; set; }
     }
 
-    public class BuildVersion
-    {
-        public int majorVersion { get; set; }
-        public int minorVersion { get; set; }
-        public int build { get; set; }
-        public int revision { get; set; }
-    }
+    public record BuildVersion(
+        [property: JsonPropertyName("majorVersion")] int? MajorVersion,
+        [property: JsonPropertyName("minorVersion")] int? MinorVersion,
+        [property: JsonPropertyName("build")] int? Build,
+        [property: JsonPropertyName("revision")] int? Revision
+    );
 
-    public class Features
-    {
-    }
+    public record Features();
 
-    public class SiteStatus
-    {
-        public DateTime buildDate { get; set; }
-        public BuildVersion buildVersion { get; set; }
-        public Features features { get; set; }
-        public List<object> messages { get; set; }
-        public string region { get; set; }
-        public int status { get; set; }
-        public Tests tests { get; set; }
-    }
+    public record SiteStatus(
+        [property: JsonPropertyName("buildDate")] DateTime? BuildDate,
+        [property: JsonPropertyName("buildVersion")] BuildVersion BuildVersion,
+        [property: JsonPropertyName("features")] Features Features,
+        [property: JsonPropertyName("messages")] IReadOnlyList<object> Messages,
+        [property: JsonPropertyName("region")] string Region,
+        [property: JsonPropertyName("status")] int? Status,
+        [property: JsonPropertyName("tests")] Tests Tests
+    );
 
-    public class Tests
-    {
-    }
+    public record Tests();
 
 
 }

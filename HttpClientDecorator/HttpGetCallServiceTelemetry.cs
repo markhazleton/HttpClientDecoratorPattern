@@ -36,7 +36,7 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
         var response = new HttpGetCallResults<T>(statusCall);
         try
         {
-            response = await _service.GetAsync<T>(statusCall, ct);
+            response = await _service.GetAsync<T>(statusCall, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
