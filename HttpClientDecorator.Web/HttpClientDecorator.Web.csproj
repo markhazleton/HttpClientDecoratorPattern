@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -13,9 +12,7 @@
 		<RepositoryUrl>https://github.com/markhazleton/HttpClientDecoratorPattern</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\HttpClientDecorator\HttpClientDecorator.csproj" />
 	</ItemGroup>
-
 </Project>
