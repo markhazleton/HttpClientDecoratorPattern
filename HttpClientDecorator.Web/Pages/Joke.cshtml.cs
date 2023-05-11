@@ -53,11 +53,6 @@ public class JokeModel : PageModel
             _logger.LogInformation("Good Response from Joke API");
             TheJoke = JokeResult.ResponseResults;
         }
-
     }
-
-
-
-
 
 }
