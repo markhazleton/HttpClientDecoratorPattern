@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC86A4BC-A7E9-47F2-B961-EC3FEA89D9F8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MauiDecoratorPattern", "MauiDecoratorPattern\MauiDecoratorPattern.csproj", "{C4917E14-313C-44DF-98D2-3B64C7F37520}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,12 @@ Global
 		{65F246DC-656B-4A1D-9F66-C4623281364D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65F246DC-656B-4A1D-9F66-C4623281364D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65F246DC-656B-4A1D-9F66-C4623281364D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4917E14-313C-44DF-98D2-3B64C7F37520}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
