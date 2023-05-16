@@ -1,6 +1,6 @@
 using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
-using HttpClientDecorator.Web.Models.Joke;
+using HttpClientDecorator.Models.Joke;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HttpClientDecorator.Web.Pages;
@@ -27,8 +27,8 @@ public class JokeModel : PageModel
 
         if (JokeResult == null)
         {
-            _logger.LogError("JokeResult is null");
-            throw new Exception("JokeResult is null");
+            _logger.LogError("artResponse is null");
+            throw new Exception("artResponse is null");
         }
 
         JokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";

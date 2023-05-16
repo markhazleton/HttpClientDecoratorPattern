@@ -1,4 +1,4 @@
-﻿namespace HttpClientDecorator.Web.Models.Joke;
+﻿namespace HttpClientDecorator.Models.Joke;
 
 public class Flags
 {

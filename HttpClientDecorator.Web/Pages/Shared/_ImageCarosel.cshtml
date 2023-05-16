@@ -1,0 +1,48 @@
+﻿@page
+@model HttpClientDecorator.Web.Pages.ArtInstituteModel
+@{
+}
+<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-label="@Model.ArtList.list[0]?.title" aria-current="true"></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="@Model.ArtList.list[1]?.title" class=""></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="@Model.ArtList.list[2]?.title" class=""></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item carousel-item-next carousel-item-start">
+            <div class="container justify-content-center">
+                <img src="@Model.ArtList.list[0]?.ImageUrl" class="img-fluid d-block w-100  h-100" />
+                <div class="carousel-caption text-center">
+                    <h1>@Model.ArtList.list[0]?.title</h1>
+                    <p>@Model.ArtList.list[0]?.artist_title</p>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="container">
+                <img src="@Model.ArtList.list[1]?.ImageUrl" class="img-fluid d-block w-100 h-100" />
+                <div class="carousel-caption text-center">
+                    <h1>@Model.ArtList.list[1]?.title</h1>
+                    <p>@Model.ArtList.list[1]?.artist_title</p>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item active carousel-item-start">
+            <div class="container">
+                <img src="@Model.ArtList.list[2]?.ImageUrl" class="img-fluid d-block w-100  h-100" />
+                <div class="carousel-caption text-center">
+                    <h1>@Model.ArtList.list[2]?.title</h1>
+                    <p>@Model.ArtList.list[3]?.artist_title</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
