@@ -15,7 +15,7 @@
 		<ApplicationTitle>MauiDecoratorPattern</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.mauidecoratorpattern</ApplicationId>
+		<ApplicationId>com.controlorigins.mauidecoratorpattern</ApplicationId>
 		<ApplicationIdGuid>a51879f7-cb99-4150-9547-6a320798b857</ApplicationIdGuid>
 
 		<!-- Versions -->
