@@ -30,7 +30,7 @@ namespace HttpClientDecorator.Tests
             HttpClientSendResults<object> getCallResults = null;
 
             // Act & Assert
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _httpGetCallService.GetAsync(getCallResults, CancellationToken.None));
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None));
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace HttpClientDecorator.Tests
             };
 
             // Act & Assert
-            await Assert.ThrowsExceptionAsync<ArgumentException>(() => _httpGetCallService.GetAsync(getCallResults, CancellationToken.None));
+            await Assert.ThrowsExceptionAsync<ArgumentException>(() => _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None));
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace HttpClientDecorator.Tests
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
-            var result = await _httpGetCallService.GetAsync(getCallResults, CancellationToken.None);
+            var result = await _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(getCallResults.ResponseResults, result.ResponseResults);
@@ -88,7 +88,7 @@ namespace HttpClientDecorator.Tests
                 .ReturnsAsync(httpResponseMessage);
 
             // Act
-            var result = await _httpGetCallService.GetAsync(getCallResults, CancellationToken.None);
+            var result = await _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(result.ResponseResults, "invalid-json");

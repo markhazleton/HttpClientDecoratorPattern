@@ -39,7 +39,7 @@ public class PollyModel : PageModel
         var requestBody = new SiteStatus
         {
             loopCount = random.Next(201),
-            maxTimeMS = 1000,
+            maxTimeMS = 500,
             runTimeMS = 0,
             message = string.Empty,
             resultValue = string.Empty
@@ -82,9 +82,16 @@ public class PollyModel : PageModel
                 try
                 {
                     // Get The Async Results
-                    var result = await _service.GetAsync(statusCall, ct).ConfigureAwait(false);
+                    var test = await statusCall.RequestBody.ReadAsStringAsync();
+
+                    var result = await _service.HttpClientSendAsync(statusCall, ct).ConfigureAwait(false);
+
                     lock (WriteLock)
                     {
+                        if(result.ErrorList.Count > 0)
+                        {
+                            result.ErrorList.Add(test);
+                        }
                         results.Add(result);
                     }
                 }

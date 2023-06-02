@@ -32,7 +32,7 @@ public class JokeModel : PageModel
         }
 
         JokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-        JokeResult = await _service.GetAsync(JokeResult, ct).ConfigureAwait(false);
+        JokeResult = await _service.HttpClientSendAsync(JokeResult, ct).ConfigureAwait(false);
 
         if (_service == null)
         {

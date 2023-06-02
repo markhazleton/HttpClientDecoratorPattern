@@ -25,7 +25,7 @@ public class HttpPollyRetryBreakerService : IHttpClientSendService
                  (exception, timespan, retryCount, context) =>
                  {
                      // Optionally, you can log or handle the retry attempt here
-                     _errorList.Value.Add($"Polly.RetryPolicy Retries:{retryCount}");
+                     _errorList.Value.Add($"Polly.RetryPolicy Retries:{retryCount}, exception:{exception.Message}");
                  });
 
         // Configure the circuit breaker policy
@@ -44,25 +44,21 @@ public class HttpPollyRetryBreakerService : IHttpClientSendService
                 });
     }
 
-    public async Task<HttpClientSendResults<T>> GetAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
     {
-        // Wrap the GetAsync call with the retry and circuit breaker policies
-        HttpClientSendResults<T> response = new();
+        // Wrap the GetAsync call with the retry / circuit breaker policies
         try
         {
-            response = await Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy)
-                            .ExecuteAsync(() => _service.GetAsync(statusCall, ct));
+            statusCall = await Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy)
+                            .ExecuteAsync(() => _service.HttpClientSendAsync(statusCall, ct));
         }
         catch (Exception ex)
         {
             _errorList.Value.Add($"Polly:GetAsync:Exception:{ex.Message}");
         }
-        response.ErrorList.AddRange(_errorList.Value);
+        statusCall.ErrorList.AddRange(_errorList.Value);
         _errorList.Value.Clear();
-        return response;
+        return statusCall;
     }
-
-
-
 
 }

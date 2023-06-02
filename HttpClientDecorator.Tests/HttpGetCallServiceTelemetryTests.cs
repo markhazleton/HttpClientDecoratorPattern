@@ -29,11 +29,11 @@ namespace HttpClientDecorator.Tests
                 ResponseResults = "OK",
                 Retries = 0
             };
-            _mockService.Setup(x => x.GetAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
+            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
             // Act
-            var result = await _telemetryService.GetAsync(expectedResponse, CancellationToken.None);
+            var result = await _telemetryService.HttpClientSendAsync(expectedResponse, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(expectedResponse.RequestPath, result.RequestPath);
@@ -55,11 +55,11 @@ namespace HttpClientDecorator.Tests
                 Retries = 0
             };
             var expectedException = new Exception("Something went wrong");
-            _mockService.Setup(x => x.GetAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
+            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(expectedException);
 
             // Act
-            var result = await _telemetryService.GetAsync(expectedResponse, CancellationToken.None);
+            var result = await _telemetryService.HttpClientSendAsync(expectedResponse, CancellationToken.None);
 
             // Assert
             Assert.AreEqual(expectedResponse.RequestPath, result.RequestPath);

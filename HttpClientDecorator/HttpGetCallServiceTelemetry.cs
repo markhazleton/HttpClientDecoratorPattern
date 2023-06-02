@@ -29,23 +29,22 @@ public class HttpGetCallServiceTelemetry : IHttpClientSendService
     /// <param name="statusCall">HttpClientSendResults instance</param>
     /// <returns>HttpClientSendResults instance including telemetry information</returns>
     /// <param name="cts"></param>
-    public async Task<HttpClientSendResults<T>> GetAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
     {
         Stopwatch sw = new();
         sw.Start();
-        var response = new HttpClientSendResults<T>(statusCall);
         try
         {
-            response = await _service.GetAsync(statusCall, ct).ConfigureAwait(false);
+            statusCall = await _service.HttpClientSendAsync(statusCall, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            response.ErrorList.Add($"Telemetry:GetAsync:Exception:{ex.Message}");
+            statusCall.ErrorList.Add($"Telemetry:GetAsync:Exception:{ex.Message}");
             _logger.LogCritical("Telemetry:GetAsync:Exception", ex.Message);
         }
         sw.Stop();
-        response.ElapsedMilliseconds = sw.ElapsedMilliseconds;
-        response.CompletionDate = DateTime.Now;
-        return response;
+        statusCall.ElapsedMilliseconds = sw.ElapsedMilliseconds;
+        statusCall.CompletionDate = DateTime.Now;
+        return statusCall;
     }
 }

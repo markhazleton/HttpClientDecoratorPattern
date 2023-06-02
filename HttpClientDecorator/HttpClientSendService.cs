@@ -13,13 +13,13 @@ public class HttpClientSendService : IHttpClientSendService
         _logger = logger;
     }
     /// <summary>
-    /// Makes a GET request to the specified URL and returns the response.
+    /// Makes a request to the specified URL and returns the response.
     /// </summary>
     /// <typeparam name="T">The type of the expected response data.</typeparam>
     /// <param name="httpSendResults">A container for the URL to make the GET request to, and the expected response data.</param>
     /// <returns>A container for the response data and any relevant error information.</returns>
     /// <param name="ct"></param>
-    public async Task<HttpClientSendResults<T>> GetAsync<T>(HttpClientSendResults<T> httpSendResults, CancellationToken ct)
+    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> httpSendResults, CancellationToken ct)
     {
         if (httpSendResults == null)
         {

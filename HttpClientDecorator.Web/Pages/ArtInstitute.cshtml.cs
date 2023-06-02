@@ -27,7 +27,7 @@ public class ArtInstituteModel : PageModel
         }
 
         artResponse.RequestPath = "https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&limit=20&fields=id,title,image_id,artist_title,material_titles&q=impressionism+oil paint";
-        artResponse = await _service.GetAsync(artResponse, ct).ConfigureAwait(false);
+        artResponse = await _service.HttpClientSendAsync(artResponse, ct).ConfigureAwait(false);
 
         if (_service == null)
         {
