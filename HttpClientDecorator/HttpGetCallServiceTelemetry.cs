@@ -4,19 +4,19 @@ using System.Diagnostics;
 namespace HttpClientDecorator;
 
 /// <summary>
-/// Class HttpGetCallServiceTelemetry adds telemetry to the IHttpGetCallService implementation
+/// Class HttpGetCallServiceTelemetry adds telemetry to the IHttpClientSendService implementation
 /// </summary>
-public class HttpGetCallServiceTelemetry : IHttpGetCallService
+public class HttpGetCallServiceTelemetry : IHttpClientSendService
 {
     private readonly ILogger<HttpGetCallServiceTelemetry> _logger;
-    private readonly IHttpGetCallService _service;
+    private readonly IHttpClientSendService _service;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpGetCallServiceTelemetry"/> class
     /// </summary>
     /// <param name="logger">ILogger instance</param>
-    /// <param name="service">IHttpGetCallService instance</param>
-    public HttpGetCallServiceTelemetry(ILogger<HttpGetCallServiceTelemetry> logger, IHttpGetCallService service)
+    /// <param name="service">IHttpClientSendService instance</param>
+    public HttpGetCallServiceTelemetry(ILogger<HttpGetCallServiceTelemetry> logger, IHttpClientSendService service)
     {
         _logger = logger;
         _service = service;
@@ -26,21 +26,21 @@ public class HttpGetCallServiceTelemetry : IHttpGetCallService
     /// GetAsync performs a GET request and adds telemetry information to the response.
     /// </summary>
     /// <typeparam name="T">Result type of the GET request</typeparam>
-    /// <param name="statusCall">HttpGetCallResults instance</param>
-    /// <returns>HttpGetCallResults instance including telemetry information</returns>
+    /// <param name="statusCall">HttpClientSendResults instance</param>
+    /// <returns>HttpClientSendResults instance including telemetry information</returns>
     /// <param name="cts"></param>
-    public async Task<HttpGetCallResults<T>> GetAsync<T>(HttpGetCallResults<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientSendResults<T>> GetAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
     {
         Stopwatch sw = new();
         sw.Start();
-        var response = new HttpGetCallResults<T>(statusCall);
+        var response = new HttpClientSendResults<T>(statusCall);
         try
         {
-            response = await _service.GetAsync<T>(statusCall, ct).ConfigureAwait(false);
+            response = await _service.GetAsync(statusCall, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            response.ErrorMessage = $"Telemetry:GetAsync:Exception:{ex.Message}";
+            response.ErrorList.Add($"Telemetry:GetAsync:Exception:{ex.Message}");
             _logger.LogCritical("Telemetry:GetAsync:Exception", ex.Message);
         }
         sw.Stop();

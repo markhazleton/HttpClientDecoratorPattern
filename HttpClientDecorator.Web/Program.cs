@@ -9,11 +9,11 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-// Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
+// Add the HttpGetCall and Telemetry Decorator for IHttpClientSendService interface
 // Add Http Client Factory
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
-    client.Timeout = TimeSpan.FromMilliseconds(1500);
+    client.Timeout = TimeSpan.FromMilliseconds(3000);
 
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.DefaultRequestHeaders.Add("User-Agent", "HttpClientDecorator");
@@ -21,13 +21,15 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
     client.DefaultRequestHeaders.Add("X-Request-Source", "HttpClientDecorator");
 });
 
-builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
+builder.Services.AddSingleton(serviceProvider =>
 {
-    var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
+    var logger = serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>();
     var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
+    var pollyLogger = serviceProvider.GetRequiredService<ILogger<HttpPollyRetryBreakerService>>();
     var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-    IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
-    IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
+    IHttpClientSendService baseService = new HttpClientSendService(logger, httpClientFactory);
+    IHttpClientSendService pollyService = new HttpPollyRetryBreakerService(pollyLogger, baseService);
+    IHttpClientSendService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, pollyService);
     return telemetryService;
 });
 

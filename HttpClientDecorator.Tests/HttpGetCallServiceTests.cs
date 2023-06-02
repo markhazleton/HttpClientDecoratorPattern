@@ -8,26 +8,26 @@ namespace HttpClientDecorator.Tests
     [TestClass]
     public class HttpGetCallServiceTests
     {
-        private HttpGetCallService _httpGetCallService;
-        private Mock<ILogger<HttpGetCallService>> _loggerMock;
+        private HttpClientSendService _httpGetCallService;
+        private Mock<ILogger<HttpClientSendService>> _loggerMock;
         private Mock<IHttpClientFactory> _httpClientFactoryMock;
         private Mock<HttpClient> _httpClientMock;
 
         [TestInitialize]
         public void Setup()
         {
-            _loggerMock = new Mock<ILogger<HttpGetCallService>>();
+            _loggerMock = new Mock<ILogger<HttpClientSendService>>();
             _httpClientMock = new Mock<HttpClient>();
             _httpClientFactoryMock = new Mock<IHttpClientFactory>();
             _httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(_httpClientMock.Object);
-            _httpGetCallService = new HttpGetCallService(_loggerMock.Object, _httpClientFactoryMock.Object);
+            _httpGetCallService = new HttpClientSendService(_loggerMock.Object, _httpClientFactoryMock.Object);
         }
 
         [TestMethod]
         public async Task GetAsync_NullGetCallResults_ThrowsArgumentNullException()
         {
             // Arrange
-            HttpGetCallResults<object> getCallResults = null;
+            HttpClientSendResults<object> getCallResults = null;
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _httpGetCallService.GetAsync(getCallResults, CancellationToken.None));
@@ -37,7 +37,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_EmptyRequestPath_ThrowsArgumentException()
         {
             // Arrange
-            var getCallResults = new HttpGetCallResults<object>
+            var getCallResults = new HttpClientSendResults<object>
             {
                 RequestPath = string.Empty
             };
@@ -50,7 +50,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_Success_ReturnsHttpGetCallResultsWithResponseData()
         {
             // Arrange
-            var getCallResults = new HttpGetCallResults<string>
+            var getCallResults = new HttpClientSendResults<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "success"
@@ -67,7 +67,7 @@ namespace HttpClientDecorator.Tests
 
             // Assert
             Assert.AreEqual(getCallResults.ResponseResults, result.ResponseResults);
-            Assert.IsNull(result.ErrorMessage);
+            Assert.AreEqual(result.ErrorList.Count,0);
             Assert.AreEqual(0, result.Retries);
         }
 
@@ -75,7 +75,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_DeserializeException_LogsCriticalErrorAndReturnsHttpGetCallResultsWithError()
         {
             // Arrange
-            var getCallResults = new HttpGetCallResults<string>
+            var getCallResults = new HttpClientSendResults<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "invalid-json"
@@ -92,8 +92,8 @@ namespace HttpClientDecorator.Tests
 
             // Assert
             Assert.AreEqual(result.ResponseResults, "invalid-json");
-            Assert.IsNotNull(result.ErrorMessage);
-            Assert.IsTrue(result.ErrorMessage.StartsWith("HttpGetCallService:GetAsync:DeserializeException"));
+            Assert.AreEqual(result.ErrorList.Count, 1);
+            Assert.IsTrue(result.ErrorList.FirstOrDefault().StartsWith("HttpClientSendService:GetAsync:DeserializeException"));
         }
     }
 }

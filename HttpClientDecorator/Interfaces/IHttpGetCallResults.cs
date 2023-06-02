@@ -4,7 +4,7 @@ public interface IHttpGetCallResults<T>
 {
     DateTime? CompletionDate { get; set; }
     long ElapsedMilliseconds { get; set; }
-    string? ErrorMessage { get; set; }
+    List<string> ErrorList { get; set; }
     int Id { get; set; }
     int Iteration { get; set; }
     string RequestPath { get; set; }

@@ -1,5 +1,5 @@
 ﻿@page
-@model HttpClientDecorator.Web.Pages.ListModel
+@model HttpClientDecorator.Web.Pages.PollyModel
 
 @{
     ViewData["Title"] = "List";
@@ -17,6 +17,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.HttpGetCallResults[0].Iteration)
+            </th>
+            <th>
+                Return Values
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.HttpGetCallResults[0].ErrorList)
@@ -37,12 +40,16 @@
                     @Html.DisplayFor(modelItem => item.Iteration)
                 </td>
                 <td>
-                    <ul>
-                        @foreach (var error in item.ErrorList)
-                        {
-                            <li>@error</li>
-                        }
-                    </ul>
+                    loops: @Html.Raw(item.ResponseResults?.loopCount) <br />
+                    maxRun: @Html.Raw(item.ResponseResults?.maxTimeMS) <br />
+                    value: @Html.Raw(item.ResponseResults?.resultValue) <br />
+                    runtime: @Html.Raw(item.ResponseResults?.runTimeMS) <br />
+                </td>
+                <td>
+                    @foreach (var error in item.ErrorList)
+                    {
+                            @error<br />
+                    }
                 </td>
             </tr>
         }

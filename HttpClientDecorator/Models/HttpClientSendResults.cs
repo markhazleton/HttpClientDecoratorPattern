@@ -6,22 +6,22 @@ namespace HttpClientDecorator.Models;
 /// <summary>
 /// Class to store the results of an HTTP GET call.
 /// </summary>
-public class HttpGetCallResults<T> : IHttpGetCallResults<T>
+public class HttpClientSendResults<T> : IHttpGetCallResults<T>
 {
     /// <summary>
     /// Default constructor to initialize the iteration and status path.
     /// </summary>
-    public HttpGetCallResults()
+    public HttpClientSendResults()
     {
         Iteration = 0;
         RequestPath = string.Empty;
     }
 
     /// <summary>
-    /// Constructor to initialize the iteration and status path from another instance of HttpGetCallResults.
+    /// Constructor to initialize the iteration and status path from another instance of HttpClientSendResults.
     /// </summary>
-    /// <param name="statusCall">An instance of HttpGetCallResults.</param>
-    public HttpGetCallResults(HttpGetCallResults<T> statusCall)
+    /// <param name="statusCall">An instance of HttpClientSendResults.</param>
+    public HttpClientSendResults(HttpClientSendResults<T> statusCall)
     {
         Iteration = statusCall.Iteration;
         RequestPath = statusCall.RequestPath;
@@ -32,7 +32,7 @@ public class HttpGetCallResults<T> : IHttpGetCallResults<T>
     /// </summary>
     /// <param name="it">Iteration number of the HTTP GET call.</param>
     /// <param name="path">Status path of the HTTP GET call.</param>
-    public HttpGetCallResults(int it, string path)
+    public HttpClientSendResults(int it, string path)
     {
         Iteration = it;
         RequestPath = path;
@@ -58,7 +58,8 @@ public class HttpGetCallResults<T> : IHttpGetCallResults<T>
     /// <summary>
     /// Error Message if something goes wrong, usually null
     /// </summary>
-    public string? ErrorMessage { get; set; }
+    public  List<string> ErrorList { get; set; } = new();
+
     /// <summary>
     /// Property to store the iteration number of the HTTP GET call.
     /// </summary>
@@ -71,10 +72,16 @@ public class HttpGetCallResults<T> : IHttpGetCallResults<T>
     /// Property to store the status path of the HTTP GET call.
     /// </summary>
     public string RequestPath { get; set; }
-
+    [NotMapped]
+    public HttpMethod RequestMethod { get; set; } = HttpMethod.Get;
     /// <summary>
     /// Property to store the results of the HTTP GET call.
     /// </summary>
     [NotMapped]
     public T? ResponseResults { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    [NotMapped]
+    public StringContent RequestBody { get; set; }
 }

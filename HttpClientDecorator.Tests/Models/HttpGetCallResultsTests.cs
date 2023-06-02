@@ -8,7 +8,7 @@ public class HttpGetCallResultsTests
     public void HttpGetCallResults_DefaultConstructor_ShouldInitializeIterationAndStatusPath()
     {
         // Arrange & Act
-        var results = new HttpGetCallResults<string>();
+        var results = new HttpClientSendResults<string>();
 
         // Assert
         Assert.AreEqual(0, results.Iteration);
@@ -19,14 +19,14 @@ public class HttpGetCallResultsTests
     public void HttpGetCallResults_CopyConstructor_ShouldCopyIterationAndStatusPath()
     {
         // Arrange
-        var statusCall = new HttpGetCallResults<string>
+        var statusCall = new HttpClientSendResults<string>
         {
             Iteration = 1,
             RequestPath = "https://example.com"
         };
 
         // Act
-        var results = new HttpGetCallResults<string>(statusCall);
+        var results = new HttpClientSendResults<string>(statusCall);
 
         // Assert
         Assert.AreEqual(statusCall.Iteration, results.Iteration);
@@ -41,7 +41,7 @@ public class HttpGetCallResultsTests
         const string statusPath = "https://example.com/status";
 
         // Act
-        var results = new HttpGetCallResults<string>(iteration, statusPath);
+        var results = new HttpClientSendResults<string>(iteration, statusPath);
 
         // Assert
         Assert.AreEqual(iteration, results.Iteration);
@@ -55,7 +55,7 @@ public class HttpGetCallResultsTests
         var completionDate = DateTime.Now;
 
         // Act
-        var results = new HttpGetCallResults<string>
+        var results = new HttpClientSendResults<string>
         {
             CompletionDate = completionDate
         };
@@ -71,7 +71,7 @@ public class HttpGetCallResultsTests
         const long elapsedMilliseconds = 12345;
 
         // Act
-        var results = new HttpGetCallResults<string>
+        var results = new HttpClientSendResults<string>
         {
             ElapsedMilliseconds = elapsedMilliseconds
         };
@@ -91,7 +91,7 @@ public class HttpGetCallResultsTests
         };
 
         // Act
-        var results = new HttpGetCallResults<string>
+        var results = new HttpClientSendResults<string>
         {
             ResponseResults = statusResults.ToString()
         };
