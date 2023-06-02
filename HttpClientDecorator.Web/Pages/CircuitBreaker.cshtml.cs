@@ -25,8 +25,8 @@ public class CircuitBreakerModel : PageModel
     {
         var runManny = new ListRequest
         {
-            MaxThreads = 10,
-            IterationCount = 10,
+            MaxThreads = 4,
+            IterationCount = 100,
             Endpoint = "http://52.255.84.179/api/remote/Results",
             RequestMethod = HttpMethod.Post
         };
