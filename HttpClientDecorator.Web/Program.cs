@@ -25,10 +25,10 @@ builder.Services.AddSingleton(serviceProvider =>
 {
     var logger = serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>();
     var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
-    var pollyLogger = serviceProvider.GetRequiredService<ILogger<HttpPollyRetryBreakerService>>();
+    var retryLogger = serviceProvider.GetRequiredService<ILogger<HttpPollyRetryBreakerService>>();
     var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
     IHttpClientSendService baseService = new HttpClientSendService(logger, httpClientFactory);
-    IHttpClientSendService pollyService = new HttpPollyRetryBreakerService(pollyLogger, baseService);
+    IHttpClientSendService pollyService = new HttpPollyRetryBreakerService(retryLogger, baseService);
     IHttpClientSendService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, pollyService);
     return telemetryService;
 });

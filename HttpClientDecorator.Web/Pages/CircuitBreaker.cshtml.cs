@@ -6,14 +6,14 @@ using System.Text.Json;
 
 namespace HttpClientDecorator.Web.Pages;
 
-public class PollyModel : PageModel
+public class CircuitBreakerModel : PageModel
 {
     private static readonly Random random = new Random();
     private readonly object WriteLock = new();
-    private readonly ILogger<PollyModel> _logger;
+    private readonly ILogger<CircuitBreakerModel> _logger;
     private readonly IHttpClientSendService _service;
 
-    public PollyModel(ILogger<PollyModel> logger, IHttpClientSendService getCallService)
+    public CircuitBreakerModel(ILogger<CircuitBreakerModel> logger, IHttpClientSendService getCallService)
     {
         _logger = logger;
         _service = getCallService;
@@ -88,7 +88,7 @@ public class PollyModel : PageModel
 
                     lock (WriteLock)
                     {
-                        if(result.ErrorList.Count > 0)
+                        if (result.ErrorList.Count > 0)
                         {
                             result.ErrorList.Add(test);
                         }

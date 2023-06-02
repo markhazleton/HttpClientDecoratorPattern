@@ -58,7 +58,7 @@ public class HttpClientSendResults<T> : IHttpGetCallResults<T>
     /// <summary>
     /// Error Message if something goes wrong, usually null
     /// </summary>
-    public  List<string> ErrorList { get; set; } = new();
+    public List<string> ErrorList { get; set; } = new();
 
     /// <summary>
     /// Property to store the iteration number of the HTTP GET call.

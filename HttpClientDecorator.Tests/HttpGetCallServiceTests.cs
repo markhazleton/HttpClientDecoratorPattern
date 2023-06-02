@@ -67,7 +67,7 @@ namespace HttpClientDecorator.Tests
 
             // Assert
             Assert.AreEqual(getCallResults.ResponseResults, result.ResponseResults);
-            Assert.AreEqual(result.ErrorList.Count,0);
+            Assert.AreEqual(result.ErrorList.Count, 0);
             Assert.AreEqual(0, result.Retries);
         }
 
