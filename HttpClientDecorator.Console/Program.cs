@@ -34,7 +34,37 @@ void OnCircuitBreakerHalfOpen()
 
 Console.WriteLine("Hello, World!");
 
-await DoSomeWorkSeq(CircuitBreakerThreshold, CircuitBreakerDurationInMS, MaxConcurrentRequests, NumberOfRequests);
+var retryPolicy = Policy.Handle<Exception>()
+    .WaitAndRetryAsync(
+        retryCount: 1,
+        sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)),
+        onRetry: (exception, calculatedWaitDuration, context) =>
+        {
+            // Log or handle the retry attempt
+            Console.WriteLine($"Retry attempt due to exception: {exception.Message}");
+        }
+    );
+
+var circuitBreakerPolicy = Policy.Handle<Exception>()
+    .CircuitBreakerAsync(
+        exceptionsAllowedBeforeBreaking: 2,
+        durationOfBreak: TimeSpan.FromSeconds(1),
+        onBreak: (ex, breakDelay) =>
+        {
+            // Log or handle the circuit breaker opening
+            Console.WriteLine("Circuit breaker opened. Requests are being blocked.");
+        },
+        onReset: () =>
+        {
+            // Log or handle the circuit breaker resetting
+            Console.WriteLine("Circuit breaker reset. Requests are allowed again.");
+        }
+    );
+
+var combinedPolicy = Policy.WrapAsync(circuitBreakerPolicy, retryPolicy);
+
+
+await DoSomeWorkSeq(CircuitBreakerThreshold, CircuitBreakerDurationInMS, MaxConcurrentRequests, NumberOfRequests, new HttpClient());
 
 Console.ReadLine();
 Console.WriteLine("We are done!");
@@ -104,12 +134,10 @@ async Task DoSomeWork(int circuitBreakerThreshold, double circuitBreakerDuration
 }
 
 
-async Task DoSomeWorkSeq(int circuitBreakerThreshold, double circuitBreakerTimeSpan, int maxConcurrentRequests, int numberOfRequests)
+async Task DoSomeWorkSeq(int circuitBreakerThreshold, double circuitBreakerTimeSpan, int maxConcurrentRequests, int numberOfRequests, HttpClient client)
 {
     var circuitBreakerPolicy = Policy.Handle<Exception>()
         .CircuitBreakerAsync(circuitBreakerThreshold, TimeSpan.FromMicroseconds(circuitBreakerTimeSpan), OnCircuitBreakerOpened, OnCircuitBreakerReset, OnCircuitBreakerHalfOpen);
-
-    var client = new HttpClient();
     var semaphore = new SemaphoreSlim(maxConcurrentRequests);
 
     var tasks = new List<Task>();
