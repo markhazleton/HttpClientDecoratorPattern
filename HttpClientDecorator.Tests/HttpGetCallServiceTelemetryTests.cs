@@ -51,7 +51,7 @@ namespace HttpClientDecorator.Tests
             var expectedResponse = new HttpClientSendResults<string>
             {
                 RequestPath = "https://example.com",
-                ResponseResults = "OK",
+                ResponseResults = null,
                 Retries = 0
             };
             var expectedException = new Exception("Something went wrong");
