@@ -27,7 +27,7 @@ public class CircuitBreakerModel : PageModel
         {
             MaxThreads = 4,
             IterationCount = 100,
-            Endpoint = "http://52.255.84.179/api/remote/Results",
+            Endpoint = "https://asyncdemoweb.azurewebsites.net/api/remote/Results",
             RequestMethod = HttpMethod.Post
         };
         HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct).ConfigureAwait(false);

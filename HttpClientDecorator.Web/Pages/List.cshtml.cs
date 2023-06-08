@@ -25,7 +25,7 @@ public class ListModel : PageModel
         {
             MaxThreads = 100,
             IterationCount = 100,
-            Endpoint = "http://52.255.84.179/status"
+            Endpoint = "https://asyncdemoweb.azurewebsites.net/status"
         };
         HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct).ConfigureAwait(false);
     }

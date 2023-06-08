@@ -96,7 +96,7 @@ async Task DoSomeWork(int circuitBreakerThreshold, double circuitBreakerDuration
                 {
                     try
                     {
-                        var request = new HttpRequestMessage(HttpMethod.Post, "http://52.255.84.179/api/remote/Results");
+                        var request = new HttpRequestMessage(HttpMethod.Post, "https://asyncdemoweb.azurewebsites.net/api/remote/Results");
                         var content = new StringContent("{\r\n  \"loopCount\": " + reqloopCount + ",\r\n  \"maxTimeMS\": 100,\r\n  \"runTimeMS\": 0,\r\n  \"message\": \"string\",\r\n  \"resultValue\": \"string\"\r\n}", null, "application/json");
                         request.Content = content;
                         var response = await client.SendAsync(request);
@@ -163,7 +163,7 @@ async Task DoSomeWorkSeq(int circuitBreakerThreshold, double circuitBreakerTimeS
 
                         try
                         {
-                            var request = new HttpRequestMessage(HttpMethod.Post, "http://52.255.84.179/api/remote/Results");
+                            var request = new HttpRequestMessage(HttpMethod.Post, "https://asyncdemoweb.azurewebsites.net/api/remote/Results");
                             var content = new StringContent("{\r\n  \"loopCount\": " + loopCount + ",\r\n  \"maxTimeMS\": 100,\r\n  \"runTimeMS\": 0,\r\n  \"message\": \"string\",\r\n  \"resultValue\": \"string\"\r\n}", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
