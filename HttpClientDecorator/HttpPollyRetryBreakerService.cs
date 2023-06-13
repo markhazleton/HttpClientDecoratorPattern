@@ -60,11 +60,10 @@ public class HttpPollyRetryBreakerService : IHttpClientSendService
 
     public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
     {
-        // Wrap the GetAsync call with the retry / circuit breaker policies
+        // Wrap the GetAsync call with the circuit breaker policies
         try
         {
-            statusCall = await Policy.WrapAsync(_retryPolicy, _circuitBreakerPolicy)
-                .ExecuteAsync(() => _service.HttpClientSendAsync(statusCall, ct));
+            statusCall = await _circuitBreakerPolicy.ExecuteAsync(() => _service.HttpClientSendAsync(statusCall, ct));
         }
         catch (Exception ex)
         {
