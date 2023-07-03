@@ -1,49 +1,109 @@
 ﻿using Polly;
 using Polly.CircuitBreaker;
 using System.Security.Cryptography;
+using HttpClientDecorator.Helpers;
 
-const int CircuitBreakerThreshold = 1;
+const int CircuitBreakerThreshold = 3;
 const int CircuitBreakerDurationInMS = 1000;
 const int MaxConcurrentRequests = 1;
 const int NumberOfRequests = 100;
 
-
 Console.WriteLine("Hello, World!");
-var results = await DoWork(
-    CircuitBreakerThreshold,
-    CircuitBreakerDurationInMS,
-    MaxConcurrentRequests,
-    NumberOfRequests,
-    new HttpClient());
+//var results = await DoWork(
+//    CircuitBreakerThreshold,
+//    CircuitBreakerDurationInMS,
+//    MaxConcurrentRequests,
+//    NumberOfRequests,
+//    new HttpClient());
 
-foreach (var (Iteration, ResponseContent) in results)
+//foreach (var (Iteration, ResponseContent) in results)
+//{
+//    Console.WriteLine($"{Iteration}:{ResponseContent}");
+//}
+//Console.WriteLine("We are done!");
+//Console.ReadKey();
+
+
+// Configure the circuit breaker policy
+var circuitBreakerPolicy = Policy
+    .Handle<HttpRequestException>()
+    .CircuitBreaker(
+        exceptionsAllowedBeforeBreaking: 3,
+        durationOfBreak: TimeSpan.FromSeconds(30),
+        onBreak: (ex, breakDelay) =>
+        {
+            Console.WriteLine($"Circuit breaker opened. Delaying for {breakDelay.TotalSeconds} seconds.");
+        },
+        onReset: () =>
+        {
+            Console.WriteLine("Circuit breaker reset.");
+        },
+        onHalfOpen: () =>
+        {
+            Console.WriteLine("Circuit breaker half-opened.");
+        }
+    );
+
+// Execute an HTTP request with the circuit breaker policy
+circuitBreakerPolicy.Execute(() =>
 {
-    Console.WriteLine($"{Iteration}:{ResponseContent}");
-}
-Console.WriteLine("We are done!");
-Console.ReadKey();
+    try
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = httpClient.GetAsync("https://asyncdemo.controlorigins.com/status").Result;
+            response.EnsureSuccessStatusCode();
+
+            var result = response.Content.ReadAsStringAsync().Result;
+            Console.WriteLine($"Response: {result}");
+        }
+    }
+    catch (HttpRequestException ex)
+    {
+        Console.WriteLine($"Error: {ex.Message}");
+        throw;
+    }
+});
 
 
-void OnCircuitBreakerOpened(Exception exception, TimeSpan span)
-{
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine($"Circuit breaker opened. No requests will be made for the specified timespan.\n\t{exception.Message}");
-    Console.ResetColor();
-}
 
-void OnCircuitBreakerReset()
-{
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("Circuit breaker reset. Requests will be attempted again.");
-    Console.ResetColor();
-}
 
-void OnCircuitBreakerHalfOpen()
-{
-    Console.ForegroundColor = ConsoleColor.Yellow;
-    Console.WriteLine("Circuit breaker half-open. Testing if requests can be made again.");
-    Console.ResetColor();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async Task<List<(int Iteration, string ResponseContent)>> DoWork(
     int circuitBreakerThreshold,
@@ -55,9 +115,9 @@ async Task<List<(int Iteration, string ResponseContent)>> DoWork(
     var circuitBreakerPolicy = Policy.Handle<Exception>()
         .CircuitBreakerAsync(circuitBreakerThreshold
         , TimeSpan.FromMicroseconds(circuitBreakerTimeSpan)
-        , onBreak: OnCircuitBreakerOpened
-        , onReset: OnCircuitBreakerReset
-        , onHalfOpen: OnCircuitBreakerHalfOpen);
+        , onBreak: CircuitBreakerHelper.OnCircuitBreakerOpened
+        , onReset: CircuitBreakerHelper.OnCircuitBreakerReset
+        , onHalfOpen: CircuitBreakerHelper.OnCircuitBreakerHalfOpen);
     var semaphore = new SemaphoreSlim(maxConcurrentRequests);
     var tasks = new List<Task>();
     var results = new List<(int Iteration, string ResponseContent)>(); // List to store the results
@@ -69,13 +129,16 @@ async Task<List<(int Iteration, string ResponseContent)>> DoWork(
         {
             int iterationNumber = i;
             await semaphore.WaitAsync(); // Acquire a semaphore slot
+
+            // await Task.Delay(200); // Delay in milliseconds
+
             tasks.Add(Task.Run(async () =>
             {
                 try // Try Block for Catching Broken Circuit Finally release Semaphore
                 {
                     await circuitBreakerPolicy.ExecuteAsync(async () =>
                     {
-                        int relativeWorkRequested = RandomNumberGenerator.GetInt32(2, 5);
+                        int relativeWorkRequested = RandomNumberGenerator.GetInt32(20, 25);
                         try // Try Block for Capturing Request Exceptions
                         {
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://asyncdemoweb.azurewebsites.net/api/remote/Results");
