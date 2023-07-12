@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace HttpClientDecorator.Web.Pages;
 
 
-public class JokeModel : PageModel
+public class JokePageModel : PageModel
 {
-    private readonly ILogger<JokeModel> _logger;
+    private readonly ILogger<JokePageModel> _logger;
     private readonly IHttpClientSendService _service;
-    public HttpClientSendResults<Joke> JokeResult { get; set; } = default!;
-    public Joke TheJoke { get; set; } = new Joke();
-    public JokeModel(ILogger<JokeModel> logger, IHttpClientSendService getCallService)
+    public HttpClientSendResults<JokeModel> JokeResult { get; set; } = default!;
+    public JokeModel TheJoke { get; set; } = new JokeModel();
+    public JokePageModel(ILogger<JokePageModel> logger, IHttpClientSendService getCallService)
     {
         _logger = logger;
         _service = getCallService;
@@ -23,7 +23,7 @@ public class JokeModel : PageModel
     /// </summary>
     public async Task OnGet(CancellationToken ct = default)
     {
-        JokeResult = new HttpClientSendResults<Joke>();
+        JokeResult = new HttpClientSendResults<JokeModel>();
 
         if (JokeResult == null)
         {
@@ -43,7 +43,7 @@ public class JokeModel : PageModel
         if (JokeResult?.ResponseResults is null)
         {
             _logger.LogError("jokeResult.ResponseResults is null");
-            TheJoke = new Joke()
+            TheJoke = new JokeModel()
             {
                 error = true
             };

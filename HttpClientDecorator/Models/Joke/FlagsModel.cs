@@ -1,6 +1,6 @@
 ﻿namespace HttpClientDecorator.Models.Joke;
 
-public class Flags
+public class FlagsModel
 {
     public bool nsfw { get; set; }
     public bool religious { get; set; }
