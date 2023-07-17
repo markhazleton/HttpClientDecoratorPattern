@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace HttpClientDecorator;
+
 
 /// <summary>
 /// Class HttpGetCallServiceTelemetry adds telemetry to the IHttpClientSendService implementation

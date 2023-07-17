@@ -1,5 +1,7 @@
 using HttpClientDecorator;
 using HttpClientDecorator.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 // Add the HttpGetCall and Telemetry Decorator for IHttpClientSendService interface
 // Add Http Client Factory
@@ -21,11 +24,8 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
     client.DefaultRequestHeaders.Add("X-Request-Source", "HttpClientDecorator");
 });
 
-
-
 builder.Services.AddSingleton(serviceProvider =>
 {
-    var logger = serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>();
     var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
     var retryLogger = serviceProvider.GetRequiredService<ILogger<HttpPollyRetryBreakerService>>();
     var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
@@ -34,11 +34,15 @@ builder.Services.AddSingleton(serviceProvider =>
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var retryOptions = configuration.GetSection("HttpPollyRetryBreakerOptions").Get<HttpPollyRetryBreakerOptions>();
 
-    IHttpClientSendService baseService = new HttpClientSendService(logger, httpClientFactory);
+    IHttpClientSendService baseService = new HttpClientSendService(serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(), httpClientFactory);
     IHttpClientSendService pollyService = new HttpPollyRetryBreakerService(retryLogger, baseService, retryOptions);
     IHttpClientSendService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, pollyService);
+    IHttpClientSendService cacheService = new HttpSendServiceCache(
+        pollyService,
+        serviceProvider.GetRequiredService<ILogger<HttpSendServiceCache>>(),
+        serviceProvider.GetRequiredService<IMemoryCache>());
 
-    return telemetryService;
+    return cacheService;
 });
 
 var app = builder.Build();

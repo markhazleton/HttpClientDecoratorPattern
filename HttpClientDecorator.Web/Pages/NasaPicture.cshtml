@@ -1,0 +1,56 @@
+﻿@page
+@model HttpClientDecorator.Web.Pages.NasaPicturePageModel
+@{
+    ViewData["Title"] = "NASA Picture of the Day";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="card border-info">
+            <div class="card-header">
+                <h1>
+                    NASA Picture of the Day
+                </h1>
+                <p>
+                    
+                </p>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <div class="row">
+                        @{
+                            foreach (var item in Model.nasaPictureResponse)
+                            {
+                                <div class="col-4 ">
+                                    <div class="card w-100">
+                                        <div class="card-header">
+                                            <h2>@item.title</h2>
+                                        </div>
+                                        <div class="card-body">
+                                        <a href="@item.hdurl" target="_blank">
+                                            <img src="@item.url" class="img-fluid d-block w-100  h-100" style="max-height:500px;max-width:500px;" />
+                                        </a>
+                                        </div>
+                                        <div class="card-footer">
+                                            <p>@item.explanation</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <strong>The Api Get call took @Html.DisplayFor(model=>model.nasaResponse.ElapsedMilliseconds) milliseconds to return.</strong>
+                <br />
+                <small>Data from @Html.DisplayFor(model=>model.nasaResponse.CompletionDate) using @Html.DisplayFor(model=>model.nasaResponse.RequestPath)</small>
+                <p>
+
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+

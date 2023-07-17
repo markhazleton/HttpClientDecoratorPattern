@@ -38,12 +38,7 @@ public class HttpClientSendResults<T> : IHttpGetCallResults<T>
         RequestPath = path;
     }
 
-    /// <summary>
-    /// Id for this record
-    /// </summary>
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Key, Column(Order = 0)]
-    public int Id { get; set; }
+    public int CacheDurationMinutes { get; set; } = 1;
 
     /// <summary>
     /// Property to store the completion date and time of the HTTP GET call.
@@ -61,27 +56,33 @@ public class HttpClientSendResults<T> : IHttpGetCallResults<T>
     public List<string> ErrorList { get; set; } = new();
 
     /// <summary>
+    /// Id for this record
+    /// </summary>
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key, Column(Order = 0)]
+    public int Id { get; set; }
+    /// <summary>
     /// Property to store the iteration number of the HTTP GET call.
     /// </summary>
     public int Iteration { get; set; }
     /// <summary>
-    /// Number of retires to get a successful HTTP GET call.
+    /// 
     /// </summary>
-    public int Retries { get; set; }
+    [NotMapped]
+    public StringContent RequestBody { get; set; }
+    [NotMapped]
+    public HttpMethod RequestMethod { get; set; } = HttpMethod.Get;
     /// <summary>
     /// Property to store the status path of the HTTP GET call.
     /// </summary>
     public string RequestPath { get; set; }
-    [NotMapped]
-    public HttpMethod RequestMethod { get; set; } = HttpMethod.Get;
     /// <summary>
     /// Property to store the results of the HTTP GET call.
     /// </summary>
     [NotMapped]
     public T? ResponseResults { get; set; }
     /// <summary>
-    /// 
+    /// Number of retires to get a successful HTTP GET call.
     /// </summary>
-    [NotMapped]
-    public StringContent RequestBody { get; set; }
+    public int Retries { get; set; }
 }
