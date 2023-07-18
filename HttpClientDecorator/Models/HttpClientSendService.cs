@@ -6,7 +6,7 @@ namespace HttpClientDecorator.Models;
 /// <summary>
 /// Class to store the results of an HTTP GET call.
 /// </summary>
-public class HttpClientSendRequest<T> 
+public class HttpClientSendRequest<T>
 {
     /// <summary>
     /// Default constructor to initialize the iteration and status path.
