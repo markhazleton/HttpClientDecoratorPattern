@@ -9,15 +9,15 @@ public class ListModel : PageModel
 {
     private readonly object WriteLock = new();
     private readonly ILogger<ListModel> _logger;
-    private readonly IHttpClientSendService _service;
+    private readonly IHttpClientRequestService _service;
 
-    public ListModel(ILogger<ListModel> logger, IHttpClientSendService getCallService)
+    public ListModel(ILogger<ListModel> logger, IHttpClientRequestService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
 
-    public IList<HttpClientSendResults<SiteStatus>> HttpGetCallResults { get; set; } = default!;
+    public IList<HttpClientRequest<SiteStatus>> HttpGetCallResults { get; set; } = default!;
 
     public async Task OnGetAsync(CancellationToken ct = default)
     {
@@ -36,12 +36,12 @@ public class ListModel : PageModel
     /// <param name="itterationCount"></param>
     /// <param name="endpoint"></param>
     /// <returns></returns>
-    private async Task<List<HttpClientSendResults<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
+    private async Task<List<HttpClientRequest<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
         SemaphoreSlim semaphore = new(listRequest.MaxThreads);
-        List<HttpClientSendResults<SiteStatus>> results = new();
+        List<HttpClientRequest<SiteStatus>> results = new();
 
         // Create a list of tasks to make the GetAsync calls
         List<Task> tasks = new();
@@ -50,7 +50,7 @@ public class ListModel : PageModel
             // Acquire the semaphore before making the request
             await semaphore.WaitAsync().ConfigureAwait(false);
             curIndex++;
-            var statusCall = new HttpClientSendResults<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
+            var statusCall = new HttpClientRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {

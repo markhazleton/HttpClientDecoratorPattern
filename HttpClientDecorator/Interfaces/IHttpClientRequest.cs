@@ -1,6 +1,6 @@
 ﻿namespace HttpClientDecorator.Interfaces;
 
-public interface IHttpGetCallResults<T>
+public interface IHttpClientRequest<T>
 {
     DateTime? CompletionDate { get; set; }
     long ElapsedMilliseconds { get; set; }

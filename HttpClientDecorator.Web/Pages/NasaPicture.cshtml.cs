@@ -8,28 +8,31 @@ namespace HttpClientDecorator.Web.Pages;
 public class NasaPicturePageModel : PageModel
 {
     private readonly ILogger<NasaPicturePageModel> _logger;
-    private readonly IHttpClientSendService _service;
-    public HttpClientSendResults<NasaPictureListDto> nasaResponse { get; set; } = default!;
-    public NasaPictureListDto nasaPictureResponse { get; set; } = new NasaPictureListDto();
+    private readonly IHttpClientRequestService _service;
+    public HttpClientRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
+    public NasaPictureListDto apiResponse { get; set; } = new NasaPictureListDto();
     public ArtList ArtList { get; set; } = new ArtList();
-    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientSendService getCallService)
+    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientRequestService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
     public async Task OnGet(CancellationToken ct = default)
     {
-        nasaResponse = new HttpClientSendResults<NasaPictureListDto>();
+        apiRequest = new HttpClientRequest<NasaPictureListDto>
+        {
+            CacheDurationMinutes = 500
+        };
 
-        if (nasaResponse == null)
+        if (apiRequest == null)
         {
             _logger.LogError("nasaPictureResponse is null");
             throw new Exception("nasaPictureResponse is null");
         }
         var apiKey = "DEMO_KEY";
 
-        nasaResponse.RequestPath = $"https://api.nasa.gov/planetary/apod?api_key={apiKey}&count=5";
-        nasaResponse = await _service.HttpClientSendAsync(nasaResponse, ct).ConfigureAwait(false);
+        apiRequest.RequestPath = $"https://api.nasa.gov/planetary/apod?api_key={apiKey}&count=5";
+        apiRequest = await _service.HttpClientSendAsync(apiRequest, ct).ConfigureAwait(false);
 
         if (_service == null)
         {
@@ -37,16 +40,15 @@ public class NasaPicturePageModel : PageModel
             throw new NullReferenceException(nameof(_service));
         }
 
-        if (nasaResponse?.ResponseResults is null)
+        if (apiRequest?.ResponseResults is null)
         {
-            nasaPictureResponse = new NasaPictureListDto();
+            apiResponse = new NasaPictureListDto();
             _logger.LogError("nasaPictureResponse.ResponseResults is null");
         }
         else
         {
-            nasaResponse.RequestPath = "https://api.nasa.gov/planetary/apod?api_key=APIKEY&count=5";
-            nasaResponse.CacheDurationMinutes = 500;
-            nasaPictureResponse = nasaResponse.ResponseResults;
+            apiRequest.RequestPath = "https://api.nasa.gov/planetary/apod?api_key=APIKEY&count=5";
+            apiResponse = apiRequest.ResponseResults;
             _logger.LogInformation("Good Response from NASA API");
         }
     }

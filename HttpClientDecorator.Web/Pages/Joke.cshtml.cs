@@ -9,10 +9,10 @@ namespace HttpClientDecorator.Web.Pages;
 public class JokePageModel : PageModel
 {
     private readonly ILogger<JokePageModel> _logger;
-    private readonly IHttpClientSendService _service;
-    public HttpClientSendResults<JokeModel> JokeResult { get; set; } = default!;
+    private readonly IHttpClientRequestService _service;
+    public HttpClientRequest<JokeModel> JokeResult { get; set; } = default!;
     public JokeModel TheJoke { get; set; } = new JokeModel();
-    public JokePageModel(ILogger<JokePageModel> logger, IHttpClientSendService getCallService)
+    public JokePageModel(ILogger<JokePageModel> logger, IHttpClientRequestService getCallService)
     {
         _logger = logger;
         _service = getCallService;
@@ -23,7 +23,7 @@ public class JokePageModel : PageModel
     /// </summary>
     public async Task OnGet(CancellationToken ct = default)
     {
-        JokeResult = new HttpClientSendResults<JokeModel>();
+        JokeResult = new HttpClientRequest<JokeModel>();
 
         if (JokeResult == null)
         {

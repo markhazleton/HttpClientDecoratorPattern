@@ -5,7 +5,7 @@ using Polly.Retry;
 
 namespace HttpClientDecorator;
 
-public class HttpPollyRetryBreakerOptions
+public class HttpClientSendPollyOptions
 {
     public int MaxRetryAttempts { get; set; }
     public TimeSpan RetryDelay { get; set; }
@@ -14,19 +14,19 @@ public class HttpPollyRetryBreakerOptions
 }
 
 
-public class HttpPollyRetryBreakerService : IHttpClientSendService
+public class HttpClientSendServicePolly : IHttpClientRequestService
 {
-    private readonly ILogger<HttpPollyRetryBreakerService> _logger;
+    private readonly ILogger<HttpClientSendServicePolly> _logger;
     private readonly List<string> _errorList = new List<string>();
-    private readonly IHttpClientSendService _service;
+    private readonly IHttpClientRequestService _service;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
-    private readonly HttpPollyRetryBreakerOptions _options;
+    private readonly HttpClientSendPollyOptions _options;
 
-    public HttpPollyRetryBreakerService(
-        ILogger<HttpPollyRetryBreakerService> logger,
-        IHttpClientSendService service,
-        HttpPollyRetryBreakerOptions options)
+    public HttpClientSendServicePolly(
+        ILogger<HttpClientSendServicePolly> logger,
+        IHttpClientRequestService service,
+        HttpClientSendPollyOptions options)
     {
         _service = service;
         _logger = logger;
@@ -58,7 +58,7 @@ public class HttpPollyRetryBreakerService : IHttpClientSendService
                 });
     }
 
-    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> statusCall, CancellationToken ct)
     {
         // Wrap the GetAsync call with the circuit breaker policies
         try

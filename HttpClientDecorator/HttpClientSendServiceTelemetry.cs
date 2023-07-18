@@ -1,24 +1,23 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace HttpClientDecorator;
 
 
 /// <summary>
-/// Class HttpGetCallServiceTelemetry adds telemetry to the IHttpClientSendService implementation
+/// Class HttpClientSendServiceTelemetry adds telemetry to the IHttpClientRequestService implementation
 /// </summary>
-public class HttpGetCallServiceTelemetry : IHttpClientSendService
+public class HttpClientSendServiceTelemetry : IHttpClientRequestService
 {
-    private readonly ILogger<HttpGetCallServiceTelemetry> _logger;
-    private readonly IHttpClientSendService _service;
+    private readonly ILogger<HttpClientSendServiceTelemetry> _logger;
+    private readonly IHttpClientRequestService _service;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="HttpGetCallServiceTelemetry"/> class
+    /// Initializes a new instance of the <see cref="HttpClientSendServiceTelemetry"/> class
     /// </summary>
     /// <param name="logger">ILogger instance</param>
-    /// <param name="service">IHttpClientSendService instance</param>
-    public HttpGetCallServiceTelemetry(ILogger<HttpGetCallServiceTelemetry> logger, IHttpClientSendService service)
+    /// <param name="service">IHttpClientRequestService instance</param>
+    public HttpClientSendServiceTelemetry(ILogger<HttpClientSendServiceTelemetry> logger, IHttpClientRequestService service)
     {
         _logger = logger;
         _service = service;
@@ -28,10 +27,10 @@ public class HttpGetCallServiceTelemetry : IHttpClientSendService
     /// GetAsync performs a GET request and adds telemetry information to the response.
     /// </summary>
     /// <typeparam name="T">Result type of the GET request</typeparam>
-    /// <param name="statusCall">HttpClientSendResults instance</param>
-    /// <returns>HttpClientSendResults instance including telemetry information</returns>
+    /// <param name="statusCall">HttpClientRequest instance</param>
+    /// <returns>HttpClientRequest instance including telemetry information</returns>
     /// <param name="cts"></param>
-    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> statusCall, CancellationToken ct)
     {
         Stopwatch sw = new();
         sw.Start();
@@ -47,6 +46,7 @@ public class HttpGetCallServiceTelemetry : IHttpClientSendService
         sw.Stop();
         statusCall.ElapsedMilliseconds = sw.ElapsedMilliseconds;
         statusCall.CompletionDate = DateTime.Now;
+        _logger.LogInformation("Telemetry:GetAsync:Attributes Updated");
         return statusCall;
     }
 }

@@ -20,7 +20,7 @@
                 <div class="container">
                     <div class="row">
                         @{
-                            foreach (var item in Model.nasaPictureResponse)
+                            foreach (var item in Model.apiResponse)
                             {
                                 <div class="col-4 ">
                                     <div class="card w-100">
@@ -43,11 +43,11 @@
                 </div>
             </div>
             <div class="card-footer">
-                <strong>The Api Get call took @Html.DisplayFor(model=>model.nasaResponse.ElapsedMilliseconds) milliseconds to return.</strong>
+                <strong>The Api Get call took @Html.DisplayFor(model=>model.apiRequest.ElapsedMilliseconds) milliseconds to return.</strong>
                 <br />
-                <small>Data from @Html.DisplayFor(model=>model.nasaResponse.CompletionDate) using @Html.DisplayFor(model=>model.nasaResponse.RequestPath)</small>
+                <small>Data from @Html.DisplayFor(model=>model.apiRequest.RequestPath)</small>
                 <p>
-
+                    @Model.apiRequest.ResultAge
                 </p>
             </div>
         </div>

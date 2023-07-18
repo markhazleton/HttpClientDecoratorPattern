@@ -7,29 +7,29 @@ namespace HttpClientDecorator.Tests
     [TestClass]
     public class HttpGetCallServiceTelemetryTests
     {
-        private Mock<IHttpClientSendService> _mockService;
-        private Mock<ILogger<HttpGetCallServiceTelemetry>> _mockLogger;
-        private HttpGetCallServiceTelemetry _telemetryService;
+        private Mock<IHttpClientRequestService> _mockService;
+        private Mock<ILogger<HttpClientSendServiceTelemetry>> _mockLogger;
+        private HttpClientSendServiceTelemetry _telemetryService;
 
         [TestInitialize]
         public void TestSetup()
         {
-            _mockService = new Mock<IHttpClientSendService>();
-            _mockLogger = new Mock<ILogger<HttpGetCallServiceTelemetry>>();
-            _telemetryService = new HttpGetCallServiceTelemetry(_mockLogger.Object, _mockService.Object);
+            _mockService = new Mock<IHttpClientRequestService>();
+            _mockLogger = new Mock<ILogger<HttpClientSendServiceTelemetry>>();
+            _telemetryService = new HttpClientSendServiceTelemetry(_mockLogger.Object, _mockService.Object);
         }
 
         [TestMethod]
         public async Task GetAsync_ReturnsExpectedResult()
         {
             // Arrange
-            var expectedResponse = new HttpClientSendResults<string>
+            var expectedResponse = new HttpClientRequest<string>
             {
                 RequestPath = "https://example.com",
                 ResponseResults = "OK",
                 Retries = 0
             };
-            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
+            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientRequest<string>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedResponse);
 
             // Act
@@ -48,14 +48,14 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_LogsErrorAndReturnsOriginalResult_WhenExceptionIsThrown()
         {
             // Arrange
-            var expectedResponse = new HttpClientSendResults<string>
+            var expectedResponse = new HttpClientRequest<string>
             {
                 RequestPath = "https://example.com",
                 ResponseResults = null,
                 Retries = 0
             };
             var expectedException = new Exception("Something went wrong");
-            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientSendResults<string>>(), It.IsAny<CancellationToken>()))
+            _mockService.Setup(x => x.HttpClientSendAsync(It.IsAny<HttpClientRequest<string>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(expectedException);
 
             // Act

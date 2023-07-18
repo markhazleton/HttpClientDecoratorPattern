@@ -2,7 +2,7 @@
 using System.Text.Json;
 
 namespace HttpClientDecorator;
-public class HttpClientSendService : IHttpClientSendService
+public class HttpClientSendService : IHttpClientRequestService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpClientSendService> _logger;
@@ -19,7 +19,7 @@ public class HttpClientSendService : IHttpClientSendService
     /// <param name="httpSendResults">A container for the URL to make the GET request to, and the expected response data.</param>
     /// <returns>A container for the response data and any relevant error information.</returns>
     /// <param name="ct"></param>
-    public async Task<HttpClientSendResults<T>> HttpClientSendAsync<T>(HttpClientSendResults<T> httpSendResults, CancellationToken ct)
+    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> httpSendResults, CancellationToken ct)
     {
         if (httpSendResults == null)
         {

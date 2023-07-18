@@ -27,7 +27,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_NullGetCallResults_ThrowsArgumentNullException()
         {
             // Arrange
-            HttpClientSendResults<object> getCallResults = null;
+            HttpClientRequest<object> getCallResults = null;
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None));
@@ -37,7 +37,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_EmptyRequestPath_ThrowsArgumentException()
         {
             // Arrange
-            var getCallResults = new HttpClientSendResults<object>
+            var getCallResults = new HttpClientRequest<object>
             {
                 RequestPath = string.Empty
             };
@@ -50,7 +50,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_Success_ReturnsHttpGetCallResultsWithResponseData()
         {
             // Arrange
-            var getCallResults = new HttpClientSendResults<string>
+            var getCallResults = new HttpClientRequest<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "success"
@@ -75,7 +75,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_DeserializeException_LogsCriticalErrorAndReturnsHttpGetCallResultsWithError()
         {
             // Arrange
-            var getCallResults = new HttpClientSendResults<string>
+            var getCallResults = new HttpClientRequest<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "invalid-json"
