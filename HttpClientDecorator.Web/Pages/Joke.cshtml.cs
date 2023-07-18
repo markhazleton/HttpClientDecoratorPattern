@@ -1,6 +1,5 @@
 using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
-using HttpClientDecorator.Models.Joke;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HttpClientDecorator.Web.Pages;
@@ -54,5 +53,27 @@ public class JokePageModel : PageModel
             TheJoke = JokeResult.ResponseResults;
         }
     }
-
 }
+public class JokeModel
+{
+    public bool error { get; set; }
+    public string? category { get; set; }
+    public string? type { get; set; }
+    public string? setup { get; set; }
+    public string? delivery { get; set; }
+    public string? joke { get; set; }
+    public FlagsModel? flags { get; set; }
+    public int id { get; set; }
+    public bool safe { get; set; }
+    public string? lang { get; set; }
+}
+public class FlagsModel
+{
+    public bool nsfw { get; set; }
+    public bool religious { get; set; }
+    public bool political { get; set; }
+    public bool racist { get; set; }
+    public bool sexist { get; set; }
+    public bool @explicit { get; set; }
+}
+

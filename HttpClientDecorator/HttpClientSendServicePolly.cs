@@ -67,11 +67,16 @@ public class HttpClientSendServicePolly : IHttpClientRequestService
         }
         catch (Exception ex)
         {
+            _logger.LogError($"Polly:CircuitBreaker:Exception:{ex.Message}");
             _errorList.Add($"Polly:GetAsync:Exception:{ex.Message}");
         }
 
         statusCall.ErrorList.AddRange(_errorList);
+
         _errorList.Clear();
+
+        _logger.LogInformation("Polly:Call Completed");
+
         return statusCall;
     }
 }

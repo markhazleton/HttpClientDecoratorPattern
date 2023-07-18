@@ -25,12 +25,12 @@ public class CircuitBreakerModel : PageModel
     {
         var runManny = new ListRequest
         {
-            MaxThreads = 4,
-            IterationCount = 100,
+            MaxThreads = 1,
+            IterationCount = 10,
             Endpoint = "https://asyncdemoweb.azurewebsites.net/api/remote/Results",
             RequestMethod = HttpMethod.Post
         };
-        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct).ConfigureAwait(false);
+        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct);
     }
 
     public StringContent GetRandomSiteStatus(int curIndex)
@@ -76,6 +76,9 @@ public class CircuitBreakerModel : PageModel
                 RequestMethod = listRequest.RequestMethod,
                 RequestBody = GetRandomSiteStatus(curIndex),
             };
+            statusCall.RequestPath = $"{statusCall.RequestPath}?Index={curIndex}";
+
+
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {
