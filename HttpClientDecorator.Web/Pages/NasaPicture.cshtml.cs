@@ -1,8 +1,3 @@
-using HttpClientDecorator.Interfaces;
-using HttpClientDecorator.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text.Json.Serialization;
-
 namespace HttpClientDecorator.Web.Pages;
 
 public class NasaPicturePageModel : PageModel

@@ -1,9 +1,4 @@
-using HttpClientDecorator.Interfaces;
-using HttpClientDecorator.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace HttpClientDecorator.Web.Pages;
-
 
 public class JokePageModel : PageModel
 {

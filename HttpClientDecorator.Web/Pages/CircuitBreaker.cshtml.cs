@@ -1,10 +1,4 @@
-﻿using HttpClientDecorator.Interfaces;
-using HttpClientDecorator.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
-using System.Text.Json;
-
-namespace HttpClientDecorator.Web.Pages;
+﻿namespace HttpClientDecorator.Web.Pages;
 
 public class CircuitBreakerModel : PageModel
 {

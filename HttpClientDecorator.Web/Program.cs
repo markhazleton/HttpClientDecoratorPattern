@@ -1,6 +1,11 @@
-using HttpClientDecorator;
-using HttpClientDecorator.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
+global using HttpClientDecorator;
+global using HttpClientDecorator.Interfaces;
+global using HttpClientDecorator.Models;
+global using Microsoft.AspNetCore.Mvc.RazorPages;
+global using Microsoft.Extensions.Caching.Memory;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
