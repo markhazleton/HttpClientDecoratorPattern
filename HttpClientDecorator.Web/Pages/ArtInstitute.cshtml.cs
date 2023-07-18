@@ -3,18 +3,18 @@ namespace HttpClientDecorator.Web.Pages;
 public class ArtInstituteModel : PageModel
 {
     private readonly ILogger<ArtInstituteModel> _logger;
-    private readonly IHttpClientRequestService _service;
-    public HttpClientRequest<ArtWorksResponse> artResponse { get; set; } = default!;
+    private readonly IHttpClientService _service;
+    public HttpClientSendRequest<ArtWorksResponse> artResponse { get; set; } = default!;
     public ArtWorksResponse artWorksResponse { get; set; } = new ArtWorksResponse();
     public ArtList ArtList { get; set; } = new ArtList();
-    public ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientRequestService getCallService)
+    public ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
     public async Task OnGet(CancellationToken ct = default)
     {
-        artResponse = new HttpClientRequest<ArtWorksResponse>();
+        artResponse = new HttpClientSendRequest<ArtWorksResponse>();
 
         if (artResponse == null)
         {

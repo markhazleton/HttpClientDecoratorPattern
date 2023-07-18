@@ -16,7 +16,7 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
-// Add the HttpGetCall and Telemetry Decorator for IHttpClientRequestService interface
+// Add the HttpGetCall and Telemetry Decorator for IHttpClientService interface
 // Add Http Client Factory
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
@@ -34,17 +34,17 @@ builder.Services.AddSingleton(serviceProvider =>
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
 
-    IHttpClientRequestService baseService = new HttpClientSendService(
+    IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>());
-    IHttpClientRequestService pollyService = new HttpClientSendServicePolly(
+    IHttpClientService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
         retryOptions);
-    IHttpClientRequestService telemetryService = new HttpClientSendServiceTelemetry(
+    IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
         pollyService);
-    IHttpClientRequestService cacheService = new HttpClientSendServiceCache(
+    IHttpClientService cacheService = new HttpClientSendServiceCache(
         telemetryService,
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceCache>>(),
         serviceProvider.GetRequiredService<IMemoryCache>());

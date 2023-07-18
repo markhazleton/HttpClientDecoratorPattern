@@ -14,18 +14,18 @@ public class HttpClientSendPollyOptions
 }
 
 
-public class HttpClientSendServicePolly : IHttpClientRequestService
+public class HttpClientSendServicePolly : IHttpClientService
 {
     private readonly ILogger<HttpClientSendServicePolly> _logger;
     private readonly List<string> _errorList = new List<string>();
-    private readonly IHttpClientRequestService _service;
+    private readonly IHttpClientService _service;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
     private readonly HttpClientSendPollyOptions _options;
 
     public HttpClientSendServicePolly(
         ILogger<HttpClientSendServicePolly> logger,
-        IHttpClientRequestService service,
+        IHttpClientService service,
         HttpClientSendPollyOptions options)
     {
         _service = service;
@@ -58,7 +58,7 @@ public class HttpClientSendServicePolly : IHttpClientRequestService
                 });
     }
 
-    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
     {
         // Wrap the GetAsync call with the circuit breaker policies
         try

@@ -2,7 +2,7 @@
 using System.Text.Json;
 
 namespace HttpClientDecorator;
-public class HttpClientSendService : IHttpClientRequestService
+public class HttpClientSendService : IHttpClientService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpClientSendService> _logger;
@@ -19,7 +19,7 @@ public class HttpClientSendService : IHttpClientRequestService
     /// <param name="httpSendResults">A container for the URL to make the GET request to, and the expected response data.</param>
     /// <returns>A container for the response data and any relevant error information.</returns>
     /// <param name="ct"></param>
-    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> httpSendResults, CancellationToken ct)
+    public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> httpSendResults, CancellationToken ct)
     {
         if (httpSendResults == null)
         {
@@ -48,8 +48,8 @@ public class HttpClientSendService : IHttpClientRequestService
         }
         catch (Exception ex)
         {
-            httpSendResults.ErrorList.Add($"HttpClientSendService:GetAsync:DeserializeException:{ex.Message}");
-            _logger.LogCritical("HttpClientSendService:GetAsync:DeserializeException", ex.Message);
+            httpSendResults.ErrorList.Add($"HttpClientSendRequest:GetAsync:DeserializeException:{ex.Message}");
+            _logger.LogCritical("HttpClientSendRequest:GetAsync:DeserializeException", ex.Message);
         }
         return httpSendResults;
     }

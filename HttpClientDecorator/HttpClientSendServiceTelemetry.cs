@@ -5,19 +5,19 @@ namespace HttpClientDecorator;
 
 
 /// <summary>
-/// Class HttpClientSendServiceTelemetry adds telemetry to the IHttpClientRequestService implementation
+/// Class HttpClientSendServiceTelemetry adds telemetry to the IHttpClientService implementation
 /// </summary>
-public class HttpClientSendServiceTelemetry : IHttpClientRequestService
+public class HttpClientSendServiceTelemetry : IHttpClientService
 {
     private readonly ILogger<HttpClientSendServiceTelemetry> _logger;
-    private readonly IHttpClientRequestService _service;
+    private readonly IHttpClientService _service;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpClientSendServiceTelemetry"/> class
     /// </summary>
     /// <param name="logger">ILogger instance</param>
-    /// <param name="service">IHttpClientRequestService instance</param>
-    public HttpClientSendServiceTelemetry(ILogger<HttpClientSendServiceTelemetry> logger, IHttpClientRequestService service)
+    /// <param name="service">IHttpClientService instance</param>
+    public HttpClientSendServiceTelemetry(ILogger<HttpClientSendServiceTelemetry> logger, IHttpClientService service)
     {
         _logger = logger;
         _service = service;
@@ -27,10 +27,10 @@ public class HttpClientSendServiceTelemetry : IHttpClientRequestService
     /// GetAsync performs a GET request and adds telemetry information to the response.
     /// </summary>
     /// <typeparam name="T">Result type of the GET request</typeparam>
-    /// <param name="statusCall">HttpClientRequest instance</param>
-    /// <returns>HttpClientRequest instance including telemetry information</returns>
+    /// <param name="statusCall">HttpClientSendRequest instance</param>
+    /// <returns>HttpClientSendRequest instance including telemetry information</returns>
     /// <param name="cts"></param>
-    public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> statusCall, CancellationToken ct)
+    public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
     {
         Stopwatch sw = new();
         sw.Start();

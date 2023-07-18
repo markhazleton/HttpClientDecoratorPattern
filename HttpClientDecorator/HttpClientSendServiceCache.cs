@@ -3,25 +3,25 @@ using Microsoft.Extensions.Logging;
 
 namespace HttpClientDecorator
 {
-    public class HttpClientSendServiceCache : IHttpClientRequestService
+    public class HttpClientSendServiceCache : IHttpClientService
     {
         private readonly IMemoryCache _cache;
         private readonly ILogger<HttpClientSendServiceCache> _logger;
-        private readonly IHttpClientRequestService _service;
+        private readonly IHttpClientService _service;
 
-        public HttpClientSendServiceCache(IHttpClientRequestService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
+        public HttpClientSendServiceCache(IHttpClientService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
         {
             _service = service;
             _cache = cache;
             _logger = logger;
         }
 
-        public async Task<HttpClientRequest<T>> HttpClientSendAsync<T>(HttpClientRequest<T> statusCall, CancellationToken ct)
+        public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
         {
             var cacheKey = statusCall.RequestPath;
 
             // Try to get the cached result for the given cache key
-            if (_cache.TryGetValue(cacheKey, out HttpClientRequest<T> cachedResult))
+            if (_cache.TryGetValue(cacheKey, out HttpClientSendRequest<T> cachedResult))
             {
                 // If the result is found in the cache, return it directly
                 _logger.LogInformation($"Cache hit for {cacheKey}");

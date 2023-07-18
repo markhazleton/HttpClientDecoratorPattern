@@ -7,13 +7,13 @@ namespace HttpClientDecorator.Tests;
 public class HttpPollyRetryBreakerServiceTests
 {
     private Mock<ILogger<HttpClientSendServicePolly>> _loggerMock;
-    private Mock<IHttpClientRequestService> _serviceMock;
+    private Mock<IHttpClientService> _serviceMock;
 
     [TestInitialize]
     public void Setup()
     {
         _loggerMock = new Mock<ILogger<HttpClientSendServicePolly>>();
-        _serviceMock = new Mock<IHttpClientRequestService>();
+        _serviceMock = new Mock<IHttpClientService>();
     }
 
     [TestMethod]
@@ -34,11 +34,11 @@ public class HttpPollyRetryBreakerServiceTests
             CircuitBreakerDuration = circuitBreakerDuration
         };
 
-        var statusCall = new HttpClientRequest<object>();
+        var statusCall = new HttpClientSendRequest<object>();
         var cancellationToken = CancellationToken.None;
         var exception = new Exception("Test exception");
 
-        _serviceMock.SetupSequence(s => s.HttpClientSendAsync(It.IsAny<HttpClientRequest<object>>(), cancellationToken))
+        _serviceMock.SetupSequence(s => s.HttpClientSendAsync(It.IsAny<HttpClientSendRequest<object>>(), cancellationToken))
             .ThrowsAsync(exception)
             .ReturnsAsync(statusCall);
 
@@ -51,7 +51,7 @@ public class HttpPollyRetryBreakerServiceTests
         var result = await service.HttpClientSendAsync(statusCall, cancellationToken);
 
         // Assert
-        //_serviceMock.Verify(s => s.HttpClientSendAsync(It.IsAny<HttpClientRequest<object>>(), cancellationToken), Times.Exactly(2));
+        //_serviceMock.Verify(s => s.HttpClientSendAsync(It.IsAny<HttpClientSendRequest<object>>(), cancellationToken), Times.Exactly(2));
         //_loggerMock.Verify(
         //    l => l.Log(
         //        LogLevel.Information,

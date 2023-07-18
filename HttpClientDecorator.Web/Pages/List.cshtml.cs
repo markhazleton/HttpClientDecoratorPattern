@@ -4,15 +4,15 @@ public class ListModel : PageModel
 {
     private readonly object WriteLock = new();
     private readonly ILogger<ListModel> _logger;
-    private readonly IHttpClientRequestService _service;
+    private readonly IHttpClientService _service;
 
-    public ListModel(ILogger<ListModel> logger, IHttpClientRequestService getCallService)
+    public ListModel(ILogger<ListModel> logger, IHttpClientService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
 
-    public IList<HttpClientRequest<SiteStatus>> HttpGetCallResults { get; set; } = default!;
+    public IList<HttpClientSendRequest<SiteStatus>> HttpGetCallResults { get; set; } = default!;
 
     public async Task OnGetAsync(CancellationToken ct = default)
     {
@@ -31,12 +31,12 @@ public class ListModel : PageModel
     /// <param name="itterationCount"></param>
     /// <param name="endpoint"></param>
     /// <returns></returns>
-    private async Task<List<HttpClientRequest<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
+    private async Task<List<HttpClientSendRequest<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
         SemaphoreSlim semaphore = new(listRequest.MaxThreads);
-        List<HttpClientRequest<SiteStatus>> results = new();
+        List<HttpClientSendRequest<SiteStatus>> results = new();
 
         // Create a list of tasks to make the GetAsync calls
         List<Task> tasks = new();
@@ -45,7 +45,7 @@ public class ListModel : PageModel
             // Acquire the semaphore before making the request
             await semaphore.WaitAsync().ConfigureAwait(false);
             curIndex++;
-            var statusCall = new HttpClientRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
+            var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {
@@ -79,7 +79,6 @@ public class ListModel : PageModel
         public int IterationCount { get; set; }
         public string? Endpoint { get; set; }
     }
-
     public record BuildVersion(
         [property: JsonPropertyName("majorVersion")] int? MajorVersion,
         [property: JsonPropertyName("minorVersion")] int? MinorVersion,
@@ -88,7 +87,6 @@ public class ListModel : PageModel
     );
 
     public record Features();
-
     public record SiteStatus(
         [property: JsonPropertyName("buildDate")] DateTime? BuildDate,
         [property: JsonPropertyName("buildVersion")] BuildVersion BuildVersion,
@@ -98,7 +96,6 @@ public class ListModel : PageModel
         [property: JsonPropertyName("status")] int? Status,
         [property: JsonPropertyName("tests")] Tests Tests
     );
-
     public record Tests();
 
 

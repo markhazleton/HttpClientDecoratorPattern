@@ -27,7 +27,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_NullGetCallResults_ThrowsArgumentNullException()
         {
             // Arrange
-            HttpClientRequest<object> getCallResults = null;
+            HttpClientSendRequest<object> getCallResults = null;
 
             // Act & Assert
             await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _httpGetCallService.HttpClientSendAsync(getCallResults, CancellationToken.None));
@@ -37,7 +37,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_EmptyRequestPath_ThrowsArgumentException()
         {
             // Arrange
-            var getCallResults = new HttpClientRequest<object>
+            var getCallResults = new HttpClientSendRequest<object>
             {
                 RequestPath = string.Empty
             };
@@ -50,7 +50,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_Success_ReturnsHttpGetCallResultsWithResponseData()
         {
             // Arrange
-            var getCallResults = new HttpClientRequest<string>
+            var getCallResults = new HttpClientSendRequest<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "success"
@@ -75,7 +75,7 @@ namespace HttpClientDecorator.Tests
         public async Task GetAsync_DeserializeException_LogsCriticalErrorAndReturnsHttpGetCallResultsWithError()
         {
             // Arrange
-            var getCallResults = new HttpClientRequest<string>
+            var getCallResults = new HttpClientSendRequest<string>
             {
                 RequestPath = "http://example.com",
                 ResponseResults = "invalid-json"
@@ -93,7 +93,7 @@ namespace HttpClientDecorator.Tests
             // Assert
             Assert.AreEqual(result.ResponseResults, "invalid-json");
             Assert.AreEqual(result.ErrorList.Count, 1);
-            Assert.IsTrue(result.ErrorList.FirstOrDefault().StartsWith("HttpClientSendService:GetAsync:DeserializeException"));
+            Assert.IsTrue(result.ErrorList.FirstOrDefault().StartsWith("HttpClientSendRequest:GetAsync:DeserializeException"));
         }
     }
 }

@@ -6,22 +6,22 @@ namespace HttpClientDecorator.Models;
 /// <summary>
 /// Class to store the results of an HTTP GET call.
 /// </summary>
-public class HttpClientRequest<T> : IHttpClientRequest<T>
+public class HttpClientSendRequest<T> 
 {
     /// <summary>
     /// Default constructor to initialize the iteration and status path.
     /// </summary>
-    public HttpClientRequest()
+    public HttpClientSendRequest()
     {
         Iteration = 0;
         RequestPath = string.Empty;
     }
 
     /// <summary>
-    /// Constructor to initialize the iteration and status path from another instance of HttpClientRequest.
+    /// Constructor to initialize the iteration and status path from another instance of HttpClientSendRequest.
     /// </summary>
-    /// <param name="statusCall">An instance of HttpClientRequest.</param>
-    public HttpClientRequest(HttpClientRequest<T> statusCall)
+    /// <param name="statusCall">An instance of HttpClientSendRequest.</param>
+    public HttpClientSendRequest(HttpClientSendRequest<T> statusCall)
     {
         Iteration = statusCall.Iteration;
         RequestPath = statusCall.RequestPath;
@@ -32,7 +32,7 @@ public class HttpClientRequest<T> : IHttpClientRequest<T>
     /// </summary>
     /// <param name="it">Iteration number of the HTTP GET call.</param>
     /// <param name="path">Status path of the HTTP GET call.</param>
-    public HttpClientRequest(int it, string path)
+    public HttpClientSendRequest(int it, string path)
     {
         Iteration = it;
         RequestPath = path;

@@ -3,18 +3,18 @@ namespace HttpClientDecorator.Web.Pages;
 public class NasaPicturePageModel : PageModel
 {
     private readonly ILogger<NasaPicturePageModel> _logger;
-    private readonly IHttpClientRequestService _service;
-    public HttpClientRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
+    private readonly IHttpClientService _service;
+    public HttpClientSendRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
     public NasaPictureListDto apiResponse { get; set; } = new NasaPictureListDto();
     public ArtList ArtList { get; set; } = new ArtList();
-    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientRequestService getCallService)
+    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
     public async Task OnGet(CancellationToken ct = default)
     {
-        apiRequest = new HttpClientRequest<NasaPictureListDto>
+        apiRequest = new HttpClientSendRequest<NasaPictureListDto>
         {
             CacheDurationMinutes = 500
         };
