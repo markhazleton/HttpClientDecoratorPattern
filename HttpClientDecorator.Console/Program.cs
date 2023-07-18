@@ -1,7 +1,7 @@
-﻿using Polly;
+﻿using HttpClientDecorator.Helpers;
+using Polly;
 using Polly.CircuitBreaker;
 using System.Security.Cryptography;
-using HttpClientDecorator.Helpers;
 
 const int CircuitBreakerThreshold = 3;
 const int CircuitBreakerDurationInMS = 1000;

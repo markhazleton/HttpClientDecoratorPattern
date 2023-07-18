@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-namespace HttpClientDecorator.Web.Helpers;
+﻿namespace HttpClientDecorator.Web.Helpers;
 
 /// <summary>
 /// Provides extension methods for the <see cref="ISession"/> interface to store and retrieve complex objects as JSON strings in the user session.

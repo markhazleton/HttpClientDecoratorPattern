@@ -42,7 +42,7 @@ builder.Services.AddSingleton(serviceProvider =>
         baseService,
         retryOptions);
     IHttpClientRequestService telemetryService = new HttpClientSendServiceTelemetry(
-        serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(), 
+        serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
         pollyService);
     IHttpClientRequestService cacheService = new HttpClientSendServiceCache(
         telemetryService,
