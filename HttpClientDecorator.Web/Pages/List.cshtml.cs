@@ -43,9 +43,12 @@ public class ListModel : PageModel
         for (int i = 0; i < listRequest.IterationCount; i++)
         {
             // Acquire the semaphore before making the request
-            await semaphore.WaitAsync().ConfigureAwait(false);
+            await semaphore.WaitAsync(ct).ConfigureAwait(false);
             curIndex++;
-            var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty);
+            var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty)
+            {
+                CacheDurationMinutes = 0
+            };
             // Create a task to make the request
             tasks.Add(Task.Run(async () =>
             {
@@ -63,7 +66,7 @@ public class ListModel : PageModel
                     // Release the semaphore
                     semaphore.Release();
                 }
-            }));
+            }, ct));
         }
 
         // Wait for all tasks to complete

@@ -62,11 +62,12 @@ public class CircuitBreakerModel : PageModel
         for (int i = 0; i < listRequest.IterationCount; i++)
         {
             // Acquire the semaphore before making the request
-            await semaphore.WaitAsync().ConfigureAwait(false);
+            await semaphore.WaitAsync(ct).ConfigureAwait(false);
             curIndex++;
 
             var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty)
             {
+                CacheDurationMinutes = 0,
                 RequestMethod = listRequest.RequestMethod,
                 RequestBody = GetRandomSiteStatus(curIndex),
             };
