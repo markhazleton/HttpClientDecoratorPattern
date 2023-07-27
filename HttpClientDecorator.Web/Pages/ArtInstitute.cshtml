@@ -41,13 +41,17 @@
                 </div>
             </div>
             <div class="card-footer">
-                <strong>The Api Get call took @Html.DisplayFor(model=>model.artResponse.ElapsedMilliseconds) millisectons to return.</strong>
-                <br />
-                <small>Art is from @Html.DisplayFor(model=>model.artResponse.RequestPath)</small>
                 <p>
                     The <a href="https://www.artic.edu" target="_blank" rel="noopener noreferrer">Art Institute of Chicago</a>'s
                     API provides JSON-formatted data as a REST-style service that allows developers to explore and
                     integrate the museum’s public data into their projects.
+                </p>
+                <p>
+                    <strong>The Api Get call took @Html.DisplayFor(model=>model.artResponse.ElapsedMilliseconds) milliseconds to return.</strong>
+                    <br />
+                    <small>Data from @Html.DisplayFor(model=>model.artResponse.RequestPath)</small>
+                    <br />
+                    @Model.artResponse.ResultAge
                 </p>
             </div>
         </div>

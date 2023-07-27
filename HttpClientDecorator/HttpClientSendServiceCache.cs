@@ -1,42 +1,63 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace HttpClientDecorator
+namespace HttpClientDecorator;
+
+/// <summary>
+/// Implementation of IHttpClientService that caches HTTP responses using IMemoryCache.
+/// </summary>
+public sealed class HttpClientSendServiceCache : IHttpClientService
 {
-    public class HttpClientSendServiceCache : IHttpClientService
+    private readonly IMemoryCache _cache;
+    private readonly ILogger<HttpClientSendServiceCache> _logger;
+    private readonly IHttpClientService _service;
+
+    public HttpClientSendServiceCache(IHttpClientService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
     {
-        private readonly IMemoryCache _cache;
-        private readonly ILogger<HttpClientSendServiceCache> _logger;
-        private readonly IHttpClientService _service;
+        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    }
 
-        public HttpClientSendServiceCache(IHttpClientService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
+    public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
+    {
+        var cacheKey = statusCall.RequestPath;
+        if (statusCall.CacheDurationMinutes > 0)
         {
-            _service = service;
-            _cache = cache;
-            _logger = logger;
-        }
-
-        public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
-        {
-            var cacheKey = statusCall.RequestPath;
-
-            // Try to get the cached result for the given cache key
-            if (_cache.TryGetValue(cacheKey, out HttpClientSendRequest<T> cachedResult))
+            try
             {
-                // If the result is found in the cache, return it directly
-                _logger.LogInformation($"Cache hit for {cacheKey}");
-                return cachedResult;
+                if (_cache.TryGetValue(cacheKey, out HttpClientSendRequest<T>? cachedResult))
+                {
+                    if (cachedResult != null)
+                    {
+                        // If the result is found in the cache, return it directly
+                        _logger.LogInformation("Cache hit for {cacheKey}", cacheKey);
+                        return cachedResult;
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // If the result is not cached, make the actual HTTP request using the wrapped service
-                // and store the result in the cache before returning it
-                statusCall = await _service.HttpClientSendAsync(statusCall, ct).ConfigureAwait(false);
-                statusCall.CompletionDate = DateTime.Now;
-                _cache.Set(cacheKey, statusCall, TimeSpan.FromMinutes(statusCall.CacheDurationMinutes)); // Cache the result for 500 minutes
-                _logger.LogInformation($"Cache miss for {cacheKey}");
-                return statusCall;
+                // Handle the exception (e.g., log, report, or take appropriate action)
+                _logger.LogError(ex, "Error while attempting to get cache item with key: {cacheKey}",cacheKey);
             }
         }
+        // If the result is not cached, make the actual HTTP request using the wrapped service
+        // and store the result in the cache before returning it
+        statusCall = await _service.HttpClientSendAsync(statusCall, ct);
+        statusCall.CompletionDate = DateTime.Now;
+        if (statusCall.CacheDurationMinutes > 0)
+        {
+            try
+            {
+                _cache.Set(cacheKey, statusCall, TimeSpan.FromMinutes(statusCall.CacheDurationMinutes));
+                _logger.LogInformation("Cache miss for {cacheKey}",cacheKey);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while attempting to set cache item with key: {cacheKey}",cacheKey);
+            }
+        }
+        return statusCall;
     }
 }

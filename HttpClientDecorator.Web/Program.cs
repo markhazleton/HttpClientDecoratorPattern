@@ -37,13 +37,16 @@ builder.Services.AddSingleton(serviceProvider =>
     IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>());
+
     IHttpClientService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
         retryOptions);
+
     IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
         pollyService);
+
     IHttpClientService cacheService = new HttpClientSendServiceCache(
         telemetryService,
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceCache>>(),

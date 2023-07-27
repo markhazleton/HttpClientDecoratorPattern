@@ -17,20 +17,20 @@ public class HttpClientSendPollyOptions
 public class HttpClientSendServicePolly : IHttpClientService
 {
     private readonly ILogger<HttpClientSendServicePolly> _logger;
-    private readonly List<string> _errorList = new List<string>();
+    private readonly List<string> _errorList = new();
     private readonly IHttpClientService _service;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
     private readonly HttpClientSendPollyOptions _options;
 
     public HttpClientSendServicePolly(
-        ILogger<HttpClientSendServicePolly> logger,
-        IHttpClientService service,
-        HttpClientSendPollyOptions options)
+        ILogger<HttpClientSendServicePolly>? logger,
+        IHttpClientService? service,
+        HttpClientSendPollyOptions? options)
     {
-        _service = service;
-        _logger = logger;
-        _options = options;
+        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _options = options ?? throw new ArgumentNullException(nameof(options)); ;
 
         // Configure the retry policy
         _retryPolicy = Policy

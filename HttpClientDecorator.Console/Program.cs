@@ -64,47 +64,6 @@ circuitBreakerPolicy.Execute(() =>
         throw;
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async Task<List<(int Iteration, string ResponseContent)>> DoWork(
     int circuitBreakerThreshold,
     double circuitBreakerTimeSpan,

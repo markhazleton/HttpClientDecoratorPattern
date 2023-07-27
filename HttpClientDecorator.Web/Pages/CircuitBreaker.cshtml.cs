@@ -2,7 +2,7 @@
 
 public class CircuitBreakerModel : PageModel
 {
-    private static readonly Random random = new Random();
+    private static readonly Random random = new();
     private readonly object WriteLock = new();
     private readonly ILogger<CircuitBreakerModel> _logger;
     private readonly IHttpClientService _service;

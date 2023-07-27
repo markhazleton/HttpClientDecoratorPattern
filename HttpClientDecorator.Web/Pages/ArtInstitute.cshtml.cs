@@ -21,7 +21,7 @@ public class ArtInstituteModel : PageModel
             _logger.LogError("artResponse is null");
             throw new Exception("artResponse is null");
         }
-
+        artResponse.CacheDurationMinutes = 500;
         artResponse.RequestPath = "https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&limit=20&fields=id,title,image_id,artist_title,material_titles&q=impressionism+oil paint";
         artResponse = await _service.HttpClientSendAsync(artResponse, ct).ConfigureAwait(false);
 
@@ -42,7 +42,7 @@ public class ArtInstituteModel : PageModel
             _logger.LogInformation("Good Response from Joke API");
             foreach (var item in artWorksResponse?.data)
             {
-                ArtWork artWork = new ArtWork();
+                ArtWork artWork = new();
                 artWork.id = item.id.ToString();
                 artWork.title = item.title;
                 artWork.image_id = item.image_id;
@@ -57,7 +57,7 @@ public class ArtInstituteModel : PageModel
 public class ArtList
 {
     public string Title { get; set; }
-    public List<ArtWork> list = new List<ArtWork>();
+    public List<ArtWork> list = new();
     public void Add(ArtWork artWork)
     {
         list.Add(artWork);
