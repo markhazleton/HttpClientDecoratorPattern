@@ -1,0 +1,109 @@
+﻿@page
+@model CrawlDomainModel
+@{
+    ViewData["Title"] = "Crawl Website";
+}
+<h1>Crawl Domain</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Domain">Enter Domain:</label>
+        <input asp-for="Domain" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="MaxDepth">Maximum Depth:</label>
+        <input asp-for="MaxDepth" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary" id="crawlButton">Start Crawling</button>
+</form>
+
+<div class="text-center mt-4 loading-spinner" style="display:none;">
+    <i class="fa fa-spinner fa-spin fa-3x"></i>
+    <p>Crawling in progress...</p>
+    <p id="url-found">starting. . .</p>
+</div>
+
+<!-- Add SignalR script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
+
+<script>
+    // Establish SignalR connection
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/crawlHub")
+        .build();
+
+    connection.on("UrlFound", function (numUrlsFound) {
+        const found = document.querySelector("p#url-found");
+        found.innerHTML = numUrlsFound;
+    });
+
+    // Start the connection
+    connection.start().catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    // Listen for updates from the server
+    connection.on("updateCrawlingStatus", function (isCrawling) {
+        const spinner = document.querySelector(".loading-spinner");
+        const results = document.querySelector("#crawlResults");
+        if (isCrawling) {
+            spinner.style.display = "block";
+            results.style.display = "none";
+        } else {
+            spinner.style.display = "none";
+            results.style.display = "block";
+        }
+    });
+
+    document.getElementById("crawlButton").addEventListener("click", function () {
+        connection.invoke("startCrawling").catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+</script>
+@if (Model?.crawler?.CrawlResults != null && Model?.crawler?.CrawlResults?.Count > 0)
+{
+    
+    <table class="table" id="crawlResults">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].CompletionDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].ElapsedMilliseconds)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].StatusCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].RequestPath)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].Iteration)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.crawler.CrawlResults)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompletionDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ElapsedMilliseconds)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StatusCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RequestPath)
+                    </td>
+<td>
+                        @Html.DisplayFor(modelItem => item.Iteration)
+                </tr>
+            }
+        </tbody>
+    </table>
+}

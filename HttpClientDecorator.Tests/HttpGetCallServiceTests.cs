@@ -20,7 +20,7 @@ namespace HttpClientDecorator.Tests
             _httpClientMock = new Mock<HttpClient>();
             _httpClientFactoryMock = new Mock<IHttpClientFactory>();
             _httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(_httpClientMock.Object);
-            _httpGetCallService = new HttpClientSendService(_loggerMock.Object, _httpClientFactoryMock.Object);
+            _httpGetCallService = new HttpClientSendService(_loggerMock.Object, _httpClientMock.Object);
         }
 
         [TestMethod]

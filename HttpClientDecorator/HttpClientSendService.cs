@@ -7,9 +7,9 @@ public class HttpClientSendService : IHttpClientService
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpClientSendService> _logger;
 
-    public HttpClientSendService(ILogger<HttpClientSendService> logger, IHttpClientFactory httpClientFactory)
+    public HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient)
     {
-        _httpClient = httpClientFactory.CreateClient("HttpClientDecorator");
+        _httpClient = httpClient;
         _logger = logger;
     }
     /// <summary>
@@ -39,17 +39,26 @@ public class HttpClientSendService : IHttpClientService
             request.Content = httpSendResults.RequestBody;
         }
         using HttpResponseMessage response = await _httpClient.SendAsync(request, ct).ConfigureAwait(false);
+        httpSendResults.StatusCode = response.StatusCode;
+
         response.EnsureSuccessStatusCode();
         string callResult = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        try
+
+        if (typeof(T) == typeof(string))
         {
-            httpSendResults.ResponseResults = JsonSerializer.Deserialize<T>(callResult);
-            return httpSendResults;
+            httpSendResults.ResponseResults = (T)(object)callResult;
         }
-        catch (Exception ex)
+        else
         {
-            httpSendResults.ErrorList.Add($"HttpClientSendRequest:GetAsync:DeserializeException:{ex.Message}");
-            _logger.LogCritical("HttpClientSendRequest:GetAsync:DeserializeException", ex.Message);
+            try
+            {
+                httpSendResults.ResponseResults = JsonSerializer.Deserialize<T>(callResult);
+            }
+            catch (Exception ex)
+            {
+                httpSendResults.ErrorList.Add($"HttpClientSendRequest:GetAsync:DeserializeException:{ex.Message}");
+                _logger.LogCritical("HttpClientSendRequest:GetAsync:DeserializeException {ex.Message}", ex.Message);
+            }
         }
         return httpSendResults;
     }
