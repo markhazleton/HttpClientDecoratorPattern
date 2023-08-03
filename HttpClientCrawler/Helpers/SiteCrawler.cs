@@ -2,92 +2,106 @@
 using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Concurrent;
 using System.Net;
 
 namespace HttpClientCrawler.Helpers;
 
 public partial class SiteCrawler : ISiteCrawler
 {
-    public const int maxCrawlCount = 500;
+    public const int maxCrawlCount = 25;
     private readonly string _domain;
     private readonly IHubContext<CrawlHub> _hubContext;
-    private readonly Queue<string> _linksToParse;
+    private readonly Queue<string> _linksToCrawl;
     private readonly IHttpClientService _service;
-    private readonly HashSet<string> _visitedLinks;
-    public readonly List<CrawlResult> CrawlResults;
+    private readonly SemaphoreSlim _semaphoreSlim = new(5, 5);
+    private readonly ConcurrentDictionary<string, CrawlResult> _crawlResults;
+
+    public ICollection<CrawlResult> CrawlResults 
+    { 
+        get { return _crawlResults.Values; }
+    }
 
     public SiteCrawler(string domain, IHubContext<CrawlHub> hubContext, IHttpClientService httpClientService)
     {
         _domain = domain;
-        _visitedLinks = new HashSet<string>();
-        _linksToParse = new Queue<string>();
+        _linksToCrawl = new Queue<string>();
         _hubContext = hubContext;
         _service = httpClientService;
-        CrawlResults = new List<CrawlResult>();
+        _crawlResults = new ConcurrentDictionary<string, CrawlResult>();
     }
 
     private async Task CrawlPage(string url, int depth, CancellationToken ct = default)
     {
-        if (_visitedLinks.Count >= maxCrawlCount || depth <= 0)
+        if (_crawlResults.Count >= maxCrawlCount || depth <= 0)
         {
             return;
         }
 
-        CrawlResult crawlResult = new();
-        if (!_visitedLinks.Contains(url))
+        if (_crawlResults.ContainsKey(url))
         {
-            _visitedLinks.Add(url);
+            return;
+        }
 
-            CrawlResult crawlRequest = new()
-            {
-                CacheDurationMinutes = 0,
-                RequestPath = url,
-                Iteration = _visitedLinks.Count
-            };
-            try
-            {
-                crawlResult = new CrawlResult(await _service.HttpClientSendAsync((HttpClientSendRequest<string>)crawlRequest, ct).ConfigureAwait(false));
+        // Acquire the semaphore before making the request
+        await _semaphoreSlim.WaitAsync(ct);
 
-                if (crawlResult.ErrorList.Count == 0)
+        try
+        {
+            CrawlResult crawlResult = new();
+            if (!_crawlResults.ContainsKey(url))
+            {
+                CrawlResult crawlRequest = new()
                 {
-                    foreach (string link in ProcessLinks(crawlResult.CrawlLinks))
+                    CacheDurationMinutes = 0,
+                    RequestPath = url,
+                    Iteration = _crawlResults.Count
+                };
+                try
+                {
+                    crawlResult = new CrawlResult(await _service.HttpClientSendAsync((HttpClientSendRequest<string>)crawlRequest, ct).ConfigureAwait(false));
+
+                    if (crawlResult.ErrorList.Count == 0)
                     {
-                        if (!_visitedLinks.Contains(link))
+                        foreach (string link in ProcessLinks(crawlResult.CrawlLinks))
                         {
-                            crawlResult.FoundLinks.Add(link);
+                            if (!_crawlResults.ContainsKey(link))
+                            {
+                                // Use a priority queue (e.g., MinHeap) instead of a regular queue
+                                _linksToCrawl.Enqueue(link);
 
-                            // Use a priority queue (e.g., MinHeap) instead of a regular queue
-                            _linksToParse.Enqueue(link);
+                                // Notify the caller about the number of URLs found
+                                await _hubContext.Clients.All.SendAsync("UrlFound", $"Links to parse:{_linksToCrawl.Count} Crawled:{_crawlResults.Count} Depth:{depth}", cancellationToken: ct);
 
-                            // Notify the caller about the number of URLs found
-                            await _hubContext.Clients.All.SendAsync("UrlFound", $"Links to parse:{_linksToParse.Count} Crawled:{_visitedLinks.Count} Depth:{depth}", cancellationToken: ct);
-
-                            // Pause for 1/2 second to avoid overloading the server
-                            await Task.Delay(500, ct).ConfigureAwait(false);
-
-                            // Recursively crawl with decreased depth
-                            await CrawlPage(link, depth - 1, ct);
+                                // Recursively crawl with decreased depth
+                                await CrawlPage(link, depth - 1, ct);
+                            }
                         }
                     }
                 }
+                catch (HttpRequestException ex)
+                {
+                    // Handle HTTP errors
+                    crawlResult.StatusCode = HttpStatusCode.ServiceUnavailable;
+                    Console.WriteLine("Error accessing page: " + url);
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    crawlResult.StatusCode = HttpStatusCode.InternalServerError;
+                    Console.WriteLine("Error accessing page: " + url);
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    _crawlResults.TryAdd(url, crawlResult);
+                }
             }
-            catch (HttpRequestException ex)
-            {
-                // Handle HTTP errors
-                crawlResult.StatusCode = HttpStatusCode.ServiceUnavailable;
-                Console.WriteLine("Error accessing page: " + url);
-                Console.WriteLine(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                crawlResult.StatusCode = HttpStatusCode.InternalServerError;
-                Console.WriteLine("Error accessing page: " + url);
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                CrawlResults.Add(crawlResult);
-            }
+        }
+        finally
+        {
+            // Release the semaphore after the request is complete
+            _semaphoreSlim.Release();
         }
     }
 
@@ -96,9 +110,7 @@ public partial class SiteCrawler : ISiteCrawler
         List<string> result = new();
         foreach (string link in links)
         {
-            if (!_visitedLinks.Contains(link)
-                && !_linksToParse.Contains(link)
-                && !link.StartsWith("#"))
+            if (!_crawlResults.ContainsKey(link))
             {
                 result.Add(link.ToLower());
             }
@@ -108,35 +120,19 @@ public partial class SiteCrawler : ISiteCrawler
 
     public async Task Crawl(int maxCrawlDepth, CancellationToken ct = default)
     {
-        _linksToParse.Enqueue(_domain); // Enqueue the starting _domain
+        _linksToCrawl.Enqueue(_domain); // Enqueue the starting _domain
         try
         {
-            while (_linksToParse.Count > 0)
+            while (_linksToCrawl.Count > 0)
             {
-                string link = _linksToParse.Dequeue();
+                string link = _linksToCrawl.Dequeue();
                 await CrawlPage(link, depth: maxCrawlDepth, ct: ct);
             }
         }
         finally
         {
-            await _hubContext.Clients.All.SendAsync("UrlFound", $"Links to parse:{_linksToParse.Count} Crawled:{CrawlResults.Count}", cancellationToken: ct);
-
+            await _hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Complete:Crawled:{_crawlResults.Count} links", cancellationToken: ct);
         }
 
-    }
-
-    public async Task ExportToCSV(string filePath)
-    {
-        using (var writer = new StreamWriter(filePath))
-        {
-            await writer.WriteLineAsync("URL,Status Code,Elapsed Time,Crawl Date,Found Links");
-
-            foreach (var result in CrawlResults)
-            {
-                var line = $"{result.RequestPath},{result.StatusCode},{result.ElapsedMilliseconds},{result.CompletionDate},{result.FoundLinks.Count}";
-                await writer.WriteLineAsync(line);
-            }
-        }
-        Console.WriteLine($"Crawl results with {CrawlResults.Count} pages exported to: {filePath}");
     }
 }

@@ -5,7 +5,7 @@ namespace HttpClientCrawler.Models;
 
 public class CrawlResult : HttpClientSendRequest<string>
 {
-    public List<string> FoundLinks { get; } = new List<string>();
+    public List<string> ResponseLinks { get; } = new List<string>();
 
     public CrawlResult() : base()
     {
@@ -19,16 +19,16 @@ public class CrawlResult : HttpClientSendRequest<string>
     {
         get
         {
-            FoundLinks.Clear();
-            if (CrawlHtmlDocument != null)
+            ResponseLinks.Clear();
+            if (ResponseHtmlDocument != null)
             {
-                foreach (var link in CrawlHtmlDocument.DocumentNode
+                foreach (var link in ResponseHtmlDocument.DocumentNode
                     .Descendants("a")
                     .Select(a => RemoveQueryAndOnPageLinks(a.GetAttributeValue("href", null)))
                     .Where(link => !string.IsNullOrWhiteSpace(link))
                     )
                 {
-                    if (FoundLinks.Contains(link))
+                    if (ResponseLinks.Contains(link))
                     {
                         continue;
                     }
@@ -36,12 +36,12 @@ public class CrawlResult : HttpClientSendRequest<string>
                     {
                         if (IsSameDomain(link))
                         {
-                            FoundLinks.Add(link);
+                            ResponseLinks.Add(link);
                         }
                     }
                 }
             }
-            return FoundLinks;
+            return ResponseLinks;
         }
     }
 
@@ -146,7 +146,7 @@ public class CrawlResult : HttpClientSendRequest<string>
         return false;
     }
 
-    public HtmlDocument? CrawlHtmlDocument
+    public HtmlDocument? ResponseHtmlDocument
     {
         get
         {

@@ -1,5 +1,6 @@
 using HttpClientCrawler.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HttpClientDecorator.Web.Pages;
 
@@ -35,6 +36,8 @@ public class CrawlDomainModel : PageModel
         {
             // Notify clients that crawling has finished
             await hubContext.Clients.All.SendAsync("updateCrawlingStatus", false);
+            await hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Is Complete");
+
         }
     }
 }

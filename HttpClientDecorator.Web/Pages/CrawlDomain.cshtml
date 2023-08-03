@@ -20,7 +20,6 @@
 <div class="text-center mt-4 loading-spinner" style="display:none;">
     <i class="fa fa-spinner fa-spin fa-3x"></i>
     <p>Crawling in progress...</p>
-    <p id="url-found">starting. . .</p>
 </div>
 
 <!-- Add SignalR script -->
@@ -34,7 +33,7 @@
 
     connection.on("UrlFound", function (numUrlsFound) {
         const found = document.querySelector("p#url-found");
-        found.innerHTML = numUrlsFound;
+        found.innerHTML += numUrlsFound + "<br/>";
     });
 
     // Start the connection
@@ -42,8 +41,7 @@
         return console.error(err.toString());
     });
 
-    // Listen for updates from the server
-    connection.on("updateCrawlingStatus", function (isCrawling) {
+    connection.invoke("getCrawlingStatus").then(function (isCrawling) {
         const spinner = document.querySelector(".loading-spinner");
         const results = document.querySelector("#crawlResults");
         if (isCrawling) {
@@ -53,6 +51,8 @@
             spinner.style.display = "none";
             results.style.display = "block";
         }
+    }).catch(function (err) {
+        return console.error(err.toString());
     });
 
     document.getElementById("crawlButton").addEventListener("click", function () {
@@ -61,26 +61,27 @@
         });
     });
 </script>
+
 @if (Model?.crawler?.CrawlResults != null && Model?.crawler?.CrawlResults?.Count > 0)
 {
-    
+
     <table class="table" id="crawlResults">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].CompletionDate)
+                    CompletionDate
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].ElapsedMilliseconds)
+                    ElapsedMilliseconds
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].StatusCode)
+                    StatusCode
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].RequestPath)
+                    RequestPath
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.crawler.CrawlResults[0].Iteration)
+                    Iteration
                 </th>
             </tr>
         </thead>
@@ -100,10 +101,19 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.RequestPath)
                     </td>
-<td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Iteration)
                 </tr>
             }
         </tbody>
     </table>
 }
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Crawl Status</h3>
+    </div>
+    <div class="card-body">
+        <p id="url-found"></p>
+    </div>
+</div>
