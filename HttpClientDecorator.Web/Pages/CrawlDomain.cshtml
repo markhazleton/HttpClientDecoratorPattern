@@ -7,8 +7,8 @@
 
 <form method="post">
     <div class="form-group">
-        <label asp-for="Domain">Enter Domain:</label>
-        <input asp-for="Domain" class="form-control" />
+        <label asp-for="StartPath">Enter Start Path:</label>
+        <input asp-for="StartPath" class="form-control" value="https://controlorigins.com" />
     </div>
     <div class="form-group">
         <label asp-for="MaxDepth">Maximum Depth:</label>
@@ -34,16 +34,8 @@
     connection.on("UrlFound", function (numUrlsFound) {
         const found = document.querySelector("p#url-found");
         found.innerHTML += numUrlsFound + "<br/>";
-    });
-
-    // Start the connection
-    connection.start().catch(function (err) {
-        return console.error(err.toString());
-    });
-
-    connection.invoke("getCrawlingStatus").then(function (isCrawling) {
         const spinner = document.querySelector(".loading-spinner");
-        const results = document.querySelector("#crawlResults");
+        const results = document.querySelector("table#crawlResults");
         if (isCrawling) {
             spinner.style.display = "block";
             results.style.display = "none";
@@ -51,44 +43,42 @@
             spinner.style.display = "none";
             results.style.display = "block";
         }
-    }).catch(function (err) {
+    });
+
+    // Start the connection
+    connection.start().catch(function (err) {
         return console.error(err.toString());
     });
 
-    document.getElementById("crawlButton").addEventListener("click", function () {
-        connection.invoke("startCrawling").catch(function (err) {
-            return console.error(err.toString());
-        });
-    });
 </script>
 
-@if (Model?.crawler?.CrawlResults != null && Model?.crawler?.CrawlResults?.Count > 0)
+@if (Model?.CrawlResults != null && Model?.CrawlResults?.Count > 0)
 {
 
     <table class="table" id="crawlResults">
         <thead>
             <tr>
-                <th>
-                    CompletionDate
-                </th>
-                <th>
-                    ElapsedMilliseconds
-                </th>
-                <th>
-                    StatusCode
-                </th>
-                <th>
-                    RequestPath
-                </th>
-                <th>
-                    Iteration
-                </th>
+                <th>Iteration</th>
+                <th>RequestPath</th>
+                <th>Links Found</th>
+                <th>CompletionDate</th>
+                <th>ElapsedMilliseconds</th>
+                <th>StatusCode</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.crawler.CrawlResults)
+            @foreach (var item in Model.CrawlResults)
             {
                 <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Iteration)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RequestPath)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CrawlLinks.Count)
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.CompletionDate)
                     </td>
@@ -98,11 +88,6 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.StatusCode)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.RequestPath)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Iteration)
                 </tr>
             }
         </tbody>

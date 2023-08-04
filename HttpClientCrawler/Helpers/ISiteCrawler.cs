@@ -1,7 +1,9 @@
-﻿namespace HttpClientCrawler.Helpers
+﻿using HttpClientCrawler.Models;
+
+namespace HttpClientCrawler.Helpers
 {
     public interface ISiteCrawler
     {
-        Task Crawl(int maxCrawlDepth, CancellationToken ct = default);
+        Task<ICollection<CrawlResult>> Crawl(int maxCrawlDepth, string StartPath, CancellationToken ct = default);
     }
 }

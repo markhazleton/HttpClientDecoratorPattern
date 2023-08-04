@@ -1,43 +1,45 @@
 using HttpClientCrawler.Helpers;
+using HttpClientCrawler.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace HttpClientDecorator.Web.Pages;
-
 public class CrawlDomainModel : PageModel
 {
     [BindProperty]
     public bool IsCrawling { get; set; }
     [BindProperty]
-    public string Domain { get; set; }
+    public string StartPath { get; set; }
     [BindProperty]
     public int MaxDepth { get; set; } = 3; // Default maximum depth for crawling
 
-    public SiteCrawler crawler;
+    public ICollection<CrawlResult> CrawlResults;
     public IHubContext<CrawlHub> hubContext { get; }
-    public IHttpClientService HttpClientService { get; }
+    private readonly SiteCrawler siteCrawler;
 
     public CrawlDomainModel(IHubContext<CrawlHub> hubContext, IHttpClientService service)
     {
         this.hubContext = hubContext;
-        HttpClientService = service;
+        siteCrawler = new SiteCrawler(hubContext, service);
     }
     public async Task OnPostAsync()
     {
         // Notify clients that crawling has started
-        await hubContext.Clients.All.SendAsync("updateCrawlingStatus", true);
+        IsCrawling= true;
+        await hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Is Started");
         // Start the crawling process
         try
         {
-            crawler = new SiteCrawler(Domain, hubContext, HttpClientService);
-            await crawler.Crawl(MaxDepth).ConfigureAwait(true);
+            CrawlResults = await siteCrawler.Crawl(MaxDepth, StartPath).ConfigureAwait(true);
         }
         finally
         {
             // Notify clients that crawling has finished
-            await hubContext.Clients.All.SendAsync("updateCrawlingStatus", false);
+            IsCrawling = false;
             await hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Is Complete");
 
+            // Pause for 3 secons to allow clients to see the final results
+            await Task.Delay(3000);
         }
+
     }
 }
