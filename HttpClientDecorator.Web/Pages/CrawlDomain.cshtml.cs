@@ -10,7 +10,7 @@ public class CrawlDomainModel : PageModel
     [BindProperty]
     public string StartPath { get; set; }
     [BindProperty]
-    public int MaxDepth { get; set; } = 3; // Default maximum depth for crawling
+    public int MaxPagesCrawled { get; set; } = 3; // Default maximum depth for crawling
 
     public ICollection<CrawlResult> CrawlResults;
     public IHubContext<CrawlHub> hubContext { get; }
@@ -24,12 +24,12 @@ public class CrawlDomainModel : PageModel
     public async Task OnPostAsync()
     {
         // Notify clients that crawling has started
-        IsCrawling= true;
+        IsCrawling = true;
         await hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Is Started");
         // Start the crawling process
         try
         {
-            CrawlResults = await siteCrawler.Crawl(MaxDepth, StartPath).ConfigureAwait(true);
+            CrawlResults = await siteCrawler.Crawl(MaxPagesCrawled, StartPath).ConfigureAwait(true);
         }
         finally
         {

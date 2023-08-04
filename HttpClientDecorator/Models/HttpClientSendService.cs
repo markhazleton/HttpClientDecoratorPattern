@@ -23,7 +23,7 @@ public class HttpClientSendRequest<T>
     /// </summary>
     /// <param name="statusCall">An instance of HttpClientSendRequest.</param>
     public HttpClientSendRequest(HttpClientSendRequest<T> statusCall)
-    { 
+    {
         Iteration = statusCall.Iteration;
         RequestPath = statusCall.RequestPath;
         ResponseResults = statusCall.ResponseResults;

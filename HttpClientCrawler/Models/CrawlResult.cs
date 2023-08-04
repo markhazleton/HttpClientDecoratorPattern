@@ -5,7 +5,6 @@ namespace HttpClientCrawler.Models;
 
 public class CrawlResult : HttpClientSendRequest<string>
 {
-    public List<string> ResponseLinks { get; } = new List<string>();
 
     public CrawlResult() : base()
     {
@@ -13,68 +12,6 @@ public class CrawlResult : HttpClientSendRequest<string>
 
     public CrawlResult(HttpClientSendRequest<string> statusCall) : base(statusCall)
     {
-    }
-
-    public List<string> CrawlLinks
-    {
-        get
-        {
-            ResponseLinks.Clear();
-            if (ResponseHtmlDocument != null)
-            {
-                foreach (var link in ResponseHtmlDocument.DocumentNode
-                    .Descendants("a")
-                    .Select(a => RemoveQueryAndOnPageLinks(a.GetAttributeValue("href", null)))
-                    .Where(link => !string.IsNullOrWhiteSpace(link))
-                    )
-                {
-                    if (ResponseLinks.Contains(link))
-                    {
-                        continue;
-                    }
-                    if (IsValidLink(link))
-                    {
-                        if (IsSameDomain(link))
-                        {
-                            ResponseLinks.Add(link);
-                        }
-                    }
-                }
-            }
-            return ResponseLinks;
-        }
-    }
-
-    private string RemoveQueryAndOnPageLinks(string? link)
-    {
-         if (string.IsNullOrWhiteSpace(link)) return string.Empty;
-
-        // Remove query parameters (if any)
-        int queryIndex = link.IndexOf('?');
-        if (queryIndex >= 0)
-        {
-            link = link[..queryIndex];
-        }
-
-        // Remove on-page links (if any)
-        int hashIndex = link.IndexOf('#');
-        if (hashIndex >= 0)
-        {
-            link = link[..hashIndex];
-        }
-
-        // Convert relative links to absolute links using the base domain
-        if (!link.StartsWith("//") && Uri.TryCreate(link, UriKind.Relative, out var relativeUri))
-        {
-            Uri baseUri = new(this.RequestPath);
-            Uri absoluteUri = new(baseUri, relativeUri);
-            link = absoluteUri.ToString();
-        }
-
-        // Remove trailing '/' (if any)
-        link = link.TrimEnd('/');
-
-        return link.ToLower();
     }
 
 
@@ -146,10 +83,76 @@ public class CrawlResult : HttpClientSendRequest<string>
         return false;
     }
 
+    private string RemoveQueryAndOnPageLinks(string? link)
+    {
+        if (string.IsNullOrWhiteSpace(link)) return string.Empty;
+
+        // Remove query parameters (if any)
+        int queryIndex = link.IndexOf('?');
+        if (queryIndex >= 0)
+        {
+            link = link[..queryIndex];
+        }
+
+        // Remove on-page links (if any)
+        int hashIndex = link.IndexOf('#');
+        if (hashIndex >= 0)
+        {
+            link = link[..hashIndex];
+        }
+
+        // Convert relative links to absolute links using the base domain
+        if (!link.StartsWith("//") && Uri.TryCreate(link, UriKind.Relative, out var relativeUri))
+        {
+            Uri baseUri = new(this.RequestPath);
+            Uri absoluteUri = new(baseUri, relativeUri);
+            link = absoluteUri.ToString();
+        }
+
+        // Remove trailing '/' (if any)
+        link = link.TrimEnd('/');
+
+        return link.ToLower();
+    }
+
+    public List<string> CrawlLinks
+    {
+        get
+        {
+            ResponseLinks.Clear();
+            if (ResponseHtmlDocument != null)
+            {
+                foreach (var link in ResponseHtmlDocument.DocumentNode
+                    .Descendants("a")
+                    .Select(a => RemoveQueryAndOnPageLinks(a.GetAttributeValue("href", null)))
+                    .Where(link => !string.IsNullOrWhiteSpace(link))
+                    )
+                {
+                    if (ResponseLinks.Contains(link))
+                    {
+                        continue;
+                    }
+                    if (IsValidLink(link))
+                    {
+                        if (IsSameDomain(link))
+                        {
+                            ResponseLinks.Add(link);
+                        }
+                    }
+                }
+            }
+            return ResponseLinks;
+        }
+    }
+
     public HtmlDocument? ResponseHtmlDocument
     {
         get
         {
+            if(string.IsNullOrWhiteSpace(ResponseResults))
+            {
+                return null;
+            }   
             try
             {
                 HtmlDocument htmlDoc = new();
@@ -162,5 +165,6 @@ public class CrawlResult : HttpClientSendRequest<string>
             }
         }
     }
+    public List<string> ResponseLinks { get; } = new List<string>();
 
 }

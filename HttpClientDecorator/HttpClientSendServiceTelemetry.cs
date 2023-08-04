@@ -46,7 +46,6 @@ public class HttpClientSendServiceTelemetry : IHttpClientService
         sw.Stop();
         statusCall.ElapsedMilliseconds = sw.ElapsedMilliseconds;
         statusCall.CompletionDate = DateTime.Now;
-        _logger.LogInformation("Telemetry:GetAsync:Attributes Updated");
         return statusCall;
     }
 }

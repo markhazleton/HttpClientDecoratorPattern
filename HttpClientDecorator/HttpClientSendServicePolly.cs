@@ -75,8 +75,6 @@ public class HttpClientSendServicePolly : IHttpClientService
 
         _errorList.Clear();
 
-        _logger.LogInformation("Polly:Call Completed");
-
         return statusCall;
     }
 }

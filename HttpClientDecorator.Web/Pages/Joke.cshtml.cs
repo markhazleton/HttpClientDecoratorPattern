@@ -24,7 +24,7 @@ public class JokePageModel : PageModel
             _logger.LogError("artResponse is null");
             throw new Exception("artResponse is null");
         }
-        JokeResult.CacheDurationMinutes =0;
+        JokeResult.CacheDurationMinutes = 0;
         JokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
         JokeResult = await _service.HttpClientSendAsync(JokeResult, ct).ConfigureAwait(false);
 
@@ -44,7 +44,6 @@ public class JokePageModel : PageModel
         }
         else
         {
-            _logger.LogInformation("Good Response from Joke API");
             TheJoke = JokeResult.ResponseResults;
         }
     }

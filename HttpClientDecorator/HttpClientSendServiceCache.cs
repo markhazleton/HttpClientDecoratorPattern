@@ -30,8 +30,6 @@ public sealed class HttpClientSendServiceCache : IHttpClientService
                 {
                     if (cachedResult != null)
                     {
-                        // If the result is found in the cache, return it directly
-                        _logger.LogInformation("Cache hit for {cacheKey}", cacheKey);
                         return cachedResult;
                     }
                 }
@@ -39,7 +37,7 @@ public sealed class HttpClientSendServiceCache : IHttpClientService
             catch (Exception ex)
             {
                 // Handle the exception (e.g., log, report, or take appropriate action)
-                _logger.LogError(ex, "Error while attempting to get cache item with key: {cacheKey}",cacheKey);
+                _logger.LogError(ex, "Error while attempting to get cache item with key: {cacheKey}", cacheKey);
             }
         }
         // If the result is not cached, make the actual HTTP request using the wrapped service
@@ -51,11 +49,10 @@ public sealed class HttpClientSendServiceCache : IHttpClientService
             try
             {
                 _cache.Set(cacheKey, statusCall, TimeSpan.FromMinutes(statusCall.CacheDurationMinutes));
-                _logger.LogInformation("Cache miss for {cacheKey}",cacheKey);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while attempting to set cache item with key: {cacheKey}",cacheKey);
+                _logger.LogError(ex, "Error while attempting to set cache item with key: {cacheKey}", cacheKey);
             }
         }
         return statusCall;

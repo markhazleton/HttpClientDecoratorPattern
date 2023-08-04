@@ -7,16 +7,21 @@
 
 <form method="post">
     <div class="form-group">
-        <label asp-for="StartPath">Enter Start Path:</label>
-        <input asp-for="StartPath" class="form-control" value="https://controlorigins.com" />
+        <label asp-for="StartPath">Select Start Path:</label>
+        <select asp-for="StartPath" class="form-control">
+            <option value="https://controlorigins.com">controlorigins.com</option>
+            <option value="https://markhazleton.controlorigins.com">markhazleton.controlorigins.com</option>
+            <option value="https://pm.controlorigins.com">pm.controlorigins.com</option>
+            <option value="https://travel.frogsfolly.com">travel.frogsfolly.com</option>
+            <option value="https://frogsfolly.com">frogsfolly.com</option>
+        </select>
     </div>
     <div class="form-group">
-        <label asp-for="MaxDepth">Maximum Depth:</label>
-        <input asp-for="MaxDepth" class="form-control" />
+        <label asp-for="MaxPagesCrawled">Maximum Pages Crawled:</label>
+        <input asp-for="MaxPagesCrawled" class="form-control" type="number" min="1" max="900" />
     </div>
     <button type="submit" class="btn btn-primary" id="crawlButton">Start Crawling</button>
 </form>
-
 <div class="text-center mt-4 loading-spinner" style="display:none;">
     <i class="fa fa-spinner fa-spin fa-3x"></i>
     <p>Crawling in progress...</p>
@@ -74,7 +79,7 @@
                         @Html.DisplayFor(modelItem => item.Iteration)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.RequestPath)
+                        <a href="@item.RequestPath" target="_blank" alt="@item.RequestPath">@item.RequestPath</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.CrawlLinks.Count)

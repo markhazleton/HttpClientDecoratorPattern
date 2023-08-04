@@ -39,7 +39,6 @@ public class ArtInstituteModel : PageModel
         else
         {
             artWorksResponse = artResponse.ResponseResults;
-            _logger.LogInformation("Good Response from Joke API");
             foreach (var item in artWorksResponse?.data)
             {
                 ArtWork artWork = new();

@@ -72,8 +72,6 @@ public class ListModel : PageModel
         // Wait for all tasks to complete
         await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        // Log a message when all calls are complete
-        _logger.LogInformation("All calls complete");
         return results;
     }
     public class ListRequest
