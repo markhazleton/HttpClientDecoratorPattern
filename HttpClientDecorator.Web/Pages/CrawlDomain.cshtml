@@ -14,6 +14,8 @@
             <option value="https://pm.controlorigins.com">pm.controlorigins.com</option>
             <option value="https://travel.frogsfolly.com">travel.frogsfolly.com</option>
             <option value="https://frogsfolly.com">frogsfolly.com</option>
+            <option value="https://mechanicsofmotherhood.com">MechanicsOfMotherhood.com</option>
+            <option value="https://texecon.com">Texecon.com</option>
         </select>
     </div>
     <div class="form-group">
@@ -38,7 +40,7 @@
 
     connection.on("UrlFound", function (numUrlsFound) {
         const found = document.querySelector("p#url-found");
-        found.innerHTML += numUrlsFound + "<br/>";
+        found.innerHTML = numUrlsFound + "<br/>";
         const spinner = document.querySelector(".loading-spinner");
         const results = document.querySelector("table#crawlResults");
         if (isCrawling) {
@@ -57,6 +59,14 @@
 
 </script>
 
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Crawl Status</h3>
+    </div>
+    <div class="card-body">
+        <p id="url-found"></p>
+    </div>
+</div>
 @if (Model?.CrawlResults != null && Model?.CrawlResults?.Count > 0)
 {
 
@@ -69,6 +79,8 @@
                 <th>CompletionDate</th>
                 <th>ElapsedMilliseconds</th>
                 <th>StatusCode</th>
+                <th>Retries</th>
+                <th>Errors</th>
             </tr>
         </thead>
         <tbody>
@@ -93,17 +105,16 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.StatusCode)
                     </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Retries)
+                    </td>
+                    <td>
+                        @string.Join(", ", item.ErrorList)
+                    </td>
+
                 </tr>
             }
         </tbody>
     </table>
 }
 
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Crawl Status</h3>
-    </div>
-    <div class="card-body">
-        <p id="url-found"></p>
-    </div>
-</div>

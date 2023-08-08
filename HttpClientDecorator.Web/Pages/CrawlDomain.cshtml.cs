@@ -1,4 +1,3 @@
-using HttpClientCrawler.Helpers;
 using HttpClientCrawler.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,7 @@ public class CrawlDomainModel : PageModel
     [BindProperty]
     public string StartPath { get; set; }
     [BindProperty]
-    public int MaxPagesCrawled { get; set; } = 3; // Default maximum depth for crawling
+    public int MaxPagesCrawled { get; set; } = 500; // Default maximum pages for crawling
 
     public ICollection<CrawlResult> CrawlResults;
     public IHubContext<CrawlHub> hubContext { get; }

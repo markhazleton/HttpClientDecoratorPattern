@@ -67,9 +67,8 @@ public partial class SiteCrawler : ISiteCrawler
         {
             while (_linksToCrawl.Count > 0 && _crawlResults.Count<=maxNumberOfResults)
             {
-                await Task.Delay(100, ct);
-
                 string link = _linksToCrawl.Dequeue();
+
                 var crawlResult = await CrawlPage(link, depth: _crawlResults.Count, ct: ct);
 
                 _crawlResults.TryAdd(link, crawlResult);
