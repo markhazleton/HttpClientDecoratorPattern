@@ -30,14 +30,12 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
 
 builder.Services.AddSingleton(serviceProvider =>
 {
-    // Get the configuration options
-    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
-
     IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>());
 
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
     IHttpClientService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
