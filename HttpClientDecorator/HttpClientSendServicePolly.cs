@@ -5,14 +5,6 @@ using Polly.Retry;
 
 namespace HttpClientDecorator;
 
-public class HttpClientSendPollyOptions
-{
-    public int MaxRetryAttempts { get; set; }
-    public TimeSpan RetryDelay { get; set; }
-    public int CircuitBreakerThreshold { get; set; }
-    public TimeSpan CircuitBreakerDuration { get; set; }
-}
-
 
 public class HttpClientSendServicePolly : IHttpClientService
 {

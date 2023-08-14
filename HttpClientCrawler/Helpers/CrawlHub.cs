@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace HttpClientCrawler.Helpers
+namespace HttpClientCrawler.Helpers;
+
+public class CrawlHub : Hub
 {
-    public class CrawlHub : Hub
-    {
-    }
 }

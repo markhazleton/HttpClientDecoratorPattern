@@ -149,10 +149,10 @@ public class CrawlResult : HttpClientSendRequest<string>
     {
         get
         {
-            if(string.IsNullOrWhiteSpace(ResponseResults))
+            if (string.IsNullOrWhiteSpace(ResponseResults))
             {
                 return null;
-            }   
+            }
             try
             {
                 HtmlDocument htmlDoc = new();

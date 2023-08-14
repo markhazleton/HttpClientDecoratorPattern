@@ -1,9 +1,8 @@
 ﻿using HttpClientCrawler.Models;
 
-namespace HttpClientCrawler.Helpers
+namespace HttpClientCrawler.Helpers;
+
+public interface ISiteCrawler
 {
-    public interface ISiteCrawler
-    {
-        Task<ICollection<CrawlResult>> Crawl(int maxCrawlDepth, string StartPath, CancellationToken ct = default);
-    }
+    Task<ICollection<CrawlResult>> Crawl(int maxCrawlDepth, string StartPath, CancellationToken ct = default);
 }

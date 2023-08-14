@@ -65,7 +65,7 @@ public partial class SiteCrawler : ISiteCrawler
         _linksToCrawl.Enqueue(StartPath.ToLower());
         try
         {
-            while (_linksToCrawl.Count > 0 && _crawlResults.Count<=maxNumberOfResults)
+            while (_linksToCrawl.Count > 0 && _crawlResults.Count <= maxNumberOfResults)
             {
                 string link = _linksToCrawl.Dequeue();
 
@@ -73,7 +73,7 @@ public partial class SiteCrawler : ISiteCrawler
 
                 _crawlResults.TryAdd(link, crawlResult);
 
-                if (crawlResult.CrawlLinks.Count > 0 )
+                if (crawlResult.CrawlLinks.Count > 0)
                 {
                     foreach (var crawlLink in crawlResult.CrawlLinks)
                     {
