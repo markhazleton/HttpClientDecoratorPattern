@@ -26,8 +26,6 @@ builder.Services.AddLogging(builder =>
                           // Add other log providers if necessary
 });
 
-
-
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
     client.Timeout = TimeSpan.FromMilliseconds(30000);
@@ -63,10 +61,6 @@ builder.Services.AddSingleton(serviceProvider =>
 
     return cacheService;
 });
-
-
-
-
 
 var app = builder.Build();
 
