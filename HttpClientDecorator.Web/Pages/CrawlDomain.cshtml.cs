@@ -1,4 +1,4 @@
-using HttpClientCrawler.Models;
+using HttpClientCrawler.Crawler;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HttpClientDecorator.Web.Pages;

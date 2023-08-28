@@ -1,4 +1,7 @@
-﻿namespace HttpClientCrawler.Helpers;
+﻿using System.Collections;
+using System.Text;
+
+namespace HttpClientCrawler.Crawler;
 
 public static class SiteCrawlerHelpers
 {
@@ -111,6 +114,34 @@ public static class SiteCrawlerHelpers
         link = link.TrimEnd('/');
 
         return link.ToLower();
+    }
+    public static void WriteToCsv<T>(IEnumerable<T> data, string filePath)
+    {
+        using (StreamWriter writer = new(filePath, false, Encoding.UTF8))
+        {
+            // Write CSV header
+            var properties = typeof(T).GetProperties();
+            writer.WriteLine(string.Join(",", properties.Select(p => p.Name)));
+            // Write data rows
+            foreach (var item in data)
+            {
+                var values = new List<string>();
+                foreach (var property in properties)
+                {
+                    if (property.PropertyType.IsGenericType &&
+                        property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
+                    {
+                        var listValue = (ICollection)property.GetValue(item);
+                        values.Add(listValue.Count.ToString());
+                    }
+                    else
+                    {
+                        values.Add(property.GetValue(item)?.ToString() ?? string.Empty);
+                    }
+                }
+                writer.WriteLine(string.Join(",", values));
+            }
+        }
     }
 
 }

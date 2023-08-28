@@ -1,11 +1,10 @@
-﻿using HttpClientCrawler.Models;
-using HttpClientDecorator.Interfaces;
+﻿using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using System.Net;
 
-namespace HttpClientCrawler.Helpers;
+namespace HttpClientCrawler.Crawler;
 
 public partial class SiteCrawler : ISiteCrawler
 {

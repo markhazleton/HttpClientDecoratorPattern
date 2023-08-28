@@ -1,4 +1,3 @@
-global using HttpClientCrawler.Helpers;
 global using HttpClientDecorator;
 global using HttpClientDecorator.Interfaces;
 global using HttpClientDecorator.Models;
@@ -7,6 +6,7 @@ global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+using HttpClientCrawler.Crawler;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +75,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
 app.UseCookiePolicy();
 app.UseSession();
 app.MapRazorPages();

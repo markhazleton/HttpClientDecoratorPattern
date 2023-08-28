@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using HttpClientCrawler.Models;
+using HttpClientCrawler.Crawler;
 
 namespace HttpClientCrawler.Tests.Models;
 

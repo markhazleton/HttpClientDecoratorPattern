@@ -1,11 +1,11 @@
 ﻿using HtmlAgilityPack;
-using HttpClientCrawler.Helpers;
 using HttpClientDecorator.Models;
 
-namespace HttpClientCrawler.Models;
+namespace HttpClientCrawler.Crawler;
 
 public class CrawlResult : HttpClientSendRequest<string>
 {
+    public List<string> Errors { get; } = new List<string>();
 
     public CrawlResult() : base()
     {
@@ -14,34 +14,45 @@ public class CrawlResult : HttpClientSendRequest<string>
     public CrawlResult(HttpClientSendRequest<string> statusCall) : base(statusCall)
     {
     }
+    private List<string> _responseLinks = new();
 
+    public CrawlResult(string requestPath, string foundUrl, int depth, int id)
+    {
+        RequestPath = requestPath;
+        Depth = depth;
+        FoundUrl = foundUrl;
+        Id = id;
+
+    }
+    public string FoundUrl { get; set; } = string.Empty;    
+    public int Depth { get; set; }
     public List<string> CrawlLinks
     {
         get
         {
-            ResponseLinks.Clear();
+            _responseLinks.Clear();
             if (ResponseHtmlDocument != null)
             {
                 foreach (var link in ResponseHtmlDocument.DocumentNode
                     .Descendants("a")
-                    .Select(a => SiteCrawlerHelpers.RemoveQueryAndOnPageLinks(a.GetAttributeValue("href", null), base.RequestPath))
+                    .Select(a => SiteCrawlerHelpers.RemoveQueryAndOnPageLinks(a.GetAttributeValue("href", null), RequestPath))
                     .Where(link => !string.IsNullOrWhiteSpace(link))
                     )
                 {
-                    if (ResponseLinks.Contains(link))
+                    if (_responseLinks.Contains(link))
                     {
                         continue;
                     }
                     if (SiteCrawlerHelpers.IsValidLink(link))
                     {
-                        if (SiteCrawlerHelpers.IsSameDomain(link, base.RequestPath))
+                        if (SiteCrawlerHelpers.IsSameDomain(link, RequestPath))
                         {
-                            ResponseLinks.Add(link);
+                            _responseLinks.Add(link);
                         }
                     }
                 }
             }
-            return ResponseLinks;
+            return _responseLinks;
         }
     }
 
@@ -65,6 +76,4 @@ public class CrawlResult : HttpClientSendRequest<string>
             }
         }
     }
-    public List<string> ResponseLinks { get; } = new List<string>();
-
 }

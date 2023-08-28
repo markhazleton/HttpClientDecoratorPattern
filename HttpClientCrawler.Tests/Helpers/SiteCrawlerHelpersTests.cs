@@ -1,4 +1,4 @@
-﻿using HttpClientCrawler.Helpers;
+﻿using HttpClientCrawler.Crawler;
 
 namespace HttpClientCrawler.Tests.Helpers;
 
@@ -13,7 +13,7 @@ public class SiteCrawlerHelpersTests
         string relativeLink = "/page";
         Uri combinedUri = new(new Uri(RequestPath), relativeLink);
         var result = SiteCrawlerHelpers.GetDomainName(combinedUri.ToString());
-        Assert.AreEqual(result,"example.com");
+        Assert.AreEqual(result, "example.com");
     }
 
     [TestMethod]

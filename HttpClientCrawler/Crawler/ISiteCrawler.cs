@@ -1,6 +1,4 @@
-﻿using HttpClientCrawler.Models;
-
-namespace HttpClientCrawler.Helpers;
+﻿namespace HttpClientCrawler.Crawler;
 
 public interface ISiteCrawler
 {
