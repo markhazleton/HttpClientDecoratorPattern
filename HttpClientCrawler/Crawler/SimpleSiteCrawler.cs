@@ -1,11 +1,10 @@
-﻿using HttpClientCrawler.Crawler;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 
-namespace SimpleSiteCrawler.Crawler;
+namespace HttpClientCrawler.Crawler;
 
-public class SimpleSiteCrawler
+public class SimpleSiteCrawler : ISiteCrawler
 {
     private static readonly HashSet<string> crawledURLs = new();
     private static readonly ConcurrentQueue<CrawlResult> crawlQueue = new();
@@ -105,7 +104,7 @@ public class SimpleSiteCrawler
         return crawlResult;
     }
 
-    public async Task<ICollection<CrawlResult>> Crawl(string link, CancellationToken ct = default)
+    public async Task<ICollection<CrawlResult>> Crawl(int MaxCrawlDepth, string link, CancellationToken ct = default)
     {
         var firstCrawl = new CrawlResult(link, link, 1, 1);
         var firstCrawlResult = await CrawlPage(firstCrawl, ct);
@@ -116,68 +115,83 @@ public class SimpleSiteCrawler
             Console.WriteLine($"--First Crawl Completed--{firstCrawlResult.RequestPath} -- found {firstCrawlResult.CrawlLinks.Count} links");
 
             int id = 1;
-            foreach (var childLink in firstCrawlResult.CrawlLinks.ToArray())
+            id = await CrawlFoundLinks(firstCrawlResult, id, ct);
+            Console.WriteLine($"****Depth 1 Crawl Completed****");
+
+            id = await CrawlAllFoundLinks(id, ct);
+            Console.WriteLine($"****Depth 2 Crawl Completed****");
+
+            id = await ProcessCrawlQueue(id, ct);
+            Console.WriteLine($"****Depth 3 Crawl Completed****");
+
+        }
+        return resultsDict.Values;
+    }
+
+    private async Task<int> ProcessCrawlQueue(int id, CancellationToken ct)
+    {
+        while (true)
+        {
+            if (crawlQueue.TryDequeue(out CrawlResult? crawlNext))
+            {
+                if (crawlNext is null)
+                {
+                    break;
+                }
+
+                if (crawledURLs.Contains(crawlNext.RequestPath))
+                {
+                    continue;
+                }
+                crawlNext.Id = id++;
+                var queueCrawlResult = await CrawlPage(crawlNext, ct);
+                if (queueCrawlResult is not null)
+                {
+                    AddCrawlResult(queueCrawlResult);
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        return id;
+    }
+
+    private async Task<int> CrawlAllFoundLinks(int id, CancellationToken ct)
+    {
+        foreach (var item in resultsDict.Values)
+        {
+            foreach (var childLink in item.CrawlLinks.ToArray())
             {
                 if (crawledURLs.Contains(childLink))
                 {
                     continue;
                 }
-                var childCrawl = new CrawlResult(childLink, firstCrawlResult.RequestPath, 2, id++);
+                var childCrawl = new CrawlResult(childLink, item.RequestPath, 3, id++);
                 var childCrawlResult = await CrawlPage(childCrawl, ct);
                 if (childCrawlResult is not null)
                 {
                     AddCrawlResult(childCrawlResult);
                 }
             }
-            Console.WriteLine($"****Depth 1 Crawl Completed****");
-
-
-            foreach (var item in resultsDict.Values)
-            {
-                foreach (var childLink in item.CrawlLinks.ToArray())
-                {
-                    if (crawledURLs.Contains(childLink))
-                    {
-                        continue;
-                    }
-                    var childCrawl = new CrawlResult(childLink, item.RequestPath, 3, id++);
-                    var childCrawlResult = await CrawlPage(childCrawl, ct);
-                    if (childCrawlResult is not null)
-                    {
-                        AddCrawlResult(childCrawlResult);
-                    }
-                }
-            }
-            Console.WriteLine($"****Depth 2 Crawl Completed****");
-
-            while (true)
-            {
-                if (crawlQueue.TryDequeue(out CrawlResult? crawlNext))
-                {
-                    if (crawlNext is null)
-                    {
-                        break;
-                    }
-
-                    if (crawledURLs.Contains(crawlNext.RequestPath))
-                    {
-                        continue;
-                    }
-
-                    var queueCrawlResult = await CrawlPage(crawlNext, ct);
-                    if (queueCrawlResult is not null)
-                    {
-                        AddCrawlResult(queueCrawlResult);
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            Console.WriteLine($"****Depth 3 Crawl Completed****");
-
         }
-        return resultsDict.Values;
+        return id;
+    }
+
+    private async Task<int> CrawlFoundLinks(CrawlResult? crawlResult, int id, CancellationToken ct)
+    {
+        if (crawlResult is null) { return id; }
+        foreach (var childLink in crawlResult.CrawlLinks.ToArray())
+        {
+            if (crawledURLs.Contains(childLink)) { continue; }
+            var childCrawl = new CrawlResult(childLink, crawlResult.RequestPath, 2, id++);
+            var childCrawlResult = await CrawlPage(childCrawl, ct);
+            if (childCrawlResult is not null)
+            {
+                AddCrawlResult(childCrawlResult);
+            }
+        }
+        return id;
     }
 }

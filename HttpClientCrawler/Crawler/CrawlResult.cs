@@ -24,7 +24,7 @@ public class CrawlResult : HttpClientSendRequest<string>
         Id = id;
 
     }
-    public string FoundUrl { get; set; } = string.Empty;    
+    public string FoundUrl { get; set; } = string.Empty;
     public int Depth { get; set; }
     public List<string> CrawlLinks
     {
