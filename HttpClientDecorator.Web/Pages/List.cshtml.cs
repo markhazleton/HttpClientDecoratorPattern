@@ -1,8 +1,9 @@
-﻿namespace HttpClientDecorator.Web.Pages;
+﻿using HttpClientDecorator.Concurrent;
+
+namespace HttpClientDecorator.Web.Pages;
 
 public class ListModel : PageModel
 {
-    private readonly object WriteLock = new();
     private readonly ILogger<ListModel> _logger;
     private readonly IHttpClientService _service;
 
@@ -16,88 +17,8 @@ public class ListModel : PageModel
 
     public async Task OnGetAsync(CancellationToken ct = default)
     {
-        var runManny = new ListRequest
-        {
-            MaxThreads = 100,
-            IterationCount = 100,
-            Endpoint = "https://asyncdemoweb.azurewebsites.net/status"
-        };
-        HttpGetCallResults = await CallEndpointMultipleTimesAsync(runManny, ct).ConfigureAwait(false);
+        var taskProcessor = new HttpClientConcurrentProcessor(taskId => new HttpClientConcurrentModel(taskId, "https://asyncdemoweb.azurewebsites.net/status"),_service);
+        List<HttpClientConcurrentModel> results = await taskProcessor.RunAsync(100, 10,ct);
+        HttpGetCallResults = results.Select(s => s.statusCall).ToList();
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="maxThreads"></param>
-    /// <param name="itterationCount"></param>
-    /// <param name="endpoint"></param>
-    /// <returns></returns>
-    private async Task<List<HttpClientSendRequest<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
-    {
-        int curIndex = 0;
-        // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
-        SemaphoreSlim semaphore = new(listRequest.MaxThreads);
-        List<HttpClientSendRequest<SiteStatus>> results = new();
-
-        // Create a list of tasks to make the GetAsync calls
-        List<Task> tasks = new();
-        for (int i = 0; i < listRequest.IterationCount; i++)
-        {
-            // Acquire the semaphore before making the request
-            await semaphore.WaitAsync(ct).ConfigureAwait(false);
-            curIndex++;
-            var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty)
-            {
-                CacheDurationMinutes = 0
-            };
-            // Create a task to make the request
-            tasks.Add(Task.Run(async () =>
-            {
-                try
-                {
-                    // Get The Async Results
-                    var result = await _service.HttpClientSendAsync(statusCall, ct).ConfigureAwait(false);
-                    lock (WriteLock)
-                    {
-                        results.Add(result);
-                    }
-                }
-                finally
-                {
-                    // Release the semaphore
-                    semaphore.Release();
-                }
-            }, ct));
-        }
-
-        // Wait for all tasks to complete
-        await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        return results;
-    }
-    public class ListRequest
-    {
-        public int MaxThreads { get; set; }
-        public int IterationCount { get; set; }
-        public string? Endpoint { get; set; }
-    }
-    public record BuildVersion(
-        [property: JsonPropertyName("majorVersion")] int? MajorVersion,
-        [property: JsonPropertyName("minorVersion")] int? MinorVersion,
-        [property: JsonPropertyName("build")] int? Build,
-        [property: JsonPropertyName("revision")] int? Revision
-    );
-
-    public record Features();
-    public record SiteStatus(
-        [property: JsonPropertyName("buildDate")] DateTime? BuildDate,
-        [property: JsonPropertyName("buildVersion")] BuildVersion BuildVersion,
-        [property: JsonPropertyName("features")] Features Features,
-        [property: JsonPropertyName("messages")] IReadOnlyList<object> Messages,
-        [property: JsonPropertyName("region")] string Region,
-        [property: JsonPropertyName("status")] int? Status,
-        [property: JsonPropertyName("tests")] Tests Tests
-    );
-    public record Tests();
-
-
 }
