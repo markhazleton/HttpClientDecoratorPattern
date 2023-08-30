@@ -71,7 +71,7 @@ public abstract class ConcurrentProcessor<T> where T : ConcurrentProcessorModel
         List<T> results = new();
         while (taskData is not null)
         {
-            long semaphoreWait = await AwaitSemaphoreAsync(semaphore,ct);
+            long semaphoreWait = await AwaitSemaphoreAsync(semaphore, ct);
             Task<T> task = ManageProcessAsync(taskData.TaskId, tasks.Count, semaphoreWait, semaphore);
             tasks.Add(task);
 

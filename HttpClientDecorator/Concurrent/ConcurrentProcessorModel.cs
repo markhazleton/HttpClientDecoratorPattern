@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace HttpClientDecorator.Concurrent;
+﻿namespace HttpClientDecorator.Concurrent;
 
 public class ConcurrentProcessorModel
 {

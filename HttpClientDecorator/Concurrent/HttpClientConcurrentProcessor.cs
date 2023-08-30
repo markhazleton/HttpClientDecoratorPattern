@@ -18,7 +18,7 @@ public class HttpClientConcurrentProcessor : ConcurrentProcessor<HttpClientConcu
     {
         if (taskData.TaskId < MaxTaskCount)
         {
-            return new HttpClientConcurrentModel(taskData.TaskId + 1,taskData.statusCall.RequestPath);
+            return new HttpClientConcurrentModel(taskData.TaskId + 1, taskData.statusCall.RequestPath);
         }
         else return null;
     }
