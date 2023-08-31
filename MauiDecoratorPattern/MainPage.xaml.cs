@@ -1,15 +1,15 @@
-﻿using HttpClientDecorator.Interfaces;
+﻿
+using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
-using HttpClientDecorator.Models.Joke;
 
 namespace MauiDecoratorPattern
 {
     public partial class MainPage : ContentPage
     {
         private int count = 0;
-        private IHttpGetCallService _service;
+        private IHttpClientService _service;
 
-        public MainPage(IHttpGetCallService service)
+        public MainPage(IHttpClientService service)
         {
             _service = service;
             InitializeComponent();
@@ -19,7 +19,7 @@ namespace MauiDecoratorPattern
         {
             count++;
 
-            var JokeResult = new HttpGetCallResults<Joke>
+            var JokeResult = new HttpClientSendRequest<JokeModel>
             {
                 RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode"
             };
@@ -27,7 +27,7 @@ namespace MauiDecoratorPattern
             var ct = new CancellationToken();
             JokeResult = Task.Run(async () =>
             {
-                return await _service.GetAsync(JokeResult, ct).ConfigureAwait(true);
+                return await _service.HttpClientSendAsync(JokeResult, ct).ConfigureAwait(true);
             }).Result;
 
             if (JokeResult.ResponseResults != null)
@@ -51,5 +51,27 @@ namespace MauiDecoratorPattern
             }
             SemanticScreenReader.Announce(CounterBtn.Text);
         }
+    }
+    public class JokeModel
+    {
+        public bool error { get; set; }
+        public string? category { get; set; }
+        public string? type { get; set; }
+        public string? setup { get; set; }
+        public string? delivery { get; set; }
+        public string? joke { get; set; }
+        public FlagsModel? flags { get; set; }
+        public int id { get; set; }
+        public bool safe { get; set; }
+        public string? lang { get; set; }
+    }
+    public class FlagsModel
+    {
+        public bool nsfw { get; set; }
+        public bool religious { get; set; }
+        public bool political { get; set; }
+        public bool racist { get; set; }
+        public bool sexist { get; set; }
+        public bool @explicit { get; set; }
     }
 }

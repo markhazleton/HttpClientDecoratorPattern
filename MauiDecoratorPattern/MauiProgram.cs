@@ -40,13 +40,13 @@ namespace MauiDecoratorPattern
                 client.DefaultRequestHeaders.Add("X-Request-Source", "HttpClientDecorator");
             });
 
-            builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
+            builder.Services.AddSingleton<IHttpClientService>(serviceProvider =>
             {
-                var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
-                var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
+                var logger = serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>();
+                var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>();
                 var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-                IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
-                IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
+                IHttpClientService baseService = new HttpClientSendService(logger, httpClientFactory.CreateClient("Maui"));
+                IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(telemetryLogger, baseService);
                 return telemetryService;
             });
 
