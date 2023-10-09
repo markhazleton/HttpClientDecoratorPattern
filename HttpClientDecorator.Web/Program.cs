@@ -26,6 +26,19 @@ builder.Services.AddLogging(builder =>
                           // Add other log providers if necessary
 });
 
+// Configure HttpClient with HttpClientHandler
+builder.Services.AddHttpClient("HttpClientDecorator", client =>
+{
+    // Configure your client here if needed
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    AllowAutoRedirect = true,
+    MaxAutomaticRedirections = 10
+});
+
+
+
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
     client.Timeout = TimeSpan.FromMilliseconds(30000);

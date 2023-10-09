@@ -2,5 +2,5 @@
 
 public interface ISiteCrawler
 {
-    Task<ICollection<CrawlResult>> Crawl(int maxCrawlDepth, string StartPath, CancellationToken ct = default);
+    Task<ICollection<CrawlResult>> CrawlAsync(int maxCrawlDepth, string StartPath, CancellationToken ct = default);
 }

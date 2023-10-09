@@ -1,26 +1,31 @@
 ﻿using HttpClientDecorator.Interfaces;
 using HttpClientDecorator.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Net;
 
 namespace HttpClientCrawler.Crawler;
 
-public partial class SiteCrawler : ISiteCrawler
+public class SiteCrawler : ISiteCrawler
 {
-    public const int maxCrawlCount = 25;
     private readonly IHubContext<CrawlHub> _hubContext;
     private readonly IHttpClientService _service;
+    private readonly ILogger<SiteCrawler> _logger;
 
-    public SiteCrawler(IHubContext<CrawlHub> hubContext, IHttpClientService httpClientService)
+    public SiteCrawler(IHubContext<CrawlHub> hubContext, IHttpClientService httpClientService, ILogger<SiteCrawler> logger)
     {
         _hubContext = hubContext;
         _service = httpClientService;
+        _logger = logger;
     }
 
-    private async Task<CrawlResult> CrawlPage(string url, int depth, CancellationToken ct = default)
+    /// <summary>
+    /// Crawls a single page and returns the result.
+    /// </summary>
+    private async Task<CrawlResult> CrawlPageAsync(string url, int depth, CancellationToken ct = default)
     {
-        CrawlResult crawlRequest = new()
+        var crawlRequest = new CrawlResult
         {
             CacheDurationMinutes = 0,
             RequestPath = url,
@@ -29,69 +34,73 @@ public partial class SiteCrawler : ISiteCrawler
 
         try
         {
-            crawlRequest = new CrawlResult(await _service.HttpClientSendAsync((HttpClientSendRequest<string>)crawlRequest, ct).ConfigureAwait(false));
+            var response = await _service.HttpClientSendAsync((HttpClientSendRequest<string>)crawlRequest, ct).ConfigureAwait(false);
+            crawlRequest = new CrawlResult(response);
         }
         catch (HttpRequestException ex)
         {
             crawlRequest.StatusCode = HttpStatusCode.ServiceUnavailable;
-            Console.WriteLine("Error accessing page: " + url);
-            Console.WriteLine(ex.Message);
+            _logger.LogError($"Error accessing page: {url}. Exception: {ex.Message}");
         }
         catch (Exception ex)
         {
             crawlRequest.StatusCode = HttpStatusCode.InternalServerError;
-            Console.WriteLine("Error accessing page: " + url);
-            Console.WriteLine(ex.Message);
+            _logger.LogError($"Error accessing page: {url}. Exception: {ex.Message}");
         }
-        finally
-        {
-        }
+
         return crawlRequest;
     }
 
     /// <summary>
-    /// 
+    /// Crawls a website starting from the given path.
     /// </summary>
-    /// <param name="maxNumberOfResults"></param>
-    /// <param name="StartPath"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    public async Task<ICollection<CrawlResult>> Crawl(int maxNumberOfResults, string StartPath, CancellationToken ct = default)
+    public async Task<ICollection<CrawlResult>> CrawlAsync(int maxNumberOfResults, string startPath, CancellationToken ct = default)
     {
-        Queue<string> _linksToCrawl = new();
-        ConcurrentDictionary<string, CrawlResult> _crawlResults = new();
+        var linksToCrawl = new Queue<string>();
+        var crawlResults = new ConcurrentDictionary<string, CrawlResult>();
 
-        _linksToCrawl.Enqueue(StartPath.ToLower());
+        linksToCrawl.Enqueue(startPath);
+
         try
         {
-            while (_linksToCrawl.Count > 0 && _crawlResults.Count <= maxNumberOfResults)
+            while (linksToCrawl.Count > 0 && crawlResults.Count <= maxNumberOfResults)
             {
-                string link = _linksToCrawl.Dequeue();
+                var link = linksToCrawl.Dequeue();
+                var crawlResult = await CrawlPageAsync(link, depth: crawlResults.Count, ct: ct);
+                crawlResults.TryAdd(link, crawlResult);
 
-                var crawlResult = await CrawlPage(link, depth: _crawlResults.Count, ct: ct);
+                EnqueueNewLinks(crawlResult, linksToCrawl, crawlResults);
 
-                _crawlResults.TryAdd(link, crawlResult);
-
-                if (crawlResult.CrawlLinks.Count > 0)
-                {
-                    foreach (var crawlLink in crawlResult.CrawlLinks)
-                    {
-                        if (!_crawlResults.ContainsKey(crawlLink))
-                        {
-                            if (!_linksToCrawl.Contains(crawlLink))
-                            {
-                                _linksToCrawl.Enqueue(crawlLink);
-                            }
-                        }
-                    }
-                }
-                await _hubContext.Clients.All.SendAsync("UrlFound", $"Links to parse:{_linksToCrawl.Count} Crawled:{_crawlResults.Count} ", cancellationToken: ct);
+                await NotifyClientsAsync($"Links to parse:{linksToCrawl.Count} Crawled:{crawlResults.Count}", ct);
             }
         }
         finally
         {
-            await _hubContext.Clients.All.SendAsync("UrlFound", $"Crawl Complete:Crawled:{_crawlResults.Count} links", cancellationToken: ct);
+            await NotifyClientsAsync($"CrawlAsync Complete:Crawled:{crawlResults.Count} links", ct);
         }
-        return _crawlResults.Values;
+
+        return crawlResults.Values;
+    }
+
+    /// <summary>
+    /// Enqueues new links to be crawled.
+    /// </summary>
+    private void EnqueueNewLinks(CrawlResult crawlResult, Queue<string> linksToCrawl, ConcurrentDictionary<string, CrawlResult> crawlResults)
+    {
+        foreach (var crawlLink in crawlResult.CrawlLinks)
+        {
+            if (!crawlResults.ContainsKey(crawlLink) && !linksToCrawl.Contains(crawlLink))
+            {
+                linksToCrawl.Enqueue(crawlLink);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sends real-time updates to connected clients.
+    /// </summary>
+    private async Task NotifyClientsAsync(string message, CancellationToken ct)
+    {
+        await _hubContext.Clients.All.SendAsync("UrlFound", message, ct);
     }
 }
