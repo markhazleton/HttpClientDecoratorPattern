@@ -44,12 +44,10 @@ public class NasaPicturePageModel : PageModel
         {
             apiRequest.RequestPath = "https://api.nasa.gov/planetary/apod?api_key=APIKEY&count=5";
             apiResponse = apiRequest.ResponseResults;
-            _logger.LogInformation("Good Response from NASA API");
         }
     }
 }
 
-// Root myDeserializedClass = JsonSerializer.Deserialize<List<Root>>(myJsonResponse);
 public class NasaPictureListDto : List<NasaPictureDto> { }
 public record NasaPictureDto(
     [property: JsonPropertyName("date")] string date,

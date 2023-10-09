@@ -5,14 +5,6 @@ using Polly.Retry;
 
 namespace HttpClientDecorator;
 
-public class HttpClientSendPollyOptions
-{
-    public int MaxRetryAttempts { get; set; }
-    public TimeSpan RetryDelay { get; set; }
-    public int CircuitBreakerThreshold { get; set; }
-    public TimeSpan CircuitBreakerDuration { get; set; }
-}
-
 
 public class HttpClientSendServicePolly : IHttpClientService
 {
@@ -74,8 +66,6 @@ public class HttpClientSendServicePolly : IHttpClientService
         statusCall.ErrorList.AddRange(_errorList);
 
         _errorList.Clear();
-
-        _logger.LogInformation("Polly:Call Completed");
 
         return statusCall;
     }

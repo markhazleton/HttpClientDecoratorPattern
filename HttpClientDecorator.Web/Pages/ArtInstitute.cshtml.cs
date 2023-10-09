@@ -4,8 +4,8 @@ public class ArtInstituteModel : PageModel
 {
     private readonly ILogger<ArtInstituteModel> _logger;
     private readonly IHttpClientService _service;
-    public HttpClientSendRequest<ArtWorksResponse> artResponse { get; set; } = default!;
-    public ArtWorksResponse artWorksResponse { get; set; } = new ArtWorksResponse();
+    public HttpClientSendRequest<ArtWorksResponse> ArtResponse { get; set; } = default!;
+    public ArtWorksResponse ArtWorksResponse { get; set; } = new ArtWorksResponse();
     public ArtList ArtList { get; set; } = new ArtList();
     public ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientService getCallService)
     {
@@ -14,16 +14,16 @@ public class ArtInstituteModel : PageModel
     }
     public async Task OnGet(CancellationToken ct = default)
     {
-        artResponse = new HttpClientSendRequest<ArtWorksResponse>();
+        ArtResponse = new HttpClientSendRequest<ArtWorksResponse>();
 
-        if (artResponse == null)
+        if (ArtResponse == null)
         {
             _logger.LogError("artResponse is null");
             throw new Exception("artResponse is null");
         }
-        artResponse.CacheDurationMinutes = 500;
-        artResponse.RequestPath = "https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&limit=20&fields=id,title,image_id,artist_title,material_titles&q=impressionism+oil paint";
-        artResponse = await _service.HttpClientSendAsync(artResponse, ct).ConfigureAwait(false);
+        ArtResponse.CacheDurationMinutes = 500;
+        ArtResponse.RequestPath = "https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&limit=20&fields=id,title,image_id,artist_title,material_titles&q=impressionism+oil paint";
+        ArtResponse = await _service.HttpClientSendAsync(ArtResponse, ct).ConfigureAwait(false);
 
         if (_service == null)
         {
@@ -31,16 +31,15 @@ public class ArtInstituteModel : PageModel
             throw new NullReferenceException(nameof(_service));
         }
 
-        if (artResponse?.ResponseResults is null)
+        if (ArtResponse?.ResponseResults is null)
         {
-            artWorksResponse = new ArtWorksResponse();
+            ArtWorksResponse = new ArtWorksResponse();
             _logger.LogError("jokeResult.ResponseResults is null");
         }
         else
         {
-            artWorksResponse = artResponse.ResponseResults;
-            _logger.LogInformation("Good Response from Joke API");
-            foreach (var item in artWorksResponse?.data)
+            ArtWorksResponse = ArtResponse.ResponseResults;
+            foreach (var item in ArtWorksResponse?.data)
             {
                 ArtWork artWork = new();
                 artWork.id = item.id.ToString();

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 
 namespace HttpClientDecorator.Models;
 
@@ -25,6 +26,15 @@ public class HttpClientSendRequest<T>
     {
         Iteration = statusCall.Iteration;
         RequestPath = statusCall.RequestPath;
+        ResponseResults = statusCall.ResponseResults;
+        ErrorList = statusCall.ErrorList;
+        StatusCode = statusCall.StatusCode;
+        CompletionDate = statusCall.CompletionDate;
+        ElapsedMilliseconds = statusCall.ElapsedMilliseconds;
+        Id = statusCall.Id;
+        RequestBody = statusCall.RequestBody;
+        CacheDurationMinutes = statusCall.CacheDurationMinutes;
+        Retries = statusCall.Retries;
     }
 
     /// <summary>
@@ -87,7 +97,6 @@ public class HttpClientSendRequest<T>
     [NotMapped]
     public T? ResponseResults { get; set; }
 
-
     public string ResultAge
     {
         get
@@ -141,5 +150,7 @@ public class HttpClientSendRequest<T>
     /// Number of retires to get a successful HTTP Client Request.
     /// </summary>
     public int Retries { get; set; }
+
+    public HttpStatusCode StatusCode { get; set; }
 }
 

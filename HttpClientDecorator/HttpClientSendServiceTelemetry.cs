@@ -41,12 +41,11 @@ public class HttpClientSendServiceTelemetry : IHttpClientService
         catch (Exception ex)
         {
             statusCall.ErrorList.Add($"Telemetry:GetAsync:Exception:{ex.Message}");
-            _logger.LogCritical("Telemetry:GetAsync:Exception", ex.Message);
+            _logger.LogCritical("Telemetry:GetAsync:Exception:{Message}", ex.Message);
         }
         sw.Stop();
         statusCall.ElapsedMilliseconds = sw.ElapsedMilliseconds;
         statusCall.CompletionDate = DateTime.Now;
-        _logger.LogInformation("Telemetry:GetAsync:Attributes Updated");
         return statusCall;
     }
 }

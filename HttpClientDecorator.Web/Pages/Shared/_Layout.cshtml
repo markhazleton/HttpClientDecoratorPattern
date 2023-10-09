@@ -50,6 +50,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/CircuitBreaker">Circuit Breaker</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/crawldomain">Crawl Site</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -85,6 +88,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="~/lib/datatables/jquery.dataTables.min.js" asp-append-version="true"></script>
     <script src="~/lib/datatables.net-bs/dataTables.bootstrap5.min.js"></script>
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

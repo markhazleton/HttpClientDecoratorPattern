@@ -2,10 +2,11 @@ global using HttpClientDecorator;
 global using HttpClientDecorator.Interfaces;
 global using HttpClientDecorator.Models;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
+global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-
+using HttpClientCrawler.Crawler;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,13 +16,19 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
+builder.Services.AddSignalR();
 
-// Add the HttpGetCall and Telemetry Decorator for IHttpClientService interface
-// Add Http Client Factory
+builder.Services.AddLogging(builder =>
+{
+    // Set the minimum logging level here
+    builder.SetMinimumLevel(LogLevel.Warning); // Change LogLevel as needed
+    builder.AddConsole(); // Add Console logger
+                          // Add other log providers if necessary
+});
+
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
-    client.Timeout = TimeSpan.FromMilliseconds(3000);
-
+    client.Timeout = TimeSpan.FromMilliseconds(30000);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.DefaultRequestHeaders.Add("User-Agent", "HttpClientDecorator");
     client.DefaultRequestHeaders.Add("X-Request-ID", Guid.NewGuid().ToString());
@@ -32,7 +39,7 @@ builder.Services.AddSingleton(serviceProvider =>
 {
     IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
-        serviceProvider.GetRequiredService<IHttpClientFactory>());
+        serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientDecorator"));
 
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
@@ -66,8 +73,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
 app.UseCookiePolicy();
 app.UseSession();
 app.MapRazorPages();
+app.MapHub<CrawlHub>("/crawlHub");
 app.Run();
+
