@@ -22,9 +22,30 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
         ValidateHttpSendResults(httpSendResults);
 
         using var request = CreateHttpRequest(httpSendResults);
-        using HttpResponseMessage response = await SendHttpRequestAsync(request, ct).ConfigureAwait(false);
-
-        return await ProcessHttpResponseAsync<T>(response, httpSendResults, ct).ConfigureAwait(false);
+        HttpResponseMessage response = null;
+        try
+        {
+            response = await _httpClient.SendAsync(request, ct).ConfigureAwait(true);
+            // Check for redirects
+            if (response?.StatusCode == System.Net.HttpStatusCode.MovedPermanently)
+            {
+                httpSendResults.ErrorList.Add($"New: {response?.RequestMessage?.RequestUri} Old:{request?.RequestUri}");
+                _logger.LogInformation("Redirected to {NewUrl}", response?.RequestMessage?.RequestUri);
+            }
+            return await ProcessHttpResponseAsync<T>(response, httpSendResults, ct).ConfigureAwait(true);
+        }
+        catch (HttpRequestException ex)
+        {
+            httpSendResults.ErrorList.Add($"HttpRequestException: {ex.Message}");
+            _logger.LogError(ex, "HttpClientSendAsync:HttpRequestException {Message}", ex.Message);
+            return httpSendResults; // Early return if the request failed
+        }
+        catch (Exception ex) // Catch other types of exceptions here
+        {
+            httpSendResults.ErrorList.Add($"GeneralException: {ex.Message}");
+            _logger.LogError(ex, "HttpClientSendAsync:GeneralException {Message}", ex.Message);
+            return httpSendResults;
+        }
     }
 
     private void ValidateHttpSendResults<T>(HttpClientSendRequest<T> httpSendResults)
@@ -59,13 +80,6 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
         }
 
         return request;
-    }
-
-    private async Task<HttpResponseMessage> SendHttpRequestAsync(HttpRequestMessage request, CancellationToken ct)
-    {
-        var response = await _httpClient.SendAsync(request, ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-        return response;
     }
 
     private async Task<HttpClientSendRequest<T>> ProcessHttpResponseAsync<T>(HttpResponseMessage response, HttpClientSendRequest<T> httpSendResults, CancellationToken ct)

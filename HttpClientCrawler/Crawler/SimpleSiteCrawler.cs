@@ -104,7 +104,7 @@ public class SimpleSiteCrawler : ISiteCrawler
         return crawlResult;
     }
 
-    public async Task<ICollection<CrawlResult>> Crawl(int MaxCrawlDepth, string link, CancellationToken ct = default)
+    public async Task<ICollection<CrawlResult>> CrawlAsync(int MaxCrawlDepth, string link, CancellationToken ct = default)
     {
         var firstCrawl = new CrawlResult(link, link, 1, 1);
         var firstCrawlResult = await CrawlPage(firstCrawl, ct);
@@ -112,17 +112,17 @@ public class SimpleSiteCrawler : ISiteCrawler
         {
             AddCrawlResult(firstCrawlResult);
 
-            Console.WriteLine($"--First Crawl Completed--{firstCrawlResult.RequestPath} -- found {firstCrawlResult.CrawlLinks.Count} links");
+            Console.WriteLine($"--First CrawlAsync Completed--{firstCrawlResult.RequestPath} -- found {firstCrawlResult.CrawlLinks.Count} links");
 
             int id = 1;
             id = await CrawlFoundLinks(firstCrawlResult, id, ct);
-            Console.WriteLine($"****Depth 1 Crawl Completed****");
+            Console.WriteLine($"****Depth 1 CrawlAsync Completed****");
 
             id = await CrawlAllFoundLinks(id, ct);
-            Console.WriteLine($"****Depth 2 Crawl Completed****");
+            Console.WriteLine($"****Depth 2 CrawlAsync Completed****");
 
             id = await ProcessCrawlQueue(id, ct);
-            Console.WriteLine($"****Depth 3 Crawl Completed****");
+            Console.WriteLine($"****Depth 3 CrawlAsync Completed****");
 
         }
         return resultsDict.Values;
