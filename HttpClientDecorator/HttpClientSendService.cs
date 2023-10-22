@@ -3,6 +3,25 @@ using System.Text.Json;
 
 namespace HttpClientDecorator;
 
+/// <summary>
+/// The HttpClientSendService class serves as the core service for sending HTTP requests.
+/// It implements the IHttpClientService interface and provides methods for sending HTTP requests,
+/// validating input parameters, and processing HTTP responses.
+/// </summary>
+/// <remarks>
+/// This class is designed to be robust and extensible, with features like:
+/// - Asynchronous HTTP request sending using HttpClient.
+/// - Exception handling for various types of exceptions like HttpRequestException.
+/// - Logging capabilities for capturing both informational messages and errors.
+/// - JSON serialization and deserialization for handling response data.
+/// </remarks>
+/// <example>
+/// Here is a simple example of using HttpClientSendService:
+/// <code>
+/// var httpClientSendService = new HttpClientSendService(logger, httpClient);
+/// var response = await httpClientSendService.HttpClientSendAsync(httpSendResults, CancellationToken.None);
+/// </code>
+/// </example>
 public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : IHttpClientService
 {
     private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
@@ -66,7 +85,7 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
         }
     }
 
-    private HttpRequestMessage CreateHttpRequest<T>(HttpClientSendRequest<T> httpSendResults)
+    public HttpRequestMessage CreateHttpRequest<T>(HttpClientSendRequest<T> httpSendResults)
     {
         var request = new HttpRequestMessage(httpSendResults.RequestMethod, httpSendResults.RequestPath)
         {
