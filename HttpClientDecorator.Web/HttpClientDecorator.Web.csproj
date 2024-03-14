@@ -14,7 +14,7 @@
 		<UserSecretsId>b8a233d5-e6d9-4cdc-9214-9c87f6ea6d06</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Text.Json" Version="7.0.3" />
+	  <PackageReference Include="System.Text.Json" Version="8.0.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\HttpClientCrawler\HttpClientCrawler.csproj" />
