@@ -26,6 +26,19 @@ builder.Services.AddLogging(builder =>
                           // Add other log providers if necessary
 });
 
+// Configure HttpClient with HttpClientHandler
+builder.Services.AddHttpClient("HttpClientDecorator", client =>
+{
+    // Configure your client here if needed
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    AllowAutoRedirect = true,
+    MaxAutomaticRedirections = 10
+});
+
+
+
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
     client.Timeout = TimeSpan.FromMilliseconds(30000);
@@ -37,14 +50,12 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
 
 builder.Services.AddSingleton(serviceProvider =>
 {
-    // Get the configuration options
-    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
-
     IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientDecorator"));
 
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
     IHttpClientService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
@@ -61,6 +72,7 @@ builder.Services.AddSingleton(serviceProvider =>
 
     return cacheService;
 });
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
 var app = builder.Build();
 

@@ -109,10 +109,6 @@ public static class SiteCrawlerHelpers
             Uri absoluteUri = new(baseUri, relativeUri);
             link = absoluteUri.ToString();
         }
-
-        // Remove trailing '/' (if any)
-        link = link.TrimEnd('/');
-
         return link.ToLower();
     }
     public static void WriteToCsv<T>(IEnumerable<T> data, string filePath)

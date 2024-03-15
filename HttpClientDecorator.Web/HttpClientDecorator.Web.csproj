@@ -12,9 +12,11 @@
 		<RepositoryUrl>https://github.com/markhazleton/HttpClientDecoratorPattern</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<UserSecretsId>b8a233d5-e6d9-4cdc-9214-9c87f6ea6d06</UserSecretsId>
+		<ApplicationInsightsResourceId>/subscriptions/1e3f18e4-ceb9-4033-8ce0-f17b8af6225f/resourceGroups/MwhSampleLinux/providers/microsoft.insights/components/HttpClientDecorator</ApplicationInsightsResourceId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Text.Json" Version="8.0.3" />
+	  <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+	  <PackageReference Include="System.Text.Json" Version="8.0.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\HttpClientCrawler\HttpClientCrawler.csproj" />
