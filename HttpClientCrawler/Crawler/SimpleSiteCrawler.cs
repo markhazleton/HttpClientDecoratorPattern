@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using HtmlAgilityPack;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
+using System.Web;
 
 namespace HttpClientCrawler.Crawler;
 
@@ -17,7 +19,7 @@ public class SimpleSiteCrawler : ISiteCrawler
         httpClientFactory = factory;
     }
 
-    private static bool AddCrawlResult(CrawlResult? result)
+    private bool AddCrawlResult(CrawlResult? result)
     {
         if (result is null)
         {
@@ -30,6 +32,7 @@ public class SimpleSiteCrawler : ISiteCrawler
                 return false;
             }
             resultsDict[result.RequestPath] = result;
+            SavePageFireAndForget(result);
 
             foreach (var foundUrl in result.CrawlLinks.ToArray())
             {
@@ -193,5 +196,120 @@ public class SimpleSiteCrawler : ISiteCrawler
             }
         }
         return id;
+    }
+
+    public async Task SavePageAsync(CrawlResult result)
+    {
+        if (result == null || string.IsNullOrWhiteSpace(result.ResponseResults))
+        {
+            Console.WriteLine("No content to save or result is null.");
+            return;
+        }
+
+        // Ensure the directory exists
+        string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pages");
+        Directory.CreateDirectory(directoryPath);
+
+        // Create a safe filename from the URL
+        string safeFileName = GetSafeFileName(result.RequestPath);
+        string filePath = Path.Combine(directoryPath, safeFileName);
+
+        // Resolve relative links
+        string updatedHtmlContent = ResolveRelativeLinks(result.ResponseResults, result.RequestPath);
+
+        // Write the content to the file
+        await File.WriteAllTextAsync(filePath, updatedHtmlContent);
+        Console.WriteLine($"Saved {result.RequestPath} to {filePath}");
+    }
+
+    private string GetSafeFileName(string url)
+    {
+        try
+        {
+            var uri = new Uri(url);
+            string path = uri.AbsolutePath; // Gets the absolute path component of the URL
+
+            // Removing query strings and fragments from the path
+            if (path.Contains("?"))
+            {
+                path = path.Substring(0, path.IndexOf("?"));
+            }
+            else if (path.Contains("#"))
+            {
+                path = path.Substring(0, path.IndexOf("#"));
+            }
+
+            // Remove the leading slash
+            if (path.StartsWith("/"))
+            {
+                path = path.TrimStart('/');
+            }
+
+            // Use 'index.html' when path is empty or '/'
+            if (string.IsNullOrEmpty(path) || path == "/")
+            {
+                return "index.html";
+            }
+
+            // Use URL encoding to ensure safe file names, then replace % with an underscore to make it more readable
+            string encodedPath = HttpUtility.UrlEncode(path).Replace("%", "_");
+
+            // Limit the length to avoid issues with file system limitations
+            encodedPath = encodedPath.Length <= 150 ? encodedPath : encodedPath.Substring(0, 150);
+
+            // Ensure the filename ends with only one ".html"
+            if (!encodedPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+            {
+                encodedPath += ".html";
+            }
+
+            return encodedPath;
+        }
+        catch
+        {
+            // In case of an exception (e.g., invalid URL), return a generic safe name
+            return "default_safe_name.html";
+        }
+    }
+
+    private string ResolveRelativeLinks(string htmlContent, string baseUrl)
+    {
+        var baseUri = new Uri(baseUrl);
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(htmlContent);
+
+        // Include link elements with href attributes in the XPath query
+        var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]|//img[@src]|//link[@href]");
+        if (nodes != null)
+        {
+            foreach (var node in nodes)
+            {
+                // Determine the attribute name (href or src)
+                string attributeName = node.Name == "link" || node.Name == "a" ? "href" : "src";
+                string originalValue = node.Attributes[attributeName]?.Value;
+                if (!string.IsNullOrEmpty(originalValue) && Uri.TryCreate(originalValue, UriKind.Relative, out Uri relativeUri))
+                {
+                    var absoluteUri = new Uri(baseUri, relativeUri);
+                    node.Attributes[attributeName].Value = absoluteUri.AbsoluteUri;
+                }
+            }
+        }
+
+        return htmlDoc.DocumentNode.OuterHtml;
+    }
+    public void SavePageFireAndForget(CrawlResult result)
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                await SavePageAsync(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                Console.WriteLine($"An error occurred while saving the page: {ex.Message}");
+            }
+        }).ConfigureAwait(false); // ConfigureAwait(false) to run the continuation on a ThreadPool thread
     }
 }

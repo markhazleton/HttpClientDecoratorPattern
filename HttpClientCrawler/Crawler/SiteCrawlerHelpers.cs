@@ -113,30 +113,34 @@ public static class SiteCrawlerHelpers
     }
     public static void WriteToCsv<T>(IEnumerable<T> data, string filePath)
     {
-        using (StreamWriter writer = new(filePath, false, Encoding.UTF8))
+        using StreamWriter writer = new(filePath, false, Encoding.UTF8);
+        // Get properties excluding ResponseResults and RequestBody
+        var properties = typeof(T).GetProperties()
+                                  .Where(p => p.Name != "ResponseResults" && p.Name != "RequestBody" && p.Name != "ResponseHtmlDocument")
+                                  .ToArray();
+
+        // Write CSV header
+        writer.WriteLine(string.Join(",", properties.Select(p => p.Name)));
+
+        // Write data rows
+        foreach (var item in data)
         {
-            // Write CSV header
-            var properties = typeof(T).GetProperties();
-            writer.WriteLine(string.Join(",", properties.Select(p => p.Name)));
-            // Write data rows
-            foreach (var item in data)
+            var values = new List<string>();
+            foreach (var property in properties)
             {
-                var values = new List<string>();
-                foreach (var property in properties)
+                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
                 {
-                    if (property.PropertyType.IsGenericType &&
-                        property.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
-                    {
-                        var listValue = (ICollection)property.GetValue(item);
-                        values.Add(listValue.Count.ToString());
-                    }
-                    else
-                    {
-                        values.Add(property.GetValue(item)?.ToString() ?? string.Empty);
-                    }
+                    var listValue = (ICollection)property.GetValue(item);
+                    values.Add(listValue.Count.ToString());
                 }
-                writer.WriteLine(string.Join(",", values));
+                else
+                {
+                    var propertyValue = property.GetValue(item);
+                    var valueString = propertyValue != null ? "\"" + propertyValue.ToString().Replace("\"", "\"\"") + "\"" : string.Empty; // Handling comma and quotes in data
+                    values.Add(valueString);
+                }
             }
+            writer.WriteLine(string.Join(",", values));
         }
     }
 

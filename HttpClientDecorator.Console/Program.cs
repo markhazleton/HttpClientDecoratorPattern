@@ -49,14 +49,12 @@ circuitBreakerPolicy.Execute(() =>
 {
     try
     {
-        using (var httpClient = new HttpClient())
-        {
-            var response = httpClient.GetAsync("https://asyncdemo.controlorigins.com/status").Result;
-            response.EnsureSuccessStatusCode();
+        using var httpClient = new HttpClient();
+        var response = httpClient.GetAsync("https://asyncdemo.controlorigins.com/status").Result;
+        response.EnsureSuccessStatusCode();
 
-            var result = response.Content.ReadAsStringAsync().Result;
-            Console.WriteLine($"Response: {result}");
-        }
+        var result = response.Content.ReadAsStringAsync().Result;
+        Console.WriteLine($"Response: {result}");
     }
     catch (HttpRequestException ex)
     {
