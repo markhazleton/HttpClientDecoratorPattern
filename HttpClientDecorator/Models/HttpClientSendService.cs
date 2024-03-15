@@ -63,7 +63,7 @@ public class HttpClientSendRequest<T>
     /// <summary>
     /// Error Message if something goes wrong, usually null
     /// </summary>
-    public List<string> ErrorList { get; set; } = new();
+    public List<string> ErrorList { get; set; } = [];
 
     /// <summary>
     /// Id for this record

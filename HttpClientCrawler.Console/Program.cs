@@ -1,7 +1,7 @@
 ﻿using HttpClientCrawler.Crawler;
 using Microsoft.Extensions.DependencyInjection;
 
-string domain = "https://pm.controlorigins.com";
+string domain = "https://wichitainformationcenter.com";
 var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
 
 var crawler = new SimpleSiteCrawler(serviceProvider.GetService<IHttpClientFactory>());

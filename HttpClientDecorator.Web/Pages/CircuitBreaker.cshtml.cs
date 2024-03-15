@@ -55,10 +55,10 @@ public class CircuitBreakerModel : PageModel
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
         SemaphoreSlim semaphore = new(listRequest.MaxThreads);
-        List<HttpClientSendRequest<SiteStatus>> results = new();
+        List<HttpClientSendRequest<SiteStatus>> results = [];
 
         // Create a list of tasks to make the GetAsync calls
-        List<Task> tasks = new();
+        List<Task> tasks = [];
         for (int i = 0; i < listRequest.IterationCount; i++)
         {
             // Acquire the semaphore before making the request

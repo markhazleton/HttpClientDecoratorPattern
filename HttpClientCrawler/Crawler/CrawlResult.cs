@@ -5,7 +5,7 @@ namespace HttpClientCrawler.Crawler;
 
 public class CrawlResult : HttpClientSendRequest<string>
 {
-    public List<string> Errors { get; } = new List<string>();
+    public List<string> Errors { get; } = [];
 
     public CrawlResult() : base()
     {
@@ -14,7 +14,7 @@ public class CrawlResult : HttpClientSendRequest<string>
     public CrawlResult(HttpClientSendRequest<string> statusCall) : base(statusCall)
     {
     }
-    private List<string> _responseLinks = new();
+    private List<string> _responseLinks = [];
 
     public CrawlResult(string requestPath, string foundUrl, int depth, int id)
     {

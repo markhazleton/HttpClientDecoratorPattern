@@ -5,7 +5,7 @@ public class NasaPicturePageModel : PageModel
     private readonly ILogger<NasaPicturePageModel> _logger;
     private readonly IHttpClientService _service;
     public HttpClientSendRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
-    public NasaPictureListDto apiResponse { get; set; } = new NasaPictureListDto();
+    public NasaPictureListDto apiResponse { get; set; } = [];
     public ArtList ArtList { get; set; } = new ArtList();
     public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientService getCallService)
     {
@@ -37,7 +37,7 @@ public class NasaPicturePageModel : PageModel
 
         if (apiRequest?.ResponseResults is null)
         {
-            apiResponse = new NasaPictureListDto();
+            apiResponse = [];
             _logger.LogError("nasaPictureResponse.ResponseResults is null");
         }
         else

@@ -9,7 +9,7 @@ namespace HttpClientDecorator;
 public class HttpClientSendServicePolly : IHttpClientService
 {
     private readonly ILogger<HttpClientSendServicePolly> _logger;
-    private readonly List<string> _errorList = new();
+    private readonly List<string> _errorList = [];
     private readonly IHttpClientService _service;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;

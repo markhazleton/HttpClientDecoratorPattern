@@ -56,7 +56,7 @@ public class ArtInstituteModel : PageModel
 public class ArtList
 {
     public string Title { get; set; }
-    public List<ArtWork> list = new();
+    public List<ArtWork> list = [];
     public void Add(ArtWork artWork)
     {
         list.Add(artWork);

@@ -6,7 +6,7 @@ namespace HttpClientCrawler.Crawler;
 
 public class SimpleSiteCrawler : ISiteCrawler
 {
-    private static readonly HashSet<string> crawledURLs = new();
+    private static readonly HashSet<string> crawledURLs = [];
     private static readonly ConcurrentQueue<CrawlResult> crawlQueue = new();
     private static readonly object lockObj = new();
     private static readonly ConcurrentDictionary<string, CrawlResult> resultsDict = new();

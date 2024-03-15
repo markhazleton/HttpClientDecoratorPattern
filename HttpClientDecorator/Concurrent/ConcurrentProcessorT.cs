@@ -13,7 +13,7 @@ public abstract class ConcurrentProcessor<T> where T : ConcurrentProcessorModel
     {
         MaxTaskCount = 1;
         MaxConcurrency = 1;
-        tasks = new List<Task<T>>();
+        tasks = [];
         this.taskDataFactory = taskDataFactory;
     }
 
@@ -68,7 +68,7 @@ public abstract class ConcurrentProcessor<T> where T : ConcurrentProcessorModel
         MaxConcurrency = maxConcurrency;
         SemaphoreSlim semaphore = new(MaxConcurrency, MaxConcurrency);
         var taskData = taskDataFactory(1);
-        List<T> results = new();
+        List<T> results = [];
         while (taskData is not null)
         {
             long semaphoreWait = await AwaitSemaphoreAsync(semaphore, ct);

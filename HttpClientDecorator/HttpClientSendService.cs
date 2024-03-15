@@ -41,7 +41,7 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
         ValidateHttpSendResults(httpSendResults);
 
         using var request = CreateHttpRequest(httpSendResults);
-        HttpResponseMessage response = null;
+        HttpResponseMessage? response = null;
         try
         {
             response = await _httpClient.SendAsync(request, ct).ConfigureAwait(true);
@@ -101,8 +101,13 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
         return request;
     }
 
-    private async Task<HttpClientSendRequest<T>> ProcessHttpResponseAsync<T>(HttpResponseMessage response, HttpClientSendRequest<T> httpSendResults, CancellationToken ct)
+    private async Task<HttpClientSendRequest<T>> ProcessHttpResponseAsync<T>(HttpResponseMessage? response, HttpClientSendRequest<T> httpSendResults, CancellationToken ct)
     {
+        if (response is null)
+        {
+            httpSendResults.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+            return httpSendResults;
+        }
         httpSendResults.StatusCode = response.StatusCode;
         string callResult = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
 
