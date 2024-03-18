@@ -217,12 +217,21 @@ public class SimpleSiteCrawler : ISiteCrawler
         // Resolve relative links
         string updatedHtmlContent = ResolveRelativeLinks(result.ResponseResults, result.RequestPath);
 
+        var validationMessages = ValidateHtml(updatedHtmlContent);
+        if (validationMessages != null)
+        {
+            Console.WriteLine($"Validation errors found for {result.RequestPath}:");
+            foreach (var message in validationMessages)
+            {
+                Console.WriteLine(message);
+            }
+        }
         // Write the content to the file
         await File.WriteAllTextAsync(filePath, updatedHtmlContent);
         Console.WriteLine($"Saved {result.RequestPath} to {filePath}");
     }
 
-    private string GetSafeFileName(string url)
+    private static string GetSafeFileName(string url)
     {
         try
         {
@@ -230,17 +239,17 @@ public class SimpleSiteCrawler : ISiteCrawler
             string path = uri.AbsolutePath; // Gets the absolute path component of the URL
 
             // Removing query strings and fragments from the path
-            if (path.Contains("?"))
+            if (path.Contains('?'))
             {
-                path = path.Substring(0, path.IndexOf("?"));
+                path = path[..path.IndexOf('?')];
             }
-            else if (path.Contains("#"))
+            else if (path.Contains('#'))
             {
-                path = path.Substring(0, path.IndexOf("#"));
+                path = path[..path.IndexOf('#')];
             }
 
             // Remove the leading slash
-            if (path.StartsWith("/"))
+            if (path.StartsWith('/'))
             {
                 path = path.TrimStart('/');
             }
@@ -255,7 +264,7 @@ public class SimpleSiteCrawler : ISiteCrawler
             string encodedPath = HttpUtility.UrlEncode(path).Replace("%", "_");
 
             // Limit the length to avoid issues with file system limitations
-            encodedPath = encodedPath.Length <= 150 ? encodedPath : encodedPath.Substring(0, 150);
+            encodedPath = encodedPath.Length <= 150 ? encodedPath : encodedPath[..150];
 
             // Ensure the filename ends with only one ".html"
             if (!encodedPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
@@ -272,21 +281,31 @@ public class SimpleSiteCrawler : ISiteCrawler
         }
     }
 
-    private string ResolveRelativeLinks(string htmlContent, string baseUrl)
+    private static string ResolveRelativeLinks(string htmlContent, string baseUrl)
     {
         var baseUri = new Uri(baseUrl);
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlContent);
 
-        // Include link elements with href attributes in the XPath query
-        var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]|//img[@src]|//link[@href]");
+        // Updated XPath query to include more elements that can contain relative URLs
+        var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]|//img[@src]|//link[@href]|//script[@src]|//iframe[@src]|//embed[@src]|//object[@data]|//source[@src]|//track[@src]|//form[@action]|//area[@href]|//blockquote[@cite]|//q[@cite]|//ins[@cite]|//del[@cite]");
         if (nodes != null)
         {
             foreach (var node in nodes)
             {
-                // Determine the attribute name (href or src)
-                string attributeName = node.Name == "link" || node.Name == "a" ? "href" : "src";
+                // Determine the attribute name based on the element
+                string attributeName = "src"; // Default attribute
+                if (node.Name == "a" || node.Name == "link" || node.Name == "area" || node.Name == "blockquote" || node.Name == "q" || node.Name == "ins" || node.Name == "del")
+                    attributeName = "href";
+                else if (node.Name == "form")
+                    attributeName = "action";
+                else if (node.Name == "object")
+                    attributeName = "data";
+                else if (node.Name == "track" || node.Name == "source")
+                    attributeName = "src";
+
                 string originalValue = node.Attributes[attributeName]?.Value;
+
                 if (!string.IsNullOrEmpty(originalValue) && Uri.TryCreate(originalValue, UriKind.Relative, out Uri relativeUri))
                 {
                     var absoluteUri = new Uri(baseUri, relativeUri);
@@ -297,6 +316,44 @@ public class SimpleSiteCrawler : ISiteCrawler
 
         return htmlDoc.DocumentNode.OuterHtml;
     }
+
+    public static List<string>? ValidateHtml(string htmlContent)
+    {
+        List<string> messages = new();
+
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.OptionCheckSyntax = true; // Enable syntax check
+        htmlDoc.LoadHtml(htmlContent);
+
+        // Check for parse errors
+        if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Any())
+        {
+            foreach (var error in htmlDoc.ParseErrors)
+            {
+                messages.Add($"Line {error.Line}: {error.Reason}");
+            }
+        }
+
+        // Example of custom validation - Add more as needed
+        // Check for images without alt attributes
+        var imgNodes = htmlDoc.DocumentNode.SelectNodes("//img[not(@alt)]");
+        if (imgNodes != null)
+        {
+            foreach (var node in imgNodes)
+            {
+                messages.Add($"Image tag without alt attribute found. Line: {node.Line}");
+            }
+        }
+
+        // Additional checks can be added here (e.g., checking for required elements like title, meta tags)
+        if (messages.Count == 0)
+        {
+            return null;
+        }
+        return messages;
+    }
+
+
     public void SavePageFireAndForget(CrawlResult result)
     {
         Task.Run(async () =>
