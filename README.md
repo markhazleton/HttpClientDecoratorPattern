@@ -36,12 +36,9 @@ usage of an application. Telemetry helps us to monitor the performance of an app
 identify and troubleshoot issues, and understand how an application is being used.
 
 ## Build status
-![Build Workflow](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/dotnet.yml/badge.svg)
+[![Build and deploy ASP.Net Core app to Azure Web App - HttpClientDecoratorPattern](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecoratorpattern.yml/badge.svg)](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecoratorpattern.yml)
 
-## CI/CD Status
-[![Build and deploy ASP.Net Core app to Azure Web App - HttpClientDecorator](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecorator.yml/badge.svg?branch=main)](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecorator.yml)
-
-Hosted on Azure [https://httpclientdecorator.azurewebsites.net/](https://httpclientdecorator.azurewebsites.net/)
+Hosted on Azure [https://httpclientdecoratorpattern.azurewebsites.net/](https://httpclientdecoratorpattern.azurewebsites.net/)
 
 ## Tech/framework used
 Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
