@@ -14,9 +14,9 @@
     <link rel="icon" href="~/favicon.ico" type="image/x-icon">
     <title>@ViewData["Title"] - HttpClientDecorator.Web</title>
 
-    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/lib/datatables.net-bs/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     @RenderSection("HeadScripts", required: false)
@@ -84,10 +84,8 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/jquery.js" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="~/lib/datatables/jquery.dataTables.min.js" asp-append-version="true"></script>
-    <script src="~/lib/datatables.net-bs/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.js"></script>
     <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
