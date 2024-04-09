@@ -98,7 +98,7 @@ async Task<List<(int Iteration, string ResponseContent)>> DoWork(
                         int relativeWorkRequested = RandomNumberGenerator.GetInt32(20, 25);
                         try // Try Block for Capturing Request Exceptions
                         {
-                            var request = new HttpRequestMessage(HttpMethod.Post, "https://asyncdemoweb.azurewebsites.net/api/remote/Results");
+                            var request = new HttpRequestMessage(HttpMethod.Post, "https://asyncdemo.azurewebsites.net/api/remote/Results");
                             var content = new StringContent("{\r\n  \"loopCount\": " + relativeWorkRequested + ",\r\n  \"maxTimeMS\": 100,\r\n  \"runTimeMS\": 0,\r\n  \"message\": \"string\",\r\n  \"resultValue\": \"string\"\r\n}", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);

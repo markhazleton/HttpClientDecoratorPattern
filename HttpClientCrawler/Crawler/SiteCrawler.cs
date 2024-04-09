@@ -40,12 +40,12 @@ public class SiteCrawler : ISiteCrawler
         catch (HttpRequestException ex)
         {
             crawlRequest.StatusCode = HttpStatusCode.ServiceUnavailable;
-            _logger.LogError($"Error accessing page: {url}. Exception: {ex.Message}");
+            _logger.LogError("Error accessing page: {url}. Exception: {ex.Message}",url, ex.Message);
         }
         catch (Exception ex)
         {
             crawlRequest.StatusCode = HttpStatusCode.InternalServerError;
-            _logger.LogError($"Error accessing page: {url}. Exception: {ex.Message}");
+            _logger.LogError("Error accessing page: {url}. Exception: {ex.Message}",url, ex.Message);
         }
 
         return crawlRequest;
