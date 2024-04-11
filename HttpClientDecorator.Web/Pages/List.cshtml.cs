@@ -1,4 +1,4 @@
-﻿using HttpClientDecorator.Concurrent;
+﻿using HttpClientUtility.Concurrent;
 using HttpClientUtility.Models;
 
 namespace HttpClientDecorator.Web.Pages;

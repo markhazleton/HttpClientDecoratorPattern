@@ -4,7 +4,7 @@ global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 using HttpClientCrawler.Crawler;
-using HttpClientUtility;
+using HttpClientUtility.SendService;
 
 var builder = WebApplication.CreateBuilder(args);
 

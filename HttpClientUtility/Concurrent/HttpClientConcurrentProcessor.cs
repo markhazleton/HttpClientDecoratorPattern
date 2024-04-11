@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace HttpClientDecorator.Concurrent;
+namespace HttpClientUtility.Concurrent;
 
 public class HttpClientConcurrentProcessor : ConcurrentProcessor<HttpClientConcurrentModel>
 {

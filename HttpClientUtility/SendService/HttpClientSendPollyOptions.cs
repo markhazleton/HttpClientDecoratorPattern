@@ -1,4 +1,4 @@
-﻿namespace HttpClientUtility;
+﻿namespace HttpClientUtility.SendService;
 
 public class HttpClientSendPollyOptions
 {

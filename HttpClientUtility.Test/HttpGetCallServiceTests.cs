@@ -1,5 +1,5 @@
-﻿using HttpClientUtility;
-using HttpClientUtility.Models;
+﻿using HttpClientUtility.Models;
+using HttpClientUtility.SendService;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;

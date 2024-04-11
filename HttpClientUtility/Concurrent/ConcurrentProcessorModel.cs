@@ -1,4 +1,4 @@
-﻿namespace HttpClientDecorator.Concurrent;
+﻿namespace HttpClientUtility.Concurrent;
 
 public class ConcurrentProcessorModel
 {

@@ -1,7 +1,7 @@
 ﻿using HttpClientUtility.Models;
 using System.Text.Json.Serialization;
 
-namespace HttpClientDecorator.Concurrent;
+namespace HttpClientUtility.Concurrent;
 
 public class HttpClientConcurrentModel : ConcurrentProcessorModel
 {

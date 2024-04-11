@@ -4,21 +4,21 @@ using Polly;
 using Polly.CircuitBreaker;
 using Polly.Retry;
 
-namespace HttpClientUtility;
+namespace HttpClientUtility.SendService;
 
 
-public class HttpClientSendServicePolly : HttpClientUtility.Interfaces.IHttpClientService
+public class HttpClientSendServicePolly : Interfaces.IHttpClientService
 {
     private readonly ILogger<HttpClientSendServicePolly> _logger;
     private readonly List<string> _errorList = [];
-    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
+    private readonly Interfaces.IHttpClientService _service;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
     private readonly HttpClientSendPollyOptions _options;
 
     public HttpClientSendServicePolly(
         ILogger<HttpClientSendServicePolly>? logger,
-        HttpClientUtility.Interfaces.IHttpClientService? service,
+        Interfaces.IHttpClientService? service,
         HttpClientSendPollyOptions? options)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));

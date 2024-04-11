@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace HttpClientUtility;
+namespace HttpClientUtility.SendService;
 
 /// <summary>
 /// The HttpClientSendService class serves as the core service for sending HTTP requests.
@@ -23,7 +23,7 @@ namespace HttpClientUtility;
 /// var response = await httpClientSendService.HttpClientSendAsync(httpSendResults, CancellationToken.None);
 /// </code>
 /// </example>
-public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : HttpClientUtility.Interfaces.IHttpClientService
+public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : Interfaces.IHttpClientService
 {
     private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     private readonly ILogger<HttpClientSendService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -52,7 +52,7 @@ public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpCl
                 httpSendResults.ErrorList.Add($"New: {response?.RequestMessage?.RequestUri} Old:{request?.RequestUri}");
                 _logger.LogInformation("Redirected to {NewUrl}", response?.RequestMessage?.RequestUri);
             }
-            return await ProcessHttpResponseAsync<T>(response, httpSendResults, ct).ConfigureAwait(true);
+            return await ProcessHttpResponseAsync(response, httpSendResults, ct).ConfigureAwait(true);
         }
         catch (HttpRequestException ex)
         {
