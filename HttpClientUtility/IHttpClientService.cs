@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,9 +11,10 @@ namespace HttpClientUtility;
 public interface IHttpClientService
 {
     /// <summary>
-    /// Set the timeout for the HttpClient
+    /// Returns a configured HttpClient instance from the factory   
     /// </summary>
-    TimeSpan Timeout { set; }
+    /// <returns></returns>
+    HttpClient CreateConfiguredClient();
     /// <summary>
     /// Process Http Get request
     /// </summary>
@@ -40,6 +43,19 @@ public interface IHttpClientService
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An instance of HttpResponseContent containing the response content and status code.</returns>
     Task<HttpResponseContent<TResult>> PostAsync<T, TResult>(Uri requestUri, T payload, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Post with Request Headers
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="requestUri"></param>
+    /// <param name="payload"></param>
+    /// <param name="headers"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<HttpResponseContent<TResult>> PostAsync<T, TResult>(Uri requestUri, T payload, Dictionary<string, string> headers, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Sends an HTTP DELETE request asynchronously and returns the response content.
     /// </summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -21,17 +22,14 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     private readonly IStringConverter _stringConverter = stringConverter ?? throw new ArgumentNullException(nameof(stringConverter));
-    private TimeSpan? _timeout;
 
     /// <summary>
     /// Creates a configured HttpClient instance.
     /// </summary>
     /// <returns>The configured HttpClient instance.</returns>
-    private HttpClient CreateConfiguredClient()
+    public HttpClient CreateConfiguredClient()
     {
-        var client = _httpClientFactory.CreateClient();
-        client.Timeout = _timeout ?? TimeSpan.FromSeconds(100);
-        return client;
+        return _httpClientFactory.CreateClient();
     }
 
     /// <summary>
@@ -72,13 +70,26 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
         }
     }
 
+    private async Task<HttpResponseContent<TResult>> SendAsync<T, TResult>(HttpMethod method, Uri requestUri, T payload, Dictionary<string,string> headers, CancellationToken cancellationToken)
+    {
+        using var client = CreateConfiguredClient();
+        var jsonPayload = _stringConverter.ConvertFromModel(payload);
+        using var httpContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(method, requestUri) { Content = httpContent };
+        // add the request headers
+        foreach (var header in headers)
+        {
+            request.Headers.Add(header.Key, header.Value);
+        }
+        return await ExecuteRequestAsync<TResult>(() => client.SendAsync(request, cancellationToken), cancellationToken);
+    }
+
     private async Task<HttpResponseContent<TResult>> SendAsync<T, TResult>(HttpMethod method, Uri requestUri, T payload, CancellationToken cancellationToken)
     {
         using var client = CreateConfiguredClient();
         var jsonPayload = _stringConverter.ConvertFromModel(payload);
         using var httpContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
         var request = new HttpRequestMessage(method, requestUri) { Content = httpContent };
-
         return await ExecuteRequestAsync<TResult>(() => client.SendAsync(request, cancellationToken), cancellationToken);
     }
 
@@ -147,6 +158,21 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
     {
         return SendAsync<T, TResult>(HttpMethod.Post, requestUri, payload, cancellationToken);
     }
+    /// <summary>
+    /// Post with Request Headers
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="requestUri"></param>
+    /// <param name="payload"></param>
+    /// <param name="headers"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseContent<TResult>> PostAsync<T, TResult>(Uri requestUri, T payload, Dictionary<string,string> headers, CancellationToken cancellationToken = default)
+    {
+        return SendAsync<T, TResult>(HttpMethod.Post, requestUri, payload, headers, cancellationToken);
+    }
+
 
     /// <summary>
     /// Sends an HTTP PUT request asynchronously and returns the response content.
@@ -160,13 +186,5 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
     public Task<HttpResponseContent<TResult>> PutAsync<T, TResult>(Uri requestUri, T payload, CancellationToken cancellationToken = default)
     {
         return SendAsync<T, TResult>(HttpMethod.Put, requestUri, payload, cancellationToken);
-    }
-
-    /// <summary>
-    /// Gets or sets the timeout for HTTP requests.
-    /// </summary>
-    public TimeSpan Timeout
-    {
-        set => _timeout = value;
     }
 }
