@@ -1,13 +1,15 @@
+using HttpClientUtility.Models;
+
 namespace HttpClientDecorator.Web.Pages;
 
 public class ArtInstituteModel : PageModel
 {
     private readonly ILogger<ArtInstituteModel> _logger;
-    private readonly IHttpClientService _service;
+    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
     public HttpClientSendRequest<ArtWorksResponse> ArtResponse { get; set; } = default!;
     public ArtWorksResponse ArtWorksResponse { get; set; } = new ArtWorksResponse();
     public ArtList ArtList { get; set; } = new ArtList();
-    public ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientService getCallService)
+    public ArtInstituteModel(ILogger<ArtInstituteModel> logger, HttpClientUtility.Interfaces.IHttpClientService getCallService)
     {
         _logger = logger;
         _service = getCallService;

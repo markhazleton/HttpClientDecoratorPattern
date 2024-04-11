@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using HttpClientUtility.Models;
+using System.Text.Json.Serialization;
 
 namespace HttpClientDecorator.Concurrent;
 

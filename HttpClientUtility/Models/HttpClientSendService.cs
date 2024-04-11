@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 
-namespace HttpClientDecorator.Models;
+namespace HttpClientUtility.Models;
 
 /// <summary>
 /// Class to store the results of an HTTP GET call.

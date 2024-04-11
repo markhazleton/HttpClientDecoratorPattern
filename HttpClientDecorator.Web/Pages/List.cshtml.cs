@@ -1,14 +1,15 @@
 ﻿using HttpClientDecorator.Concurrent;
+using HttpClientUtility.Models;
 
 namespace HttpClientDecorator.Web.Pages;
 
 public class ListModel : PageModel
 {
     private readonly ILogger<ListModel> _logger;
-    private readonly IHttpClientService _service;
+    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
     private readonly IConfiguration _configuration;
 
-    public ListModel(ILogger<ListModel> logger, IHttpClientService getCallService, IConfiguration configuration)
+    public ListModel(ILogger<ListModel> logger, HttpClientUtility.Interfaces.IHttpClientService getCallService, IConfiguration configuration)
     {
         _logger = logger;
         _service = getCallService;

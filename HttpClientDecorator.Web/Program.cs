@@ -1,12 +1,10 @@
-global using HttpClientDecorator;
-global using HttpClientDecorator.Interfaces;
-global using HttpClientDecorator.Models;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
 using HttpClientCrawler.Crawler;
+using HttpClientUtility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,22 +48,22 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
 
 builder.Services.AddSingleton(serviceProvider =>
 {
-    IHttpClientService baseService = new HttpClientSendService(
+    HttpClientUtility.Interfaces.IHttpClientService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientDecorator"));
 
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
-    IHttpClientService pollyService = new HttpClientSendServicePolly(
+    HttpClientUtility.Interfaces.IHttpClientService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
         retryOptions);
 
-    IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(
+    HttpClientUtility.Interfaces.IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
         pollyService);
 
-    IHttpClientService cacheService = new HttpClientSendServiceCache(
+    HttpClientUtility.Interfaces.IHttpClientService cacheService = new HttpClientSendServiceCache(
         telemetryService,
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceCache>>(),
         serviceProvider.GetRequiredService<IMemoryCache>());

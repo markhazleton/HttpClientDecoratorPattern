@@ -28,6 +28,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HttpClientDecorator\HttpClientDecorator.csproj" />
+		<ProjectReference Include="..\HttpClientUtility\HttpClientUtility.csproj" />
 	</ItemGroup>
 
 </Project>

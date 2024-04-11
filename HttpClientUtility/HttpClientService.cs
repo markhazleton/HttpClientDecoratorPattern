@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using HttpClientUtility.StringConverter;
+using System;
+using System.Net;
+using System.Text;
 
 namespace HttpClientUtility;
 
@@ -70,7 +66,7 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
         }
     }
 
-    private async Task<HttpResponseContent<TResult>> SendAsync<T, TResult>(HttpMethod method, Uri requestUri, T payload, Dictionary<string,string> headers, CancellationToken cancellationToken)
+    private async Task<HttpResponseContent<TResult>> SendAsync<T, TResult>(HttpMethod method, Uri requestUri, T payload, Dictionary<string, string> headers, CancellationToken cancellationToken)
     {
         using var client = CreateConfiguredClient();
         var jsonPayload = _stringConverter.ConvertFromModel(payload);
@@ -168,7 +164,7 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
     /// <param name="headers"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<HttpResponseContent<TResult>> PostAsync<T, TResult>(Uri requestUri, T payload, Dictionary<string,string> headers, CancellationToken cancellationToken = default)
+    public Task<HttpResponseContent<TResult>> PostAsync<T, TResult>(Uri requestUri, T payload, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
     {
         return SendAsync<T, TResult>(HttpMethod.Post, requestUri, payload, headers, cancellationToken);
     }

@@ -1,23 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HttpClientUtility.Models;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-namespace HttpClientDecorator;
+namespace HttpClientUtility;
 
 
 /// <summary>
 /// Class HttpClientSendServiceTelemetry adds telemetry to the IHttpClientService implementation
 /// </summary>
-public class HttpClientSendServiceTelemetry : IHttpClientService
+public class HttpClientSendServiceTelemetry : HttpClientUtility.Interfaces.IHttpClientService
 {
     private readonly ILogger<HttpClientSendServiceTelemetry> _logger;
-    private readonly IHttpClientService _service;
+    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpClientSendServiceTelemetry"/> class
     /// </summary>
     /// <param name="logger">ILogger instance</param>
     /// <param name="service">IHttpClientService instance</param>
-    public HttpClientSendServiceTelemetry(ILogger<HttpClientSendServiceTelemetry> logger, IHttpClientService service)
+    public HttpClientSendServiceTelemetry(ILogger<HttpClientSendServiceTelemetry> logger, HttpClientUtility.Interfaces.IHttpClientService service)
     {
         _logger = logger;
         _service = service;

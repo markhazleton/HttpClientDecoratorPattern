@@ -1,4 +1,5 @@
-﻿
+﻿using HttpClientUtility.Models;
+
 namespace HttpClientDecorator.Tests.Models;
 
 [TestClass]

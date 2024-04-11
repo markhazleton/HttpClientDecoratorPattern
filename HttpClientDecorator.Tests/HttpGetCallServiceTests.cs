@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HttpClientUtility;
+using HttpClientUtility.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
 

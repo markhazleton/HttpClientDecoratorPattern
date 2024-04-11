@@ -1,4 +1,4 @@
-﻿namespace HttpClientDecorator;
+﻿namespace HttpClientUtility;
 
 public class HttpClientSendPollyOptions
 {

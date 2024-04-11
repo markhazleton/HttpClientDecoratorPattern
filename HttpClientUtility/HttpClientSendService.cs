@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HttpClientUtility.Models;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace HttpClientDecorator;
+namespace HttpClientUtility;
 
 /// <summary>
 /// The HttpClientSendService class serves as the core service for sending HTTP requests.
@@ -22,7 +23,7 @@ namespace HttpClientDecorator;
 /// var response = await httpClientSendService.HttpClientSendAsync(httpSendResults, CancellationToken.None);
 /// </code>
 /// </example>
-public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : IHttpClientService
+public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : HttpClientUtility.Interfaces.IHttpClientService
 {
     private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     private readonly ILogger<HttpClientSendService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -1,4 +1,6 @@
-﻿namespace HttpClientDecorator.Interfaces;
+﻿using HttpClientUtility.Models;
+
+namespace HttpClientUtility.Interfaces;
 
 public interface IHttpClientService
 {

@@ -15,7 +15,7 @@ public class CrawlDomainModel : PageModel
     public IHubContext<CrawlHub> hubContext { get; }
     private readonly SiteCrawler siteCrawler;
 
-    public CrawlDomainModel(IHubContext<CrawlHub> hubContext, IHttpClientService service, ILogger<SiteCrawler> logger)
+    public CrawlDomainModel(IHubContext<CrawlHub> hubContext, HttpClientUtility.Interfaces.IHttpClientService service, ILogger<SiteCrawler> logger)
     {
         this.hubContext = hubContext;
         siteCrawler = new SiteCrawler(hubContext, service, logger);

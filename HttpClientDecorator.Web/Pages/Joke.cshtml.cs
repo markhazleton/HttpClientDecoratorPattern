@@ -1,12 +1,14 @@
+using HttpClientUtility.Models;
+
 namespace HttpClientDecorator.Web.Pages;
 
 public class JokePageModel : PageModel
 {
     private readonly ILogger<JokePageModel> _logger;
-    private readonly IHttpClientService _service;
+    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
     public HttpClientSendRequest<JokeModel> JokeResult { get; set; } = default!;
     public JokeModel TheJoke { get; set; } = new JokeModel();
-    public JokePageModel(ILogger<JokePageModel> logger, IHttpClientService getCallService)
+    public JokePageModel(ILogger<JokePageModel> logger, HttpClientUtility.Interfaces.IHttpClientService getCallService)
     {
         _logger = logger;
         _service = getCallService;
