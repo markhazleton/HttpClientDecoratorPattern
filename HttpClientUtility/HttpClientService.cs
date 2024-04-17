@@ -1,9 +1,11 @@
 using HttpClientUtility.StringConverter;
-using System;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 
 namespace HttpClientUtility;
+
+
 
 /// <summary>
 /// Represents a service for making HTTP requests using HttpClient.
@@ -25,7 +27,7 @@ public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConv
     /// <returns>The configured HttpClient instance.</returns>
     public HttpClient CreateConfiguredClient()
     {
-        return _httpClientFactory.CreateClient();
+        return _httpClientFactory.CreateClient("HttpClientService");
     }
 
     /// <summary>

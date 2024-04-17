@@ -1,5 +1,3 @@
-using System;
-
 namespace HttpClientUtility;
 /// <summary>
 /// Interface for HttpClientService
