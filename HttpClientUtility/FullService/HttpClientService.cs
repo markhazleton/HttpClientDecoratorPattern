@@ -1,9 +1,9 @@
+using HttpClientUtility.Models;
 using HttpClientUtility.StringConverter;
-using System.Diagnostics;
 using System.Net;
 using System.Text;
 
-namespace HttpClientUtility;
+namespace HttpClientUtility.FullService;
 
 
 
@@ -16,7 +16,7 @@ namespace HttpClientUtility;
 /// <param name="httpClientFactory">The factory for creating HttpClient instances.</param>
 /// <param name="stringConverter">The string converter for serializing and deserializing objects.</param>
 /// <exception cref="ArgumentNullException">Thrown when httpClientFactory or stringConverter is null.</exception>
-public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConverter stringConverter) : IHttpClientService
+public class HttpClientService(IHttpClientFactory httpClientFactory, IStringConverter stringConverter) : IHttpClientFullService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     private readonly IStringConverter _stringConverter = stringConverter ?? throw new ArgumentNullException(nameof(stringConverter));

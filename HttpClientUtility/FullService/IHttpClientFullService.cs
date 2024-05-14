@@ -1,8 +1,10 @@
-namespace HttpClientUtility;
+using HttpClientUtility.Models;
+
+namespace HttpClientUtility.FullService;
 /// <summary>
 /// Interface for HttpClientService
 /// </summary>
-public interface IHttpClientService
+public interface IHttpClientFullService
 {
     /// <summary>
     /// Returns a configured HttpClient instance from the factory   

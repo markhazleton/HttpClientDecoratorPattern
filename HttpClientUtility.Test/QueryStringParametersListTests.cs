@@ -1,4 +1,4 @@
-﻿using System;
+﻿using HttpClientUtility.Models;
 
 namespace HttpClientUtility.Test;
 

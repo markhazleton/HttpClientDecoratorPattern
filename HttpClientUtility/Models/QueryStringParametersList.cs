@@ -2,7 +2,7 @@
 using System.Text;
 
 
-namespace HttpClientUtility;
+namespace HttpClientUtility.Models;
 
 /// <summary>
 /// Represents a list of query string parameters for an Http request.

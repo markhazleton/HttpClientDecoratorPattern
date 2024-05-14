@@ -1,4 +1,5 @@
 using HttpClientCrawler.Crawler;
+using HttpClientUtility.SendService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HttpClientDecorator.Web.Pages;
@@ -15,7 +16,7 @@ public class CrawlDomainModel : PageModel
     public IHubContext<CrawlHub> hubContext { get; }
     private readonly SiteCrawler siteCrawler;
 
-    public CrawlDomainModel(IHubContext<CrawlHub> hubContext, HttpClientUtility.Interfaces.IHttpClientService service, ILogger<SiteCrawler> logger)
+    public CrawlDomainModel(IHubContext<CrawlHub> hubContext, IHttpClientSendService service, ILogger<SiteCrawler> logger)
     {
         this.hubContext = hubContext;
         siteCrawler = new SiteCrawler(hubContext, service, logger);

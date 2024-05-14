@@ -5,15 +5,15 @@ using Microsoft.Extensions.Logging;
 namespace HttpClientUtility.SendService;
 
 /// <summary>
-/// Implementation of IHttpClientService that caches HTTP responses using IMemoryCache.
+/// Implementation of IHttpClientFullService that caches HTTP responses using IMemoryCache.
 /// </summary>
-public sealed class HttpClientSendServiceCache : Interfaces.IHttpClientService
+public sealed class HttpClientSendServiceCache : IHttpClientSendService
 {
     private readonly IMemoryCache _cache;
     private readonly ILogger<HttpClientSendServiceCache> _logger;
-    private readonly Interfaces.IHttpClientService _service;
+    private readonly IHttpClientSendService _service;
 
-    public HttpClientSendServiceCache(Interfaces.IHttpClientService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
+    public HttpClientSendServiceCache(IHttpClientSendService service, ILogger<HttpClientSendServiceCache> logger, IMemoryCache cache)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

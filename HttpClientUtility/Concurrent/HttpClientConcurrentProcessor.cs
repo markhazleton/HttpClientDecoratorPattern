@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
+﻿using HttpClientUtility.SendService;
+using System.Diagnostics;
 
 namespace HttpClientUtility.Concurrent;
 
 public class HttpClientConcurrentProcessor : ConcurrentProcessor<HttpClientConcurrentModel>
 {
-    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
+    private readonly IHttpClientSendService _service;
 
     public HttpClientConcurrentProcessor(
-        Func<int, HttpClientConcurrentModel> taskDataFactory, HttpClientUtility.Interfaces.IHttpClientService service) :
+        Func<int, HttpClientConcurrentModel> taskDataFactory, IHttpClientSendService service) :
         base(
             taskDataFactory)
     {

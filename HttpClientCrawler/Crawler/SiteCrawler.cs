@@ -1,4 +1,5 @@
 ﻿using HttpClientUtility.Models;
+using HttpClientUtility.SendService;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
@@ -9,10 +10,10 @@ namespace HttpClientCrawler.Crawler;
 public class SiteCrawler : ISiteCrawler
 {
     private readonly IHubContext<CrawlHub> _hubContext;
-    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
+    private readonly IHttpClientSendService _service;
     private readonly ILogger<SiteCrawler> _logger;
 
-    public SiteCrawler(IHubContext<CrawlHub> hubContext, HttpClientUtility.Interfaces.IHttpClientService httpClientService, ILogger<SiteCrawler> logger)
+    public SiteCrawler(IHubContext<CrawlHub> hubContext, IHttpClientSendService httpClientService, ILogger<SiteCrawler> logger)
     {
         _hubContext = hubContext;
         _service = httpClientService;

@@ -1,4 +1,5 @@
 ﻿using HttpClientUtility.Models;
+using HttpClientUtility.SendService;
 
 namespace HttpClientDecorator.Web.Pages;
 
@@ -7,9 +8,9 @@ public class CircuitBreakerModel : PageModel
     private static readonly Random random = new();
     private readonly object WriteLock = new();
     private readonly ILogger<CircuitBreakerModel> _logger;
-    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
+    private readonly IHttpClientSendService _service;
 
-    public CircuitBreakerModel(ILogger<CircuitBreakerModel> logger, HttpClientUtility.Interfaces.IHttpClientService getCallService)
+    public CircuitBreakerModel(ILogger<CircuitBreakerModel> logger, IHttpClientSendService getCallService)
     {
         _logger = logger;
         _service = getCallService;

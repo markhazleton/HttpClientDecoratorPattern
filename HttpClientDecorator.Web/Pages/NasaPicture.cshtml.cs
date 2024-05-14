@@ -1,15 +1,16 @@
 using HttpClientUtility.Models;
+using HttpClientUtility.SendService;
 
 namespace HttpClientDecorator.Web.Pages;
 
 public class NasaPicturePageModel : PageModel
 {
     private readonly ILogger<NasaPicturePageModel> _logger;
-    private readonly HttpClientUtility.Interfaces.IHttpClientService _service;
+    private readonly IHttpClientSendService _service;
     public HttpClientSendRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
     public NasaPictureListDto apiResponse { get; set; } = [];
     public ArtList ArtList { get; set; } = new ArtList();
-    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, HttpClientUtility.Interfaces.IHttpClientService getCallService)
+    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientSendService getCallService)
     {
         _logger = logger;
         _service = getCallService;

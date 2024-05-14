@@ -1,9 +1,10 @@
+using HttpClientUtility.Models;
 using System.Diagnostics;
 using System.Net;
 
-namespace HttpClientUtility
+namespace HttpClientUtility.FullService
 {
-    public class HttpClientServiceTelemetry(IHttpClientService service) : IHttpClientService
+    public class HttpClientServiceTelemetry(IHttpClientFullService service) : IHttpClientFullService
     {
         public HttpClient CreateConfiguredClient()
         {

@@ -6,7 +6,7 @@ namespace HttpClientUtility.SendService;
 
 /// <summary>
 /// The HttpClientSendService class serves as the core service for sending HTTP requests.
-/// It implements the IHttpClientService interface and provides methods for sending HTTP requests,
+/// It implements the IHttpClientFullService interface and provides methods for sending HTTP requests,
 /// validating input parameters, and processing HTTP responses.
 /// </summary>
 /// <remarks>
@@ -23,7 +23,7 @@ namespace HttpClientUtility.SendService;
 /// var response = await httpClientSendService.HttpClientSendAsync(httpSendResults, CancellationToken.None);
 /// </code>
 /// </example>
-public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : Interfaces.IHttpClientService
+public class HttpClientSendService(ILogger<HttpClientSendService> logger, HttpClient httpClient) : IHttpClientSendService
 {
     private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     private readonly ILogger<HttpClientSendService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));

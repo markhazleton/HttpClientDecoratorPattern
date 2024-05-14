@@ -1,8 +1,8 @@
 ﻿using HttpClientUtility.Models;
 
-namespace HttpClientUtility.Interfaces;
+namespace HttpClientUtility.SendService;
 
-public interface IHttpClientService
+public interface IHttpClientSendService
 {
     Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct);
 }

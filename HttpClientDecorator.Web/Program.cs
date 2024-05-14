@@ -35,8 +35,6 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
     MaxAutomaticRedirections = 10
 });
 
-
-
 builder.Services.AddHttpClient("HttpClientDecorator", client =>
 {
     client.Timeout = TimeSpan.FromMilliseconds(30000);
@@ -48,22 +46,22 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
 
 builder.Services.AddSingleton(serviceProvider =>
 {
-    HttpClientUtility.Interfaces.IHttpClientService baseService = new HttpClientSendService(
+    IHttpClientSendService baseService = new HttpClientSendService(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
         serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientDecorator"));
 
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
-    HttpClientUtility.Interfaces.IHttpClientService pollyService = new HttpClientSendServicePolly(
+    IHttpClientSendService pollyService = new HttpClientSendServicePolly(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
         baseService,
         retryOptions);
 
-    HttpClientUtility.Interfaces.IHttpClientService telemetryService = new HttpClientSendServiceTelemetry(
+    IHttpClientSendService telemetryService = new HttpClientSendServiceTelemetry(
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
         pollyService);
 
-    HttpClientUtility.Interfaces.IHttpClientService cacheService = new HttpClientSendServiceCache(
+    IHttpClientSendService cacheService = new HttpClientSendServiceCache(
         telemetryService,
         serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceCache>>(),
         serviceProvider.GetRequiredService<IMemoryCache>());
