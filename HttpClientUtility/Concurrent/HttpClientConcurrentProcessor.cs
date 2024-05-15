@@ -3,34 +3,53 @@ using System.Diagnostics;
 
 namespace HttpClientUtility.Concurrent;
 
-public class HttpClientConcurrentProcessor : ConcurrentProcessor<HttpClientConcurrentModel>
+/// <summary>
+/// Processes HTTP client requests concurrently.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="HttpClientConcurrentProcessor"/> class.
+/// </remarks>
+/// <param name="taskDataFactory">The factory function to create task data.</param>
+/// <param name="service">The HTTP client send service.</param>
+public class HttpClientConcurrentProcessor(
+    Func<int, HttpClientConcurrentModel> taskDataFactory, IHttpClientSendService service) : ConcurrentProcessor<HttpClientConcurrentModel>(taskDataFactory)
 {
-    private readonly IHttpClientSendService _service;
+    private readonly IHttpClientSendService _service = service ?? throw new ArgumentNullException(nameof(service));
 
-    public HttpClientConcurrentProcessor(
-        Func<int, HttpClientConcurrentModel> taskDataFactory, IHttpClientSendService service) :
-        base(
-            taskDataFactory)
-    {
-        _service = service;
-    }
-
+    /// <summary>
+    /// Gets the next task data based on the current task data.
+    /// </summary>
+    /// <param name="taskData">The current task data.</param>
+    /// <returns>The next task data or null if there are no more tasks.</returns>
     protected override HttpClientConcurrentModel? GetNextTaskData(HttpClientConcurrentModel taskData)
     {
         if (taskData.TaskId < MaxTaskCount)
         {
             return new HttpClientConcurrentModel(taskData.TaskId + 1, taskData.statusCall.RequestPath);
         }
-        else return null;
+        return null;
     }
 
+    /// <summary>
+    /// Processes the task asynchronously.
+    /// </summary>
+    /// <param name="taskData">The task data.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The result of the task.</returns>
     protected override async Task<HttpClientConcurrentModel> ProcessAsync(HttpClientConcurrentModel taskData, CancellationToken ct = default)
     {
-        Stopwatch sw = Stopwatch.StartNew();
-        var result = await _service.HttpClientSendAsync(taskData.statusCall, ct).ConfigureAwait(false);
-        taskData.statusCall = result;
-        sw.Stop();
-        taskData.DurationMS = sw.ElapsedMilliseconds;
-        return new HttpClientConcurrentModel(taskData, taskData.statusCall.RequestPath);
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            var result = await _service.HttpClientSendAsync(taskData.statusCall, ct).ConfigureAwait(false);
+            taskData.statusCall = result;
+            taskData.DurationMS = sw.ElapsedMilliseconds;
+            return new HttpClientConcurrentModel(taskData, taskData.statusCall.RequestPath);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            throw new InvalidOperationException("An error occurred while processing the task.", ex);
+        }
     }
 }
