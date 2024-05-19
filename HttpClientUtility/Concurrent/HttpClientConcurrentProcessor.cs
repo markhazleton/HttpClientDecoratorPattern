@@ -38,11 +38,15 @@ public class HttpClientConcurrentProcessor(
     /// <returns>The result of the task.</returns>
     protected override async Task<HttpClientConcurrentModel> ProcessAsync(HttpClientConcurrentModel taskData, CancellationToken ct = default)
     {
-        var sw = Stopwatch.StartNew();
         try
         {
-            var result = await _service.HttpClientSendAsync(taskData.statusCall, ct).ConfigureAwait(false);
+            var sw = Stopwatch.StartNew();
+            var result = await _service.HttpClientSendAsync(taskData.statusCall, ct).ConfigureAwait(true);
             taskData.statusCall = result;
+            // add random delay of 3-5 seconds
+            // await Task.Delay(new Random().Next(1000, 2000), ct).ConfigureAwait(true);
+
+            sw.Stop();
             taskData.DurationMS = sw.ElapsedMilliseconds;
             return new HttpClientConcurrentModel(taskData, taskData.statusCall.RequestPath);
         }

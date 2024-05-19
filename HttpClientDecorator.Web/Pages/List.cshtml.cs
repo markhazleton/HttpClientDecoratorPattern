@@ -15,7 +15,7 @@ public class ListModel(
     {
         string requestUrl = _configuration.GetValue<string>("RequestUrl") ?? "https://asyncdemo.azurewebsites.net/status";
         var taskProcessor = new HttpClientConcurrentProcessor(taskId => new HttpClientConcurrentModel(taskId, requestUrl), _getCallService);
-        List<HttpClientConcurrentModel> results = await taskProcessor.RunAsync(100, 10, ct);
+        List<HttpClientConcurrentModel> results = await taskProcessor.RunAsync(10, 1, ct);
         HttpGetCallResults = results.Select(s => s.statusCall).ToList();
     }
 }
