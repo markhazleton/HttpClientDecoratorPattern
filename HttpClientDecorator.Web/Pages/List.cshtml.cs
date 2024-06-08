@@ -5,8 +5,8 @@ using HttpClientUtility.SendService;
 namespace HttpClientDecorator.Web.Pages;
 
 public class ListModel(
-    ILogger<ListModel> _logger, 
-    IHttpClientSendService _getCallService, 
+    ILogger<ListModel> _logger,
+    IHttpClientSendService _getCallService,
     IConfiguration _configuration) : PageModel
 {
     public IList<HttpClientSendRequest<SiteStatus>> HttpGetCallResults { get; set; } = default!;
