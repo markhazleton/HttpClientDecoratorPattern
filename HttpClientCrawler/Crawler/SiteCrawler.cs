@@ -85,7 +85,7 @@ public class SiteCrawler : ISiteCrawler
     /// <summary>
     /// Enqueues new links to be crawled.
     /// </summary>
-    private void EnqueueNewLinks(CrawlResult crawlResult, Queue<string> linksToCrawl, ConcurrentDictionary<string, CrawlResult> crawlResults)
+    private static void EnqueueNewLinks(CrawlResult crawlResult, Queue<string> linksToCrawl, ConcurrentDictionary<string, CrawlResult> crawlResults)
     {
         foreach (var crawlLink in crawlResult.CrawlLinks)
         {
