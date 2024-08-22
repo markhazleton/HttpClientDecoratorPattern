@@ -2,24 +2,70 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
-using System.Web;
+using System.Xml.Linq;
 
 namespace HttpClientCrawler.Crawler;
 
-public class SimpleSiteCrawler : ISiteCrawler
+public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
 {
-    private static readonly HashSet<string> crawledURLs = [];
+    private static readonly HashSet<string> crawledURLs = new();
     private static readonly ConcurrentQueue<CrawlResult> crawlQueue = new();
     private static readonly object lockObj = new();
     private static readonly ConcurrentDictionary<string, CrawlResult> resultsDict = new();
-    private readonly IHttpClientFactory httpClientFactory;
+    private static readonly ConcurrentBag<string> notInSitemapLinks = new();
+    private static readonly int maxCrawlDepth = 3; // Configurable maximum depth
 
-    public SimpleSiteCrawler(IHttpClientFactory factory)
+    public async Task InitializeDomainAsync(string domainUrl, CancellationToken ct = default)
     {
-        httpClientFactory = factory;
+        var sitemapUrl = new Uri(new Uri(domainUrl), "sitemap.xml").ToString();
+        try
+        {
+            var response = await factory.CreateClient("SimpleSiteCrawler").GetAsync(sitemapUrl, ct);
+            if (response.IsSuccessStatusCode)
+            {
+                var sitemapContent = await response.Content.ReadAsStringAsync(ct);
+                var sitemapLinks = ParseSitemap(sitemapContent);
+                foreach (var link in sitemapLinks)
+                {
+                    var normalizedLink = NormalizeUrl(link);
+                    if (!crawledURLs.Contains(normalizedLink) && !resultsDict.ContainsKey(normalizedLink))
+                    {
+                        crawlQueue.Enqueue(new CrawlResult(normalizedLink, domainUrl, 1, 1));
+                    }
+                }
+                Console.WriteLine($"Sitemap found and {sitemapLinks.Count} links added to the crawl queue.");
+            }
+            else
+            {
+                Console.WriteLine("Sitemap not found or inaccessible.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error accessing sitemap: {ex.Message}");
+        }
     }
 
-    private bool AddCrawlResult(CrawlResult? result)
+    private List<string> ParseSitemap(string sitemapContent)
+    {
+        var links = new List<string>();
+        try
+        {
+            var xdoc = XDocument.Parse(sitemapContent);
+            XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
+            links = xdoc.Root.Elements(ns + "url")
+                            .Elements(ns + "loc")
+                            .Select(e => e.Value)
+                            .ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing sitemap: {ex.Message}");
+        }
+        return links;
+    }
+
+    private static bool AddCrawlResult(CrawlResult? result)
     {
         if (result is null)
         {
@@ -27,48 +73,60 @@ public class SimpleSiteCrawler : ISiteCrawler
         }
         lock (lockObj)
         {
-            if (resultsDict.ContainsKey(result.RequestPath))
+            var normalizedUrl = NormalizeUrl(result.RequestPath);
+            if (resultsDict.ContainsKey(normalizedUrl))
             {
                 return false;
             }
-            resultsDict[result.RequestPath] = result;
+            result.RequestPath = normalizedUrl;
+            resultsDict[normalizedUrl] = result;
             SavePageFireAndForget(result);
 
             foreach (var foundUrl in result.CrawlLinks.ToArray())
             {
-                if (crawledURLs.Contains(foundUrl))
+                var normalizedFoundUrl = NormalizeUrl(foundUrl);
+                if (crawledURLs.Contains(normalizedFoundUrl))
                 {
                     continue;
                 }
-                if (resultsDict.ContainsKey(foundUrl))
+                if (resultsDict.ContainsKey(normalizedFoundUrl))
+                {
+                    continue;
+                }
+                if (crawlQueue.Any(w => w.RequestPath == normalizedFoundUrl))
                 {
                     continue;
                 }
 
-                if (crawlQueue.Any(w => w.RequestPath == foundUrl))
-                {
-                    continue;
-                }
-                var newCrawl = new CrawlResult(foundUrl, result.RequestPath, result.Depth + 1, crawledURLs.Count + 1);
+                notInSitemapLinks.Add(normalizedFoundUrl); // Track links not in sitemap
+
+                var newCrawl = new CrawlResult(normalizedFoundUrl, result.RequestPath, result.Depth + 1, crawledURLs.Count + 1);
                 crawlQueue.Enqueue(newCrawl);
             }
             Console.WriteLine($"ID:{result.Id} CRAWLED:{resultsDict.Count:D5} QUEUE:{crawlQueue.Count:D5}  DEPTH:{result.Depth} TIME:{result.ElapsedMilliseconds:0,000} +++ Added Result: {result.RequestPath}");
             return true;
         }
     }
+
+    private async Task DelayRequestAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(200)); // Adjust delay as needed
+    }
+
     private async Task<CrawlResult?> CrawlPage(CrawlResult? crawlResult, CancellationToken ct = default)
     {
         if (crawlResult is null)
         {
             return null;
         }
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        await DelayRequestAsync(); // Add delay before each request
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
-            crawledURLs.Add(crawlResult.RequestPath);
-            var response = await httpClientFactory.CreateClient("SimpleSiteCrawler").GetAsync(crawlResult.RequestPath, ct);
+            var normalizedUrl = NormalizeUrl(crawlResult.RequestPath);
+            crawledURLs.Add(normalizedUrl);
+            var response = await factory.CreateClient("SimpleSiteCrawler").GetAsync(normalizedUrl, ct);
             crawlResult.StatusCode = response.StatusCode;
 
             if (response.IsSuccessStatusCode)
@@ -78,25 +136,13 @@ public class SimpleSiteCrawler : ISiteCrawler
         }
         catch (HttpRequestException ex)
         {
-            // Handle HTTP errors
-            if (Enum.TryParse(ex.StatusCode.ToString(), out HttpStatusCode statusCode))
-            {
-                crawlResult.StatusCode = statusCode;
-            }
-            else
-            {
-                crawlResult.StatusCode = HttpStatusCode.InternalServerError;
-            }
-            crawlResult.Errors.Add(ex.Message);
-            crawlResult.Errors.Add("Error accessing page: " + crawlResult.RequestPath);
-            Console.WriteLine(ex.Message);
+            crawlResult.StatusCode = ex.StatusCode ?? HttpStatusCode.InternalServerError;
+            crawlResult.Errors.Add($"HTTP error: {ex.Message}");
         }
         catch (Exception ex)
         {
             crawlResult.StatusCode = HttpStatusCode.InternalServerError;
-            crawlResult.Errors.Add(ex.Message);
-            crawlResult.Errors.Add("Error accessing page: " + crawlResult.RequestPath);
-            Console.WriteLine(ex.Message);
+            crawlResult.Errors.Add($"General error: {ex.Message}");
         }
         finally
         {
@@ -107,57 +153,62 @@ public class SimpleSiteCrawler : ISiteCrawler
         return crawlResult;
     }
 
-    public async Task<ICollection<CrawlResult>> CrawlAsync(int MaxCrawlDepth, string link, CancellationToken ct = default)
+    public async Task<ICollection<CrawlResult>> CrawlAsync(int maxCrawlDepth, string link, CancellationToken ct = default)
+    {
+        await InitializeDomainAsync(link, ct);
+
+        var firstCrawlResult = await StartInitialCrawlAsync(link, ct);
+        if (firstCrawlResult != null)
+        {
+            int id = 1;
+            id = await CrawlFoundLinks(firstCrawlResult, id, ct);
+            id = await CrawlAllFoundLinks(id, ct);
+            id = await ProcessCrawlQueue(id, ct);
+        }
+
+        // Output links found but not in the sitemap
+        Console.WriteLine("Links found but not in the sitemap:");
+        foreach (var url in notInSitemapLinks)
+        {
+            Console.WriteLine(url);
+        }
+
+        return resultsDict.Values;
+    }
+
+    private async Task<CrawlResult?> StartInitialCrawlAsync(string link, CancellationToken ct)
     {
         var firstCrawl = new CrawlResult(link, link, 1, 1);
         var firstCrawlResult = await CrawlPage(firstCrawl, ct);
-        if (firstCrawlResult is not null)
+        if (firstCrawlResult != null)
         {
             AddCrawlResult(firstCrawlResult);
-
             Console.WriteLine($"--First CrawlAsync Completed--{firstCrawlResult.RequestPath} -- found {firstCrawlResult.CrawlLinks.Count} links");
-
-            int id = 1;
-            id = await CrawlFoundLinks(firstCrawlResult, id, ct);
-            Console.WriteLine($"****Depth 1 CrawlAsync Completed****");
-
-            id = await CrawlAllFoundLinks(id, ct);
-            Console.WriteLine($"****Depth 2 CrawlAsync Completed****");
-
-            id = await ProcessCrawlQueue(id, ct);
-            Console.WriteLine($"****Depth 3 CrawlAsync Completed****");
-
         }
-        return resultsDict.Values;
+        return firstCrawlResult;
     }
 
     private async Task<int> ProcessCrawlQueue(int id, CancellationToken ct)
     {
-        while (true)
+        var tasks = new List<Task>();
+        while (crawlQueue.TryDequeue(out CrawlResult? crawlNext))
         {
-            if (crawlQueue.TryDequeue(out CrawlResult? crawlNext))
+            if (crawlNext is null || crawledURLs.Contains(NormalizeUrl(crawlNext.RequestPath)))
             {
-                if (crawlNext is null)
-                {
-                    break;
-                }
+                continue;
+            }
 
-                if (crawledURLs.Contains(crawlNext.RequestPath))
-                {
-                    continue;
-                }
-                crawlNext.Id = id++;
+            crawlNext.Id = id++;
+            tasks.Add(Task.Run(async () =>
+            {
                 var queueCrawlResult = await CrawlPage(crawlNext, ct);
                 if (queueCrawlResult is not null)
                 {
                     AddCrawlResult(queueCrawlResult);
                 }
-            }
-            else
-            {
-                break;
-            }
+            }));
         }
+        await Task.WhenAll(tasks);
         return id;
     }
 
@@ -167,11 +218,12 @@ public class SimpleSiteCrawler : ISiteCrawler
         {
             foreach (var childLink in item.CrawlLinks.ToArray())
             {
-                if (crawledURLs.Contains(childLink))
+                var normalizedChildLink = NormalizeUrl(childLink);
+                if (crawledURLs.Contains(normalizedChildLink))
                 {
                     continue;
                 }
-                var childCrawl = new CrawlResult(childLink, item.RequestPath, 3, id++);
+                var childCrawl = new CrawlResult(normalizedChildLink, item.RequestPath, 3, id++);
                 var childCrawlResult = await CrawlPage(childCrawl, ct);
                 if (childCrawlResult is not null)
                 {
@@ -187,8 +239,9 @@ public class SimpleSiteCrawler : ISiteCrawler
         if (crawlResult is null) { return id; }
         foreach (var childLink in crawlResult.CrawlLinks.ToArray())
         {
-            if (crawledURLs.Contains(childLink)) { continue; }
-            var childCrawl = new CrawlResult(childLink, crawlResult.RequestPath, 2, id++);
+            var normalizedChildLink = NormalizeUrl(childLink);
+            if (crawledURLs.Contains(normalizedChildLink)) { continue; }
+            var childCrawl = new CrawlResult(normalizedChildLink, crawlResult.RequestPath, 2, id++);
             var childCrawlResult = await CrawlPage(childCrawl, ct);
             if (childCrawlResult is not null)
             {
@@ -198,7 +251,13 @@ public class SimpleSiteCrawler : ISiteCrawler
         return id;
     }
 
-    public async Task SavePageAsync(CrawlResult result)
+    private static string NormalizeUrl(string url)
+    {
+        var uri = new Uri(url);
+        return uri.GetLeftPart(UriPartial.Path).TrimEnd('/') + uri.Query;
+    }
+
+    public static async Task SavePageAsync(CrawlResult result)
     {
         if (result == null || string.IsNullOrWhiteSpace(result.ResponseResults))
         {
@@ -206,15 +265,12 @@ public class SimpleSiteCrawler : ISiteCrawler
             return;
         }
 
-        // Ensure the directory exists
         string directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pages");
         Directory.CreateDirectory(directoryPath);
 
-        // Create a safe filename from the URL
-        string safeFileName = GetSafeFileName(result.RequestPath);
+        string safeFileName = GetSafeFileName(result.RequestPath, directoryPath);
         string filePath = Path.Combine(directoryPath, safeFileName);
 
-        // Resolve relative links
         string updatedHtmlContent = ResolveRelativeLinks(result.ResponseResults, result.RequestPath);
 
         var validationMessages = ValidateHtml(updatedHtmlContent);
@@ -226,58 +282,49 @@ public class SimpleSiteCrawler : ISiteCrawler
                 Console.WriteLine(message);
             }
         }
-        // Write the content to the file
+
+        EnsureDirectoryExists(filePath);
         await File.WriteAllTextAsync(filePath, updatedHtmlContent);
         Console.WriteLine($"Saved {result.RequestPath} to {filePath}");
     }
 
-    private static string GetSafeFileName(string url)
+    public static void EnsureDirectoryExists(string filePath)
+    {
+        try
+        {
+            string? directoryPath = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error ensuring directory exists: {ex.Message}");
+        }
+    }
+
+    public static string GetSafeFileName(string url, string outputDir)
     {
         try
         {
             var uri = new Uri(url);
-            string path = uri.AbsolutePath; // Gets the absolute path component of the URL
+            string path = uri.AbsolutePath.Split('?', '#')[0];
+            path = string.IsNullOrEmpty(path) || path == "/" ? "index.html" : path;
 
-            // Removing query strings and fragments from the path
-            if (path.Contains('?'))
+            if (!path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
             {
-                path = path[..path.IndexOf('?')];
-            }
-            else if (path.Contains('#'))
-            {
-                path = path[..path.IndexOf('#')];
+                path = path.TrimEnd('/') + ".html";
             }
 
-            // Remove the leading slash
-            if (path.StartsWith('/'))
-            {
-                path = path.TrimStart('/');
-            }
+            path = path.Replace('/', '\\').TrimStart(Path.DirectorySeparatorChar);
+            path = path.Length <= 150 ? path : path.Substring(0, 150);
 
-            // Use 'index.html' when path is empty or '/'
-            if (string.IsNullOrEmpty(path) || path == "/")
-            {
-                return "index.html";
-            }
-
-            // Use URL encoding to ensure safe file names, then replace % with an underscore to make it more readable
-            string encodedPath = HttpUtility.UrlEncode(path).Replace("%", "_");
-
-            // Limit the length to avoid issues with file system limitations
-            encodedPath = encodedPath.Length <= 150 ? encodedPath : encodedPath[..150];
-
-            // Ensure the filename ends with only one ".html"
-            if (!encodedPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
-            {
-                encodedPath += ".html";
-            }
-
-            return encodedPath;
+            return Path.Combine(outputDir, path);
         }
         catch
         {
-            // In case of an exception (e.g., invalid URL), return a generic safe name
-            return "default_safe_name.html";
+            return Path.Combine(outputDir, "default_safe_name.html");
         }
     }
 
@@ -287,22 +334,19 @@ public class SimpleSiteCrawler : ISiteCrawler
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlContent);
 
-        // Updated XPath query to include more elements that can contain relative URLs
         var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]|//img[@src]|//link[@href]|//script[@src]|//iframe[@src]|//embed[@src]|//object[@data]|//source[@src]|//track[@src]|//form[@action]|//area[@href]|//blockquote[@cite]|//q[@cite]|//ins[@cite]|//del[@cite]");
         if (nodes != null)
         {
             foreach (var node in nodes)
             {
-                // Determine the attribute name based on the element
-                string attributeName = "src"; // Default attribute
-                if (node.Name == "a" || node.Name == "link" || node.Name == "area" || node.Name == "blockquote" || node.Name == "q" || node.Name == "ins" || node.Name == "del")
-                    attributeName = "href";
-                else if (node.Name == "form")
-                    attributeName = "action";
-                else if (node.Name == "object")
-                    attributeName = "data";
-                else if (node.Name == "track" || node.Name == "source")
-                    attributeName = "src";
+                string attributeName = node.Name switch
+                {
+                    "a" or "link" or "area" or "blockquote" or "q" or "ins" or "del" => "href",
+                    "form" => "action",
+                    "object" => "data",
+                    "track" or "source" => "src",
+                    _ => "src"
+                };
 
                 string originalValue = node.Attributes[attributeName]?.Value;
 
@@ -313,7 +357,6 @@ public class SimpleSiteCrawler : ISiteCrawler
                 }
             }
         }
-
         return htmlDoc.DocumentNode.OuterHtml;
     }
 
@@ -321,40 +364,27 @@ public class SimpleSiteCrawler : ISiteCrawler
     {
         List<string> messages = new();
 
-        var htmlDoc = new HtmlDocument();
-        htmlDoc.OptionCheckSyntax = true; // Enable syntax check
+        var htmlDoc = new HtmlDocument
+        {
+            OptionCheckSyntax = true
+        };
         htmlDoc.LoadHtml(htmlContent);
 
-        // Check for parse errors
         if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Any())
         {
-            foreach (var error in htmlDoc.ParseErrors)
-            {
-                messages.Add($"Line {error.Line}: {error.Reason}");
-            }
+            messages.AddRange(htmlDoc.ParseErrors.Select(error => $"Line {error.Line}: {error.Reason}"));
         }
 
-        // Example of custom validation - Add more as needed
-        // Check for images without alt attributes
         var imgNodes = htmlDoc.DocumentNode.SelectNodes("//img[not(@alt)]");
         if (imgNodes != null)
         {
-            foreach (var node in imgNodes)
-            {
-                messages.Add($"Image tag without alt attribute found. Line: {node.Line}");
-            }
+            messages.AddRange(imgNodes.Select(node => $"Image tag without alt attribute found. Line: {node.Line}"));
         }
 
-        // Additional checks can be added here (e.g., checking for required elements like title, meta tags)
-        if (messages.Count == 0)
-        {
-            return null;
-        }
-        return messages;
+        return messages.Count == 0 ? null : messages;
     }
 
-
-    public void SavePageFireAndForget(CrawlResult result)
+    public static void SavePageFireAndForget(CrawlResult result)
     {
         Task.Run(async () =>
         {
@@ -364,9 +394,8 @@ public class SimpleSiteCrawler : ISiteCrawler
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as needed
                 Console.WriteLine($"An error occurred while saving the page: {ex.Message}");
             }
-        }).ConfigureAwait(false); // ConfigureAwait(false) to run the continuation on a ThreadPool thread
+        }).ConfigureAwait(false);
     }
 }
