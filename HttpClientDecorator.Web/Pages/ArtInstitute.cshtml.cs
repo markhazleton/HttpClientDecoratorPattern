@@ -3,41 +3,35 @@ using HttpClientUtility.SendService;
 
 namespace HttpClientDecorator.Web.Pages;
 
-public class ArtInstituteModel : PageModel
+public class ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientSendService getCallService) : PageModel
 {
-    private readonly ILogger<ArtInstituteModel> _logger;
-    private readonly IHttpClientSendService _service;
     public HttpClientSendRequest<ArtWorksResponse> ArtResponse { get; set; } = default!;
     public ArtWorksResponse ArtWorksResponse { get; set; } = new ArtWorksResponse();
     public ArtList ArtList { get; set; } = new ArtList();
-    public ArtInstituteModel(ILogger<ArtInstituteModel> logger, IHttpClientSendService getCallService)
-    {
-        _logger = logger;
-        _service = getCallService;
-    }
+
     public async Task OnGet(CancellationToken ct = default)
     {
         ArtResponse = new HttpClientSendRequest<ArtWorksResponse>();
 
         if (ArtResponse == null)
         {
-            _logger.LogError("artResponse is null");
+            logger.LogError("artResponse is null");
             throw new Exception("artResponse is null");
         }
         ArtResponse.CacheDurationMinutes = 500;
         ArtResponse.RequestPath = "https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&limit=20&fields=id,title,image_id,artist_title,material_titles&q=impressionism+oil paint";
-        ArtResponse = await _service.HttpClientSendAsync(ArtResponse, ct).ConfigureAwait(false);
+        ArtResponse = await getCallService.HttpClientSendAsync(ArtResponse, ct).ConfigureAwait(false);
 
-        if (_service == null)
+        if (getCallService == null)
         {
-            _logger.LogError("_service is null");
-            throw new NullReferenceException(nameof(_service));
+            logger.LogError("_service is null");
+            throw new NullReferenceException(nameof(getCallService));
         }
 
         if (ArtResponse?.ResponseResults is null)
         {
             ArtWorksResponse = new ArtWorksResponse();
-            _logger.LogError("jokeResult.ResponseResults is null");
+            logger.LogError("jokeResult.ResponseResults is null");
         }
         else
         {

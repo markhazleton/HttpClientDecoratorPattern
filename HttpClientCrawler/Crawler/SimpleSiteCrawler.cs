@@ -8,12 +8,11 @@ namespace HttpClientCrawler.Crawler;
 
 public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
 {
-    private static readonly HashSet<string> crawledURLs = new();
+    private static readonly HashSet<string> crawledURLs = [];
     private static readonly ConcurrentQueue<CrawlResult> crawlQueue = new();
     private static readonly object lockObj = new();
     private static readonly ConcurrentDictionary<string, CrawlResult> resultsDict = new();
-    private static readonly ConcurrentBag<string> notInSitemapLinks = new();
-    private static readonly int maxCrawlDepth = 3; // Configurable maximum depth
+    private static readonly ConcurrentBag<string> notInSitemapLinks = [];
 
     public async Task InitializeDomainAsync(string domainUrl, CancellationToken ct = default)
     {
@@ -46,7 +45,7 @@ public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
         }
     }
 
-    private List<string> ParseSitemap(string sitemapContent)
+    private static List<string> ParseSitemap(string sitemapContent)
     {
         var links = new List<string>();
         try
@@ -108,7 +107,7 @@ public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
         }
     }
 
-    private async Task DelayRequestAsync()
+    private static async Task DelayRequestAsync()
     {
         await Task.Delay(TimeSpan.FromMilliseconds(200)); // Adjust delay as needed
     }
@@ -362,7 +361,7 @@ public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
 
     public static List<string>? ValidateHtml(string htmlContent)
     {
-        List<string> messages = new();
+        List<string> messages = [];
 
         var htmlDoc = new HtmlDocument
         {
