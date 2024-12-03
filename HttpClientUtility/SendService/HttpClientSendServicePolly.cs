@@ -7,6 +7,9 @@ using Polly.Retry;
 namespace HttpClientUtility.SendService;
 
 
+/// <summary>
+/// Service for sending HTTP requests with Polly policies for retry and circuit breaker.
+/// </summary>
 public class HttpClientSendServicePolly : IHttpClientSendService
 {
     private readonly ILogger<HttpClientSendServicePolly> _logger;
@@ -16,6 +19,13 @@ public class HttpClientSendServicePolly : IHttpClientSendService
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
     private readonly HttpClientSendPollyOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HttpClientSendServicePolly"/> class.
+    /// </summary>
+    /// <param name="logger">The logger instance.</param>
+    /// <param name="service">The HTTP client send service instance.</param>
+    /// <param name="options">The Polly options for retry and circuit breaker policies.</param>
+    /// <exception cref="ArgumentNullException">Thrown when any of the parameters are null.</exception>
     public HttpClientSendServicePolly(
         ILogger<HttpClientSendServicePolly>? logger,
         IHttpClientSendService? service,
@@ -23,7 +33,7 @@ public class HttpClientSendServicePolly : IHttpClientSendService
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options ?? throw new ArgumentNullException(nameof(options)); ;
+        _options = options ?? throw new ArgumentNullException(nameof(options));
 
         // Configure the retry policy
         _retryPolicy = Policy
@@ -51,6 +61,13 @@ public class HttpClientSendServicePolly : IHttpClientSendService
                 });
     }
 
+    /// <summary>
+    /// Sends an HTTP request asynchronously with Polly policies for retry and circuit breaker.
+    /// </summary>
+    /// <typeparam name="T">The type of the response result.</typeparam>
+    /// <param name="statusCall">The HTTP client send request.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The HTTP client send request with the response result.</returns>
     public async Task<HttpClientSendRequest<T>> HttpClientSendAsync<T>(HttpClientSendRequest<T> statusCall, CancellationToken ct)
     {
         // Wrap the GetAsync call with the circuit breaker policies

@@ -8,11 +8,11 @@ namespace HttpClientCrawler.Crawler;
 
 public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
 {
-    private static readonly HashSet<string> crawledURLs = new();
+    private static readonly HashSet<string> crawledURLs = [];
     private static readonly ConcurrentQueue<CrawlResult> crawlQueue = new();
     private static readonly object lockObj = new();
     private static readonly ConcurrentDictionary<string, CrawlResult> resultsDict = new();
-    private static readonly ConcurrentBag<string> notInSitemapLinks = new();
+    private static readonly ConcurrentBag<string> notInSitemapLinks = [];
     private static readonly int maxCrawlDepth = 3; // Configurable maximum depth
 
     public async Task InitializeDomainAsync(string domainUrl, CancellationToken ct = default)
@@ -362,7 +362,7 @@ public class SimpleSiteCrawler(IHttpClientFactory factory) : ISiteCrawler
 
     public static List<string>? ValidateHtml(string htmlContent)
     {
-        List<string> messages = new();
+        List<string> messages = [];
 
         var htmlDoc = new HtmlDocument
         {
