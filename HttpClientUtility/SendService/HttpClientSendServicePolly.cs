@@ -12,12 +12,12 @@ namespace HttpClientUtility.SendService;
 /// </summary>
 public class HttpClientSendServicePolly : IHttpClientSendService
 {
-    private readonly ILogger<HttpClientSendServicePolly> _logger;
-    private readonly List<string> _errorList = [];
-    private readonly IHttpClientSendService _service;
-    private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
+    private readonly List<string> _errorList = [];
+    private readonly ILogger<HttpClientSendServicePolly> _logger;
     private readonly HttpClientSendPollyOptions _options;
+    private readonly AsyncRetryPolicy _retryPolicy;
+    private readonly IHttpClientSendService _service;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpClientSendServicePolly"/> class.
