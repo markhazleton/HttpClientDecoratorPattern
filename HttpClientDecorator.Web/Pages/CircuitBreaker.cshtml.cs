@@ -1,5 +1,4 @@
-﻿using HttpClientUtility.Models;
-using HttpClientUtility.SendService;
+﻿using WebSpark.HttpClientUtility.RequestResult;
 
 namespace HttpClientDecorator.Web.Pages;
 
@@ -8,15 +7,15 @@ public class CircuitBreakerModel : PageModel
     private static readonly Random random = new();
     private readonly object WriteLock = new();
     private readonly ILogger<CircuitBreakerModel> _logger;
-    private readonly IHttpClientSendService _service;
+    private readonly IHttpRequestResultService _service;
 
-    public CircuitBreakerModel(ILogger<CircuitBreakerModel> logger, IHttpClientSendService getCallService)
+    public CircuitBreakerModel(ILogger<CircuitBreakerModel> logger, IHttpRequestResultService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
 
-    public IList<HttpClientSendRequest<SiteStatus>> HttpGetCallResults { get; set; } = default!;
+    public IList<HttpRequestResult<SiteStatus>> HttpGetCallResults { get; set; } = default!;
 
     public async Task OnGetAsync(CancellationToken ct = default)
     {
@@ -53,12 +52,12 @@ public class CircuitBreakerModel : PageModel
     /// <param name="itterationCount"></param>
     /// <param name="endpoint"></param>
     /// <returns></returns>
-    private async Task<List<HttpClientSendRequest<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
+    private async Task<List<HttpRequestResult<SiteStatus>>> CallEndpointMultipleTimesAsync(ListRequest listRequest, CancellationToken ct)
     {
         int curIndex = 0;
         // Create a SemaphoreSlim with a maximum of maxThreads concurrent requests
         SemaphoreSlim semaphore = new(listRequest.MaxThreads);
-        List<HttpClientSendRequest<SiteStatus>> results = [];
+        List<HttpRequestResult<SiteStatus>> results = [];
 
         // Create a list of tasks to make the GetAsync calls
         List<Task> tasks = [];
@@ -68,7 +67,7 @@ public class CircuitBreakerModel : PageModel
             await semaphore.WaitAsync(ct).ConfigureAwait(false);
             curIndex++;
 
-            var statusCall = new HttpClientSendRequest<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty)
+            var statusCall = new HttpRequestResult<SiteStatus>(curIndex, listRequest.Endpoint ?? string.Empty)
             {
                 CacheDurationMinutes = 0,
                 RequestMethod = listRequest.RequestMethod,
@@ -85,7 +84,7 @@ public class CircuitBreakerModel : PageModel
                     // Get The Async Results
                     var test = await statusCall.RequestBody.ReadAsStringAsync();
 
-                    var result = await _service.HttpClientSendAsync(statusCall, ct).ConfigureAwait(false);
+                    var result = await _service.HttpSendRequestResultAsync(statusCall, ct: ct).ConfigureAwait(false);
 
                     lock (WriteLock)
                     {
@@ -121,7 +120,7 @@ public class CircuitBreakerModel : PageModel
         public int loopCount { get; set; }
         public int maxTimeMS { get; set; }
         public int runTimeMS { get; set; }
-        public string message { get; set; }
-        public string resultValue { get; set; }
+        public string message { get; set; } = string.Empty;
+        public string resultValue { get; set; } = string.Empty;
     }
 }

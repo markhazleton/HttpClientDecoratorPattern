@@ -1,185 +1,218 @@
-# Decorator Design Pattern
+# HttpClient Decorator Pattern for .NET
 
-## Adding Telemetry to HttpClient
-
-This repository demonstrates how to use the decorator design pattern to add telemetry to an HttpClient. 
-
-The **Decorator Pattern** is a design pattern that allows developers to add additional functionality to existing 
-classes/objects without modifying the existing class/object. 
-
-This repository demonstrates how to use the decorator design pattern to add telemetry 
-to an HttpClient in C#. By the end of this demonstration, you will have a good understanding 
-of the decorator pattern and how to use it to add telemetry to an HttpClient.
-
-By using the Decorator Pattern, developers can add 
-additional properties and methods to the existing HttpClient class to add telemetry data to the request. 
-This allows for easy tracking of requests and their associated data, such as request time, response time, and response size. 
-By using the Decorator Pattern, the original HttpClient class remains unchanged, and the telemetry data is added 
-through a “wrapper” or “decorator” class. This makes the code more maintainable, as the changes are isolated to 
-the decorator class, while the original HttpClient class remains unchanged.
-
-## Motiviation
-To have a working version of the decorator pattern in C# with a real world example.
-This repository demonstrates the power and flexibility of the decorator design pattern, 
-and shows how to use it to add telemetry to an HttpClient in C#. 
-
-
-### HttpClient & HttpClientFactory
-HttpClient is a modern, easy-to-use, and powerful HTTP client library that is built 
-into .NET. It provides a simple, asynchronous, and extensible way to make HTTP requests.
-This project uses the IHttpClientFactory to create an HttpClient instance. 
-
-
-### What is Telemetry?
-Telemetry is the collection, transmission, and analysis of data related to the performance and 
-usage of an application. Telemetry helps us to monitor the performance of an application, 
-identify and troubleshoot issues, and understand how an application is being used.
-
-## Build status
 [![Build and deploy ASP.Net Core app to Azure Web App - HttpClientDecoratorPattern](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecoratorpattern.yml/badge.svg)](https://github.com/markhazleton/HttpClientDecoratorPattern/actions/workflows/main_httpclientdecoratorpattern.yml)
+[![NuGet](https://img.shields.io/nuget/v/WebSpark.HttpClientUtility.svg)](https://www.nuget.org/packages/WebSpark.HttpClientUtility/)
 
-Hosted on Azure [https://httpclientdecoratorpattern.azurewebsites.net/](https://httpclientdecoratorpattern.azurewebsites.net/)
+## 🚀 Enhancing HttpClient with Telemetry, Caching, and Circuit Breaking
 
-## Tech/framework used
-Asp.Net C# code style, with out of the box Visual Studio 2022 settings.
+This repository serves as a demonstration site for the public NuGet package [WebSpark.HttpClientUtility](https://www.nuget.org/packages/WebSpark.HttpClientUtility/), showcasing how to implement the Decorator Design Pattern in C# to enhance HttpClient functionality with telemetry, caching, and circuit breaking capabilities. It provides a practical, real-world example for .NET developers working with HTTP services.
 
-## Features
- 1. **Joke**        - Make an API call to the public JOKE API and display the results.
-    - Single Call passing with Model from Joke API
-    ![Joke Page](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/JokeRazorPageResults.JPG)
+## 📋 Overview
 
- 1. **Many Calls**  - Make multiple API calls and display results so you can compare telemetry values. 
-    - Demontrate using Semphore Slim Apporach to limiting the number of concurrent calls. 
-    ![Many Calls](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/ListPageResults.JPG)
+The **Decorator Pattern** is a structural design pattern that allows behavior to be added to individual objects without affecting the behavior of other objects from the same class. This repository demonstrates how this pattern is implemented in the WebSpark.HttpClientUtility package and can be applied to the HttpClient class to add cross-cutting concerns like:
 
-### List.cshtml Razor Page
-This page is responsible for making multiple HTTP GET requests concurrently using asynchronous programming. 
+- **Telemetry**: Track request/response times and sizes
+- **Caching**: Reduce redundant API calls
+- **Circuit Breaking**: Prevent cascading failures during API outages
+- **Polly Integration**: Implement resilience policies
 
-The main method is called CallEndpointMultipleTimes amd retirms a list of Api call results.
-The method takes three parameters:
-- **maxThreads**: Represents the maximum number of threads to use for making the GET requests.
-- **itterationCount**: Represents the number of GET requests to be made.
-- **endpoint**: Represents the endpoint to send the GET request to.
+By following this pattern, the original HttpClient class remains untouched while additional functionality is layered through decorator classes, making the codebase more maintainable and adhering to the Open/Closed principle.
 
-This code creates a semaphore, SemaphoreSlim, to limit the number of concurrent requests to maxThreads. 
-Then it creates a list of tasks, tasks, to store the results of the GetAsync calls. 
-For each iteration of the loop, it waits for the semaphore to be available and then adds a new task to the tasks list, 
-making a call to the GetAsync method. 
-The result of each GetAsync call is added to a List<HttpGetCallResults> object, results.
+## 🌟 Features
 
-Once all the tasks are complete, the method returns the results list and logs a message indicating that all 
-calls have been completed. The SemaphoreSlim is used to limit the number of concurrent requests and ensure 
-that the number of requests does not exceed the maxThreads value.
+1. **Telemetry-Enhanced HttpClient**: Track performance metrics for all HTTP requests
+   - Response time tracking
+   - Request/response size monitoring
+   - Detailed logging with correlation IDs
 
-## Code Brief
+2. **Advanced API Interactions**:
+   - **Joke API**: Demonstrates simple API consumption with telemetry
+     ![Joke Page](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/JokeRazorPageResults.JPG)
 
-## Implementing the service interface and main class
-The pattern requires at least three classes
-- The interface that defines the methods to be implemented.
-- The base class that implements the functionality
-- The decorator class that adds additional functionality to the base class.
+   - **Concurrent API Calls**: Shows how to manage multiple parallel requests with SemaphoreSlim
+     ![Many Calls](https://raw.githubusercontent.com/markhazleton/HttpClientDecoratorPattern/main/Images/ListPageResults.JPG)
 
-Here are brief examples of the code, with logging and error handling removed for brevity.
+   - **Circuit Breaking**: Protects your application from API failures
 
-### The Interface
+3. **Additional Patterns**:
+   - Implementation of SemaphoreSlim for controlled concurrent requests
+   - Memory caching for API responses
+   - SignalR integration for real-time updates
+
+## 💻 Technologies Used
+
+- ASP.NET Core (.NET 9.0)
+- C# 12
+- Razor Pages
+- SignalR
+- Polly for resilience policies
+- [WebSpark.HttpClientUtility](https://www.nuget.org/packages/WebSpark.HttpClientUtility/) package providing the core implementation
+
+## 📦 WebSpark.HttpClientUtility NuGet Package
+
+This demonstration site uses the WebSpark.HttpClientUtility NuGet package which provides:
+
+- `HttpRequestResult<T>` - Core class for handling HTTP requests with built-in telemetry
+- `IHttpRequestResultService` - Interface for the HTTP request service
+- `HttpRequestResultService` - Base implementation of the service
+- Decorator implementations:
+  - `HttpRequestResultServiceTelemetry` - Adds telemetry capabilities
+  - `HttpRequestResultServiceCache` - Adds caching capabilities
+  - `HttpRequestResultServicePolly` - Adds resilience policies with Polly
+
+To use the package in your own projects:
+
 ```
-public interface IHttpGetCallService
+dotnet add package WebSpark.HttpClientUtility
+```
+
+## 🧩 Architecture
+
+The implementation leverages the WebSpark.HttpClientUtility package and follows a clean decorator pattern architecture with the following components:
+
+### Core Interface from WebSpark.HttpClientUtility
+
+```csharp
+public interface IHttpRequestResultService
 {
-    Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall);
-}
-```
-### The Base Class
-```
-public class HttpGetCallService : IHttpGetCallService
-{
-    private readonly IHttpClientFactory _clientFactory;
-    public HttpGetCallService(IHttpClientFactory httpClientFactory)
-    {
-        _clientFactory = httpClientFactory;
-    }
-    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
-    {
-       using var httpClient = _clientFactory.CreateClient();
-       var response = await httpClient.GetAsync(statusCall.GetPath);
-       response.EnsureSuccessStatusCode();
-       var StatusResults = await response.Content.ReadAsStringAsync();
-       statusCall.GetResults = JsonSerializer.Deserialize<T>(StatusResults);
-       return statusCall;
-    }
-}
-
-```
-
-### The Decorator Class
-```
-public class HttpGetCallServiceTelemetry : IHttpGetCallService
-{
-    private readonly IHttpGetCallService _service;
-    public HttpGetCallServiceTelemetry(IHttpGetCallService service)
-    {
-        _service = service;
-    }
-    public async Task<HttpGetCallResults> GetAsync<T>(HttpGetCallResults statusCall)
-    {
-        return await _service.GetAsync<T>(statusCall);
-    }
+    Task<HttpRequestResult<T>> HttpSendRequestResultAsync<T>(HttpRequestResult<T> requestResult, CancellationToken ct = default);
 }
 ```
 
+### Base Implementation from WebSpark.HttpClientUtility
 
-## Registering the Decorator and main class in program.cs
-In order to use the decorator pattern, you must register the decorator 
-and the main class in the ConfigureServices program.cs file.
-
+```csharp
+public class HttpRequestResultService : IHttpRequestResultService
+{
+    private readonly HttpClient _httpClient;
+    
+    public HttpRequestResultService(ILogger<HttpRequestResultService> logger, 
+                                  IConfiguration configuration, 
+                                  HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+    
+    public async Task<HttpRequestResult<T>> HttpSendRequestResultAsync<T>(HttpRequestResult<T> requestResult, 
+                                                                       CancellationToken ct = default)
+    {
+       // Base implementation of HTTP request handling
+    }
+}
 ```
 
-// Add the HttpGetCall and Telemetry Decorator for IHttpGetCallService interface
-// Add Http Client Factory
-builder.Services.AddHttpClient<IHttpGetCallService, HttpGetCallService>();
-builder.Services.AddSingleton<IHttpGetCallService>(serviceProvider =>
+### Decorator Implementations from WebSpark.HttpClientUtility
+
+```csharp
+// Telemetry Decorator
+public class HttpRequestResultServiceTelemetry : IHttpRequestResultService
 {
-    var logger = serviceProvider.GetRequiredService<ILogger<HttpGetCallService>>();
-    var telemetryLogger = serviceProvider.GetRequiredService<ILogger<HttpGetCallServiceTelemetry>>();
-    var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-    IHttpGetCallService baseService = new HttpGetCallService(logger, httpClientFactory);
-    IHttpGetCallService telemetryService = new HttpGetCallServiceTelemetry(telemetryLogger, baseService);
-    return telemetryService;
+    private readonly IHttpRequestResultService _decoratedService;
+    
+    public HttpRequestResultServiceTelemetry(ILogger<HttpRequestResultServiceTelemetry> logger,
+                                         IHttpRequestResultService decoratedService)
+    {
+        _decoratedService = decoratedService;
+    }
+    
+    public async Task<HttpRequestResult<T>> HttpSendRequestResultAsync<T>(HttpRequestResult<T> requestResult, 
+                                                                       CancellationToken ct = default)
+    {
+        // Add telemetry before and after the decorated service call
+    }
+}
+
+// Caching Decorator
+public class HttpRequestResultServiceCache : IHttpRequestResultService
+{
+    private readonly IHttpRequestResultService _decoratedService;
+    private readonly IMemoryCache _cache;
+    
+    // Implementation with caching capability
+}
+
+// Polly Resilience Decorator
+public class HttpRequestResultServicePolly : IHttpRequestResultService
+{
+    private readonly IHttpRequestResultService _decoratedService;
+    
+    // Implementation with Polly retry and circuit breaker policies
+}
+```
+
+### Service Registration Using WebSpark.HttpClientUtility Classes
+
+```csharp
+// Registering the layered decorators in Program.cs
+builder.Services.AddSingleton(serviceProvider =>
+{
+    // Base service from WebSpark.HttpClientUtility
+    IHttpRequestResultService baseService = new HttpRequestResultService(
+        /* dependencies */);
+
+    // Add Polly resilience policies from WebSpark.HttpClientUtility
+    IHttpRequestResultService pollyService = new HttpRequestResultServicePolly(
+        /* dependencies */,
+        baseService);
+
+    // Add telemetry from WebSpark.HttpClientUtility
+    IHttpRequestResultService telemetryService = new HttpRequestResultServiceTelemetry(
+        /* dependencies */,
+        pollyService);
+
+    // Add caching from WebSpark.HttpClientUtility
+    IHttpRequestResultService cacheService = new HttpRequestResultServiceCache(
+        telemetryService,
+        /* dependencies */);
+
+    return cacheService;
 });
-
 ```
 
-## Installation
-  1. Clone this repository to your local machine.
-  1. Open the solution file in Visual Studio.
-  1. Run the Web project to see the demonstration in action.
+## 🚦 Getting Started
 
-## API Reference
-- This project uses a freely availible Joke API. ( https://jokeapi.dev/ ) Joke API Project on GitHub: https://github.com/Sv443/JokeAPI
+1. **Prerequisites**:
+   - Visual Studio 2022 or newer
+   - .NET 9.0 SDK or newer
 
-## Tests
-Some limited test cases have been created, for the models created for this prooject. 
+2. **Installation**:
 
-## How to use?
-This repositry is to show an example of the decorator pattern in C# and to server a as refresher
-when you need to implement the pattern.  
+   ```
+   git clone https://github.com/markhazleton/HttpClientDecoratorPattern.git
+   cd HttpClientDecoratorPattern
+   ```
 
-It is not meant to be a production ready solution, or even
-a template for your own implementation of the pattern.
+3. **Run the application**:
+   - Open the solution in Visual Studio
+   - Build and run the HttpClientDecorator.Web project
+   - Navigate through the different examples
 
+## 🔌 API Integration Examples Using WebSpark.HttpClientUtility
 
-## Contribute
-You are welcome to create pull requests for update to this repository.  
-Please review the  [contributing guideline](https://github.1com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) before making an pull requests.
-Please submit changeslimited to the topic of demonstrating the decorator pattern. 
+This project demonstrates integration with several APIs using the WebSpark.HttpClientUtility package:
 
-## Credits
-Many great online examples and tutorials inspired this repository.
+- **JokeAPI**: Public API for retrieving jokes (<https://jokeapi.dev/>)
+- **Art Institute API**: Example of consuming art data
+- **NASA Picture API**: Example of image API integration
 
-I also watched several Pluralsight.com courses on design patterns.
+## 🤝 Contributing
 
-Some Related YouTube Videos
-- [Stop using the HttpClient the wrong way in .NET - Nick Chapsas](https://www.youtube.com/watch?v=Z6Y2adsMnAA)
-- 
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-MIT ©2023 [Mark Hazleton](https://markhazleton.com)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please review the [contributing guidelines](https://github.com/markhazleton/HttpClientDecoratorPattern/blob/main/CONTRIBUTING.md) before making pull requests.
+
+## 📚 Learn More
+
+- [Read the Blog Post](https://markhazleton.com/decorator-pattern-http-client.html)
+- [WebSpark.HttpClientUtility on NuGet](https://www.nuget.org/packages/WebSpark.HttpClientUtility/)
+- [Live Demo](https://httpclientdecoratorpattern.azurewebsites.net/)
+
+## 📜 License
+
+MIT © [Mark Hazleton](https://markhazleton.com)

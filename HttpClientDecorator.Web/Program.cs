@@ -3,8 +3,8 @@ global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-using HttpClientCrawler.Crawler;
-using HttpClientUtility.SendService;
+using WebSpark.HttpClientUtility.Crawler;
+using WebSpark.HttpClientUtility.RequestResult;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,26 +44,30 @@ builder.Services.AddHttpClient("HttpClientDecorator", client =>
     client.DefaultRequestHeaders.Add("X-Request-Source", "HttpClientDecorator");
 });
 
+// HTTP Send Service with Decorator Pattern
 builder.Services.AddSingleton(serviceProvider =>
 {
-    IHttpClientSendService baseService = new HttpClientSendService(
-        serviceProvider.GetRequiredService<ILogger<HttpClientSendService>>(),
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var retryOptions = configuration.GetSection("HttpRequestResultPollyOptions").Get<HttpRequestResultPollyOptions>();
+
+    IHttpRequestResultService baseService = new HttpRequestResultService(
+        serviceProvider.GetRequiredService<ILogger<HttpRequestResultService>>(),
+        configuration,
         serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientDecorator"));
 
-    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    var retryOptions = configuration.GetSection("HttpClientSendPollyOptions").Get<HttpClientSendPollyOptions>();
-    IHttpClientSendService pollyService = new HttpClientSendServicePolly(
-        serviceProvider.GetRequiredService<ILogger<HttpClientSendServicePolly>>(),
+
+    IHttpRequestResultService pollyService = new HttpRequestResultServicePolly(
+        serviceProvider.GetRequiredService<ILogger<HttpRequestResultServicePolly>>(),
         baseService,
         retryOptions);
 
-    IHttpClientSendService telemetryService = new HttpClientSendServiceTelemetry(
-        serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceTelemetry>>(),
+    IHttpRequestResultService telemetryService = new HttpRequestResultServiceTelemetry(
+        serviceProvider.GetRequiredService<ILogger<HttpRequestResultServiceTelemetry>>(),
         pollyService);
 
-    IHttpClientSendService cacheService = new HttpClientSendServiceCache(
+    IHttpRequestResultService cacheService = new HttpRequestResultServiceCache(
         telemetryService,
-        serviceProvider.GetRequiredService<ILogger<HttpClientSendServiceCache>>(),
+        serviceProvider.GetRequiredService<ILogger<HttpRequestResultServiceCache>>(),
         serviceProvider.GetRequiredService<IMemoryCache>());
 
     return cacheService;

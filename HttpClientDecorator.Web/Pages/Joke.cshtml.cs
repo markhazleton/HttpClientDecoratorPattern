@@ -1,15 +1,13 @@
-using HttpClientUtility.Models;
-using HttpClientUtility.SendService;
-
+using WebSpark.HttpClientUtility.RequestResult;
 namespace HttpClientDecorator.Web.Pages;
 
 public class JokePageModel : PageModel
 {
     private readonly ILogger<JokePageModel> _logger;
-    private readonly IHttpClientSendService _service;
-    public HttpClientSendRequest<JokeModel> JokeResult { get; set; } = default!;
+    private readonly IHttpRequestResultService _service;
+    public HttpRequestResult<JokeModel> JokeResult { get; set; } = default!;
     public JokeModel TheJoke { get; set; } = new JokeModel();
-    public JokePageModel(ILogger<JokePageModel> logger, IHttpClientSendService getCallService)
+    public JokePageModel(ILogger<JokePageModel> logger, IHttpRequestResultService getCallService)
     {
         _logger = logger;
         _service = getCallService;
@@ -20,7 +18,7 @@ public class JokePageModel : PageModel
     /// </summary>
     public async Task OnGet(CancellationToken ct = default)
     {
-        JokeResult = new HttpClientSendRequest<JokeModel>();
+        JokeResult = new HttpRequestResult<JokeModel>();
 
         if (JokeResult == null)
         {
@@ -29,7 +27,7 @@ public class JokePageModel : PageModel
         }
         JokeResult.CacheDurationMinutes = 0;
         JokeResult.RequestPath = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-        JokeResult = await _service.HttpClientSendAsync(JokeResult, ct).ConfigureAwait(false);
+        JokeResult = await _service.HttpSendRequestResultAsync(JokeResult, ct: ct).ConfigureAwait(false);
 
         if (_service == null)
         {

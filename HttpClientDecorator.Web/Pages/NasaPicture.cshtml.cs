@@ -1,23 +1,22 @@
-using HttpClientUtility.Models;
-using HttpClientUtility.SendService;
+using WebSpark.HttpClientUtility.RequestResult;
 
 namespace HttpClientDecorator.Web.Pages;
 
 public class NasaPicturePageModel : PageModel
 {
     private readonly ILogger<NasaPicturePageModel> _logger;
-    private readonly IHttpClientSendService _service;
-    public HttpClientSendRequest<NasaPictureListDto> apiRequest { get; set; } = default!;
+    private readonly IHttpRequestResultService _service;
+    public HttpRequestResult<NasaPictureListDto> apiRequest { get; set; } = default!;
     public NasaPictureListDto apiResponse { get; set; } = [];
     public ArtList ArtList { get; set; } = new ArtList();
-    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpClientSendService getCallService)
+    public NasaPicturePageModel(ILogger<NasaPicturePageModel> logger, IHttpRequestResultService getCallService)
     {
         _logger = logger;
         _service = getCallService;
     }
     public async Task OnGet(CancellationToken ct = default)
     {
-        apiRequest = new HttpClientSendRequest<NasaPictureListDto>
+        apiRequest = new HttpRequestResult<NasaPictureListDto>
         {
             CacheDurationMinutes = 500
         };
@@ -30,7 +29,7 @@ public class NasaPicturePageModel : PageModel
         var apiKey = "DEMO_KEY";
 
         apiRequest.RequestPath = $"https://api.nasa.gov/planetary/apod?api_key={apiKey}&count=5";
-        apiRequest = await _service.HttpClientSendAsync(apiRequest, ct).ConfigureAwait(false);
+        apiRequest = await _service.HttpSendRequestResultAsync(apiRequest, ct: ct).ConfigureAwait(false);
 
         if (_service == null)
         {

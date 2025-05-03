@@ -5,17 +5,19 @@
     <NoWarn>$(NoWarn);NU1507</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.11.71" />
-    <PackageVersion Include="Markdig" Version="0.38.0" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageVersion Include="Markdig" Version="0.41.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.6.3" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.8.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Polly" Version="8.5.0" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
+    <PackageVersion Include="Polly" Version="8.5.2" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.4" />
+    <PackageVersion Include="WebSpark.HttpClientUtility" Version="1.0.4" />
   </ItemGroup>
 </Project>
