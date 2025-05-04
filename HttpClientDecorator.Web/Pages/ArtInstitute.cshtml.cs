@@ -47,11 +47,13 @@ public class ArtInstituteModel : PageModel
                 {
                     if (item != null)
                     {
-                        ArtWork artWork = new();
-                        artWork.id = item.id.ToString();
-                        artWork.title = item.title;
-                        artWork.image_id = item.image_id;
-                        artWork.artist_title = item.artist_title;
+                        ArtWork artWork = new()
+                        {
+                            id = item.id.ToString(),
+                            title = item.title,
+                            image_id = item.image_id,
+                            artist_title = item.artist_title
+                        };
                         ArtList.Add(artWork);
                     }
                 }

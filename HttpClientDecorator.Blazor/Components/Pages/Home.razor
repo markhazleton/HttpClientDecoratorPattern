@@ -1,0 +1,56 @@
+﻿@page "/"
+
+<PageTitle>HttpClient Decorator Pattern - Blazor Demo</PageTitle>
+
+<h1>HttpClient Decorator Pattern for .NET</h1>
+
+<div class="alert alert-info">
+    <p>
+        This is a Blazor demonstration of the HttpClient Decorator Pattern using WebSpark.HttpClientUtility package.
+    </p>
+</div>
+
+<h2>🚀 Enhancing HttpClient with Telemetry, Caching, and Circuit Breaking</h2>
+
+<p>
+    This application showcases how to implement the Decorator Design Pattern in C# to enhance HttpClient functionality with:
+</p>
+
+<ul>
+    <li><strong>Telemetry</strong> - Measure and log HTTP request performance</li>
+    <li><strong>Caching</strong> - Reduce duplicate requests and improve response times</li>
+    <li><strong>Circuit Breaking</strong> - Prevent cascading failures when external services are unavailable</li>
+</ul>
+
+<h2>💻 Technologies Used</h2>
+
+<ul>
+    <li>Blazor (.NET 9.0)</li>
+    <li>C# 12</li>
+    <li>SignalR for real-time updates</li>
+    <li>Polly for resilience policies</li>
+    <li><a href="https://www.nuget.org/packages/WebSpark.HttpClientUtility/" target="_blank">WebSpark.HttpClientUtility</a> package providing the core implementation</li>
+</ul>
+
+<h2>🧩 Decorator Pattern Architecture</h2>
+
+<p>
+    The implementation leverages the WebSpark.HttpClientUtility package and follows a clean decorator pattern architecture:
+</p>
+
+<pre>
+Base Service → Polly Service → Telemetry Service → Cache Service
+</pre>
+
+<p>
+    Each decorator adds functionality while maintaining the same interface (IHttpRequestResultService),
+    allowing them to be composed together.
+</p>
+
+<h2>📊 Demo Pages</h2>
+
+<ul>
+    <li>
+        <a href="circuitbreaker">Circuit Breaker</a> - Demonstrates resilience with the Polly circuit breaker pattern
+    </li>
+</ul>
