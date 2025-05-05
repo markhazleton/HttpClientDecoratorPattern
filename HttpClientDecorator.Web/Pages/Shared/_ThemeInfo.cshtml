@@ -1,0 +1,61 @@
+@using WebSpark.Bootswatch.Model
+@inject IStyleProvider StyleProvider
+@{
+    var theme = Context.Request.Query["theme"].ToString() ?? "default";
+    var currentStyle = await StyleProvider.GetAsync(theme);
+
+    // Get color mode from cookie or default
+    var colorModeCookie = Context.Request.Cookies["color-mode"];
+    var colorMode = !string.IsNullOrEmpty(colorModeCookie) ? colorModeCookie : (theme.Contains("dark") ? "dark" : "light");
+}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">Theme Information</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Current Theme:</strong> @currentStyle.name</p>
+        <p><strong>Color Mode:</strong> @colorMode</p>
+
+        <h6>Available Themes:</h6>
+        <div class="row">
+            @{
+                var styles = await StyleProvider.GetAsync();
+                foreach (var style in styles)
+                {
+                    <div class="col-md-3 mb-2">
+                        <a href="?theme=@style.name"
+                            class="btn @(style.name == theme ? "btn-primary" : "btn-outline-secondary") w-100">
+                            @style.name
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="mt-4">
+            <button id="toggleColorModeBtn" class="btn btn-outline-primary">
+                Switch to @(colorMode == "dark" ? "Light" : "Dark") Mode
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('toggleColorModeBtn').addEventListener('click', function ()
+    {
+        const currentMode = document.documentElement.getAttribute('data-bs-theme');
+        const newMode = currentMode === 'dark' ? 'light' : 'dark';
+
+        // Get current URL and parameters
+        const url = new URL(window.location.href);
+        const currentTheme = url.searchParams.get('theme');
+
+        // Save the preference in a cookie
+        document.cookie = `color-mode=${newMode};path=/;max-age=31536000`;
+
+        // Refresh page to apply the change, preserving the current theme
+        window.location.href = window.location.href;
+    });
+</script>
+

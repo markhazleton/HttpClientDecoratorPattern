@@ -1,11 +1,23 @@
 ﻿@using HttpClientDecorator.Web.Status
 @using System.Reflection;
+@using WebSpark.Bootswatch.Model
+@inject IStyleProvider StyleProvider
 @{
     var currentYear = DateTime.Now.Year.ToString();
     var status = new ApplicationStatus(Assembly.GetExecutingAssembly());
+
+    // Get theme from query string or default
+    var theme = Context.Request.Query["theme"].ToString() ?? "default";
+
+    // Check for color mode cookie
+    var colorModeCookie = Context.Request.Cookies["color-mode"];
+    var colorMode = !string.IsNullOrEmpty(colorModeCookie) ? colorModeCookie : (theme.Contains("dark") ? "dark" : "light");
+
+    var currentStyle = await StyleProvider.GetAsync(theme);
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="@colorMode">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,44 +26,76 @@
     <link rel="icon" href="~/favicon.ico" type="image/x-icon">
     <title>@ViewData["Title"] - HttpClientDecorator.Web</title>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.css" rel="stylesheet">
+    @if (!string.IsNullOrEmpty(currentStyle.cssCdn))
+    {
+        <link rel="stylesheet" href="@currentStyle.cssCdn" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.css"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     @RenderSection("HeadScripts", required: false)
 </head>
+
 <body id="page-top">
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">HttpClientDecorator.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Joke">Joke</a>
+                            <a class="nav-link" asp-area="" asp-page="/Joke">Joke</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ArtInstitute">Art Institute</a>
+                            <a class="nav-link" asp-area="" asp-page="/ArtInstitute">Art Institute</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/NasaPicture">Nasa Pictures</a>
+                            <a class="nav-link" asp-area="" asp-page="/NasaPicture">Nasa Pictures</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/List">List</a>
+                            <a class="nav-link" asp-area="" asp-page="/List">List</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/CircuitBreaker">Circuit Breaker</a>
+                            <a class="nav-link" asp-area="" asp-page="/CircuitBreaker">Circuit Breaker</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/crawldomain">Crawl Site</a>
+                            <a class="nav-link" asp-area="" asp-page="/crawldomain">Crawl Site</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="themeDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Theme
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="themeDropdown">
+                                @{
+                                    var styles = await StyleProvider.GetAsync();
+                                    foreach (var style in styles)
+                                    {
+                                        <li><a class="dropdown-item @(style.name == theme ? "active" : "")"
+                                                href="?theme=@style.name">@style.name</a></li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <button class="btn btn-link nav-link" id="colorModeToggle">
+                                <i class="bi" id="colorModeIcon"></i>
+                                <span id="colorModeText">Toggle Dark/Light</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -59,9 +103,9 @@
         </nav>
     </header>
 
-
     <main role="main" class="pb-3">
-        <section class="container-fluid" style="padding-top:25px;margin-top:25px;margin-bottom:25px;padding-bottom:25px;">
+        <section class="container-fluid"
+            style="padding-top:25px;margin-top:25px;margin-bottom:25px;padding-bottom:25px;">
             @RenderBody()
         </section>
     </main>
@@ -71,23 +115,28 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12" style="float:left">
                     Version: @status.BuildVersion?.ToString() <br />
-                    <a href="https://github.com/markhazleton/HttpClientDecoratorPattern" target="_blank">GitHub Repository</a>
+                    <a href="https://github.com/markhazleton/HttpClientDecoratorPattern" target="_blank">GitHub
+                        Repository</a>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12" style="text-align:center;">
                     &copy; 2020-@currentYear HttpClientDecorator.Web <br />
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12" style="float:right">
                     Last Built: @status.BuildDate.ToLocalTime().ToLongDateString() <br />
-                    <a href="https://markhazleton.com" title="Mark Hazleton, Solutions Architect, Lifelong Learner, not sidetracked by sizzle" target="_blank">Mark Hazleton</a>
+                    <a href="https://markhazleton.com"
+                        title="Mark Hazleton, Solutions Architect, Lifelong Learner, not sidetracked by sizzle"
+                        target="_blank">Mark Hazleton</a>
                 </div>
             </div>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.js"></script>
+    <script
+        src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.3/r-3.0.1/sc-2.4.1/sp-2.3.0/datatables.min.js"></script>
     <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

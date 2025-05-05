@@ -3,6 +3,7 @@ global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Caching.Memory;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+using WebSpark.Bootswatch;
 using WebSpark.HttpClientUtility.Crawler;
 using WebSpark.HttpClientUtility.RequestResult;
 
@@ -15,6 +16,9 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 builder.Services.AddSignalR();
+
+// Add Bootswatch services
+builder.Services.AddBootswatchStyles();
 
 builder.Services.AddLogging(builder =>
 {
@@ -84,6 +88,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseBootswatchStaticFiles(); // Enable Bootswatch static files
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseSession();

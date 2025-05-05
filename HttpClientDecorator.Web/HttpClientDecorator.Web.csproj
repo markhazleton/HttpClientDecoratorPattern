@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="WebSpark.Bootswatch" />
     <PackageReference Include="WebSpark.HttpClientUtility" />
   </ItemGroup>
 </Project>
