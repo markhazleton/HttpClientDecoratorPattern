@@ -13,10 +13,6 @@ $(document).ready(function () {
         const currentMode = $('html').attr('data-bs-theme');
         const newMode = currentMode === 'dark' ? 'light' : 'dark';
         
-        // Get current URL and parameters
-        const url = new URL(window.location.href);
-        const currentTheme = url.searchParams.get('theme');
-        
         // Save the preference in a cookie
         document.cookie = `color-mode=${newMode};path=/;max-age=31536000`;
         
@@ -27,11 +23,7 @@ $(document).ready(function () {
         updateColorModeUI();
         
         // If we're on a page with a specific theme parameter, preserve it when switching modes
-        if (currentTheme) {
-            // Refresh page to ensure the server-side rendering uses the updated cookie
-            // but preserve the current theme selection
-            window.location.href = window.location.href;
-        }
+        // No need to reload the page as UI is updated directly, server-side will get cookie on next request
     });
 
     // Function to update color mode UI elements

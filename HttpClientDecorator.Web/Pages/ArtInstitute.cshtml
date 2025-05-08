@@ -1,11 +1,11 @@
 ﻿@page
 @model HttpClientDecorator.Web.Pages.ArtInstituteModel
 @{
-    ViewData["Title"] = "Art Institute of Chicago";
+    ViewData["Title"] = "Art Institute of Chicago API Demo";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="jumbotron">
+<div class="py-5 bg-body-tertiary rounded-3">
     <div class="container">
         <div class="card border-info">
             <div class="card-header">
@@ -22,13 +22,13 @@
                         @{
                             foreach (var item in Model.ArtList.list)
                             {
-                                <div class="col-4 ">
-                                    <div class="card w-100">
+                                <div class="col-4">
+                                    <div class="card w-100 h-100">
                                         <div class="card-header">
                                             <h2>@item.title</h2>
                                         </div>
                                         <div class="card-body">
-                                            <img src="@item.ImageUrl" class="img-fluid d-block w-100  h-100" style="max-height:500px;max-width:500px;" />
+                                            <img src="@item.ImageUrl" class="img-fluid d-block mh-100 mw-100" alt="@item.title" />
                                         </div>
                                         <div class="card-footer">
                                             <p>@item.artist_title</p>
@@ -44,7 +44,7 @@
                 <p>
                     The <a href="https://www.artic.edu" target="_blank" rel="noopener noreferrer">Art Institute of Chicago</a>'s
                     API provides JSON-formatted data as a REST-style service that allows developers to explore and
-                    integrate the museum’s public data into their projects.
+                    integrate the museum's public data into their projects.
                 </p>
                 <p>
                     <strong>The Api Get call took @Html.DisplayFor(model=>model.ArtResponse.ElapsedMilliseconds) milliseconds to return.</strong>

@@ -1,12 +1,9 @@
 @using WebSpark.Bootswatch.Model
+@using HttpClientDecorator.Web.Pages.Shared
 @inject IStyleProvider StyleProvider
 @{
-    var theme = Context.Request.Query["theme"].ToString() ?? "default";
-    var currentStyle = await StyleProvider.GetAsync(theme);
-
-    // Get color mode from cookie or default
-    var colorModeCookie = Context.Request.Cookies["color-mode"];
-    var colorMode = !string.IsNullOrEmpty(colorModeCookie) ? colorModeCookie : (theme.Contains("dark") ? "dark" : "light");
+    var themeSettings = ThemeHelper.GetThemeSettings(Context);
+    var currentStyle = await StyleProvider.GetAsync(themeSettings.Name);
 }
 
 <div class="card mb-4">
@@ -15,7 +12,7 @@
     </div>
     <div class="card-body">
         <p><strong>Current Theme:</strong> @currentStyle.name</p>
-        <p><strong>Color Mode:</strong> @colorMode</p>
+        <p><strong>Color Mode:</strong> @themeSettings.ColorMode</p>
 
         <h6>Available Themes:</h6>
         <div class="row">
@@ -25,7 +22,7 @@
                 {
                     <div class="col-md-3 mb-2">
                         <a href="?theme=@style.name"
-                            class="btn @(style.name == theme ? "btn-primary" : "btn-outline-secondary") w-100">
+                            class="btn @(style.name == themeSettings.Name ? "btn-primary" : "btn-outline-secondary") w-100">
                             @style.name
                         </a>
                     </div>
@@ -35,7 +32,7 @@
 
         <div class="mt-4">
             <button id="toggleColorModeBtn" class="btn btn-outline-primary">
-                Switch to @(colorMode == "dark" ? "Light" : "Dark") Mode
+                Switch to @(themeSettings.ColorMode == "dark" ? "Light" : "Dark") Mode
             </button>
         </div>
     </div>
@@ -47,10 +44,6 @@
         const currentMode = document.documentElement.getAttribute('data-bs-theme');
         const newMode = currentMode === 'dark' ? 'light' : 'dark';
 
-        // Get current URL and parameters
-        const url = new URL(window.location.href);
-        const currentTheme = url.searchParams.get('theme');
-
         // Save the preference in a cookie
         document.cookie = `color-mode=${newMode};path=/;max-age=31536000`;
 
@@ -58,4 +51,3 @@
         window.location.href = window.location.href;
     });
 </script>
-

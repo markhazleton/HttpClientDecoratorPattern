@@ -3,6 +3,14 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Prevent file locking issues during builds -->
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <!-- Configure warnings as errors/messages -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors></WarningsAsErrors>
+    <WarningsNotAsErrors>MSB3026;MSB3027</WarningsNotAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <Deterministic>false</Deterministic>
@@ -15,10 +23,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Net.Http" />
-    <PackageReference Include="System.Security.Cryptography.Xml" />
-    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Security.Cryptography.Xml"  />
+    <PackageReference Include="System.Text.Json"  />
     <PackageReference Include="System.Text.RegularExpressions" />
-    <PackageReference Include="WebSpark.Bootswatch" />
-    <PackageReference Include="WebSpark.HttpClientUtility" />
+    <PackageReference Include="WebSpark.Bootswatch"  />
+    <PackageReference Include="WebSpark.HttpClientUtility"  />
   </ItemGroup>
 </Project>

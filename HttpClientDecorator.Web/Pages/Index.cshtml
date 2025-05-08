@@ -1,9 +1,12 @@
 ﻿@page
 @model IndexModel
+@{
+    ViewData["Title"] = "Home - HttpClient Decorator Pattern";
+}
 
 <div class="row">
     <div class="col-md-8">
-        <div class="jumbotron">
+        <div class="py-5 bg-body-tertiary rounded-3">
             <div class="container">
                 <div class="card border-info">
                     <div class="card-header">
@@ -13,7 +16,8 @@
                     <div class="card-body">
                         <p>
                             This website demonstrates how to use the decorator design pattern to add telemetry to an
-                            HttpClient.<br />
+                            HttpClient.
+                        </p>
                         <dl>
                             <dt>Read the Post</dt>
                             <dd>
@@ -34,7 +38,6 @@
                             </dd>
                         </dl>
 
-                        </p>
                         <p>
                             The Decorator Pattern is a design pattern that allows developers to add additional
                             functionality to
@@ -52,7 +55,7 @@
                             tracking of
                             requests and their associated data, such as request time, response time, and response size.
                             By using the Decorator Pattern, the original HttpClient class remains unchanged, and the
-                            telemetry data is added through a “wrapper” or “decorator” class. This makes the code more
+                            telemetry data is added through a "wrapper" or "decorator" class. This makes the code more
                             maintainable, as the changes are isolated to the decorator class, while the original
                             HttpClient class remains unchanged.
                         </p>

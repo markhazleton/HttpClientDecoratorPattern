@@ -1,11 +1,11 @@
 ﻿@page
-@model HttpClientDecorator.Web.Pages.NasaPicturePageModel
+@model NasaPicturePageModel
 @{
     ViewData["Title"] = "NASA Picture of the Day";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="jumbotron">
+<div class="py-5 bg-body-tertiary rounded-3">
     <div class="container">
         <div class="card border-info">
             <div class="card-header">
@@ -13,7 +13,7 @@
                     NASA Picture of the Day
                 </h1>
                 <p>
-                    
+
                 </p>
             </div>
             <div class="card-body">
@@ -22,15 +22,16 @@
                         @{
                             foreach (var item in Model.apiResponse)
                             {
-                                <div class="col-4 ">
-                                    <div class="card w-100">
+                                <div class="col-4">
+                                    <div class="card w-100 h-100">
                                         <div class="card-header">
                                             <h2>@item.title</h2>
                                         </div>
                                         <div class="card-body">
-                                        <a href="@item.hdurl" target="_blank">
-                                            <img src="@item.url" class="img-fluid d-block w-100  h-100" style="max-height:500px;max-width:500px;" />
-                                        </a>
+                                            <a href="@item.hdurl" target="_blank">
+                                                <img src="@item.url" class="img-fluid d-block mh-100 mw-100" 
+                                                     alt="@item.title" />
+                                            </a>
                                         </div>
                                         <div class="card-footer">
                                             <p>@item.explanation</p>
@@ -43,9 +44,10 @@
                 </div>
             </div>
             <div class="card-footer">
-                <strong>The Api Get call took @Html.DisplayFor(model=>model.apiRequest.ElapsedMilliseconds) milliseconds to return.</strong>
+                <strong>The Api Get call took @Html.DisplayFor(model => model.apiRequest.ElapsedMilliseconds) milliseconds
+                    to return.</strong>
                 <br />
-                <small>Data from @Html.DisplayFor(model=>model.apiRequest.RequestPath)</small>
+                <small>Data from @Html.DisplayFor(model => model.apiRequest.RequestPath)</small>
                 <p>
                     @Model.apiRequest.ResultAge
                 </p>
@@ -53,4 +55,3 @@
         </div>
     </div>
 </div>
-

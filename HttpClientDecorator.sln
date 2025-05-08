@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientDecorator.Web", "HttpClientDecorator.Web\HttpClientDecorator.Web.csproj", "{50280061-30DC-4EA3-9504-6797A318442C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientDecorator.Blazor", "HttpClientDecorator.Blazor\HttpClientDecorator.Blazor.csproj", "{50590E29-B293-4628-B71E-020EC403C1BD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,18 +35,6 @@ Global
 		{50280061-30DC-4EA3-9504-6797A318442C}.Release|x64.Build.0 = Release|Any CPU
 		{50280061-30DC-4EA3-9504-6797A318442C}.Release|x86.ActiveCfg = Release|Any CPU
 		{50280061-30DC-4EA3-9504-6797A318442C}.Release|x86.Build.0 = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|x64.Build.0 = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Debug|x86.Build.0 = Debug|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|x64.ActiveCfg = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|x64.Build.0 = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|x86.ActiveCfg = Release|Any CPU
-		{50590E29-B293-4628-B71E-020EC403C1BD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
