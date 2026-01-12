@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Prevent file locking issues during builds -->
@@ -15,17 +15,13 @@
   <PropertyGroup>
     <Deterministic>false</Deterministic>
     <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</SourceRevisionId>
-    <AssemblyVersion>9.$([System.DateTime]::UtcNow.ToString(yyMM)).$([System.DateTime]::UtcNow.ToString(ddHH)).$([System.DateTime]::UtcNow.ToString(mmss))</AssemblyVersion>
+    <AssemblyVersion>10.$([System.DateTime]::UtcNow.ToString(yyMM)).$([System.DateTime]::UtcNow.ToString(ddHH)).$([System.DateTime]::UtcNow.ToString(mmss))</AssemblyVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/markhazleton/HttpClientDecoratorPattern</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <UserSecretsId>b8a233d5-e6d9-4cdc-9214-9c87f6ea6d06</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Net.Http" />
-    <PackageReference Include="System.Security.Cryptography.Xml"  />
-    <PackageReference Include="System.Text.Json"  />
-    <PackageReference Include="System.Text.RegularExpressions" />
     <PackageReference Include="WebSpark.Bootswatch"  />
     <PackageReference Include="WebSpark.HttpClientUtility"  />
   </ItemGroup>
